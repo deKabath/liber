@@ -8,8 +8,8 @@
 
 const API = (() => {
 
-  // ── Huidige deployment URL (v12.5 @12) ──
-  const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycby9FoA4PxMiKvVZCMPA4JMhaE1fikyGbvzQmzBmHWaISMQqOTdqEevs1Mvw8Ya1eH2ymg/exec';
+  // ── Huidige deployment URL (v12.6 @13) ──
+  const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbz0AFVa1KwXEqTM4OQ70mYFdMBLOWLYNyZewFSWwnYpugJCTWwctJKhiQUtKwfP5gJsHg/exec';
 
   // Auto-migratie: als localStorage een oudere deployment URL heeft, update naar nieuwste
   const stored = localStorage.getItem('liber_api_url') || '';

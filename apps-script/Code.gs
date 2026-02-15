@@ -1933,6 +1933,7 @@ function uploadAudioFromFrontend_(body) {
 
 /**
  * Chunked upload - ontvang een chunk van de audio.
+ * Slaat chunks op als tijdelijke bestanden in Google Drive (Properties heeft 9KB limiet).
  * Body: {reportId, fileName, mimeType, chunkIndex, totalChunks, chunkBase64}
  */
 function uploadAudioChunk_(body) {
@@ -1944,13 +1945,27 @@ function uploadAudioChunk_(body) {
   if (!reportId) throw new Error("reportId is vereist");
   if (!chunkBase64) throw new Error("chunkBase64 is vereist");
 
-  const chunkKey = `upload_${reportId}_chunk_${chunkIndex}`;
-  PROPS.setProperty(chunkKey, chunkBase64);
+  // Maak of hergebruik een tijdelijke upload-map in SOURCE_FOLDER
+  let tempFolderId = PROPS.getProperty(`upload_${reportId}_tempFolderId`);
+  if (!tempFolderId) {
+    const sourceFolder = DriveApp.getFolderById(SOURCE_FOLDER_ID);
+    const tempFolder = sourceFolder.createFolder(`_upload_temp_${reportId}`);
+    tempFolderId = tempFolder.getId();
+    PROPS.setProperty(`upload_${reportId}_tempFolderId`, tempFolderId);
+  }
+
+  // Sla chunk op als Drive-bestand (binaire bytes, niet base64 tekst)
+  const tempFolder = DriveApp.getFolderById(tempFolderId);
+  const chunkBytes = Utilities.base64Decode(chunkBase64);
+  const chunkBlob = Utilities.newBlob(chunkBytes, 'application/octet-stream', `chunk_${String(chunkIndex).padStart(4, '0')}`);
+  tempFolder.createFile(chunkBlob);
+
+  // Metadata in Properties (kleine waarden, past binnen 9KB limiet)
   PROPS.setProperty(`upload_${reportId}_totalChunks`, String(totalChunks));
   PROPS.setProperty(`upload_${reportId}_fileName`, body.fileName || 'audio.mp3');
   PROPS.setProperty(`upload_${reportId}_mimeType`, body.mimeType || 'audio/mpeg');
 
-  console.log(`✓ Chunk ${chunkIndex + 1}/${totalChunks} ontvangen voor report ${reportId}`);
+  console.log(`✓ Chunk ${chunkIndex + 1}/${totalChunks} ontvangen voor report ${reportId} (${chunkBytes.length} bytes naar Drive)`);
 
   return {
     status: 'chunk_received',
@@ -1960,7 +1975,7 @@ function uploadAudioChunk_(body) {
 }
 
 /**
- * Finaliseer chunked upload - assembleer alle chunks en start transcriptie.
+ * Finaliseer chunked upload - assembleer alle chunk-bestanden uit Drive en start transcriptie.
  * Body: {reportId}
  */
 function finalizeAudioUpload_(body) {
@@ -1970,29 +1985,77 @@ function finalizeAudioUpload_(body) {
   const totalChunks = parseInt(PROPS.getProperty(`upload_${reportId}_totalChunks`) || "1", 10);
   const fileName = PROPS.getProperty(`upload_${reportId}_fileName`) || 'audio.mp3';
   const mimeType = PROPS.getProperty(`upload_${reportId}_mimeType`) || 'audio/mpeg';
+  const tempFolderId = PROPS.getProperty(`upload_${reportId}_tempFolderId`);
+
+  if (!tempFolderId) throw new Error("Geen temp upload folder gevonden voor report " + reportId);
 
   console.log(`=== FINALIZE UPLOAD: ${totalChunks} chunks voor report ${reportId} ===`);
 
-  // Assembleer alle chunks
-  let fullBase64 = '';
-  for (let i = 0; i < totalChunks; i++) {
-    const chunkKey = `upload_${reportId}_chunk_${i}`;
-    const chunk = PROPS.getProperty(chunkKey);
-    if (!chunk) throw new Error(`Chunk ${i} niet gevonden voor report ${reportId}`);
-    fullBase64 += chunk;
-    PROPS.deleteProperty(chunkKey); // Cleanup
+  // Lees alle chunk-bestanden uit de temp-folder, gesorteerd op naam (chunk_0000, chunk_0001, ...)
+  const tempFolder = DriveApp.getFolderById(tempFolderId);
+  const files = tempFolder.getFiles();
+  const chunkFiles = [];
+  while (files.hasNext()) {
+    chunkFiles.push(files.next());
   }
+  chunkFiles.sort((a, b) => a.getName().localeCompare(b.getName()));
+
+  if (chunkFiles.length !== totalChunks) {
+    console.log(`WAARSCHUWING: verwacht ${totalChunks} chunks, gevonden ${chunkFiles.length}`);
+  }
+
+  // Combineer alle chunk-bytes tot één audiobestand
+  let allBytes = [];
+  for (const chunkFile of chunkFiles) {
+    const bytes = chunkFile.getBlob().getBytes();
+    allBytes = allBytes.concat(bytes);
+  }
+  console.log(`✓ ${chunkFiles.length} chunks samengevoegd: ${allBytes.length} bytes totaal`);
+
+  // Verwijder temp-folder en metadata
+  tempFolder.setTrashed(true);
+  PROPS.deleteProperty(`upload_${reportId}_tempFolderId`);
   PROPS.deleteProperty(`upload_${reportId}_totalChunks`);
   PROPS.deleteProperty(`upload_${reportId}_fileName`);
   PROPS.deleteProperty(`upload_${reportId}_mimeType`);
 
-  // Gebruik de volledige upload functie
-  return uploadAudioFromFrontend_({
+  // Maak de meeting-folder en sla het audiobestand op
+  const meetingName = PROPS.getProperty("report_" + reportId + "_meetingName") || "Verslag";
+  const sourceFolder = DriveApp.getFolderById(SOURCE_FOLDER_ID);
+  const meetingFolder = sourceFolder.createFolder(meetingName);
+  const meetingFolderId = meetingFolder.getId();
+
+  const audioBlob = Utilities.newBlob(allBytes, mimeType, fileName);
+  const audioFile = meetingFolder.createFile(audioBlob);
+
+  console.log(`✓ Audio opgeslagen: ${audioFile.getName()} (${allBytes.length} bytes) in ${meetingFolderId}`);
+
+  // Koppel meetingFolderId aan reportId
+  PROPS.setProperty("report_" + reportId + "_meetingFolderId", meetingFolderId);
+  PROPS.setProperty("report_" + reportId + "_status", "transcribing");
+
+  // ── STAP-TRACKING: Upload klaar, start pipeline ──
+  const uploadJobKey = "job_" + meetingFolderId;
+  PROPS.setProperty(uploadJobKey + "_uploadCompletedAt", new Date().toISOString());
+
+  // Start transcriptie pipeline
+  try {
+    prepareMeetingJob_(meetingFolder, meetingName, audioFile);
+    scheduleResume_(1);
+    console.log("✓ Transcriptie pipeline gestart voor:", meetingName);
+  } catch (err) {
+    console.log("!!! Fout bij starten transcriptie:", err);
+    PROPS.setProperty("report_" + reportId + "_status", "error");
+    PROPS.setProperty("report_" + reportId + "_error", String(err));
+    return { status: 'error', error: String(err) };
+  }
+
+  return {
+    status: 'transcribing',
     reportId: reportId,
-    fileName: fileName,
-    mimeType: mimeType,
-    audioBase64: fullBase64
-  });
+    meetingFolderId: meetingFolderId,
+    message: 'Audio ontvangen, transcriptie gestart.'
+  };
 }
 
 /**
