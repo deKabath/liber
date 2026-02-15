@@ -74,6 +74,7 @@ const API = (() => {
     return post('finalizeAudioUpload', { reportId });
   }
   async function getReportStatus(reportId)               { return get('getReportStatus', { reportId }); }
+  async function checkTranscription(reportId)            { return get('checkTranscription', { reportId }); }
 
   return {
     setApiUrl, getApiUrl, isConfigured,
@@ -83,6 +84,6 @@ const API = (() => {
     generateAllSections, updateSection, updateHeader,
     assembleReport, insertImage, deleteReport,
     uploadAudio, uploadAudioChunk, finalizeAudioUpload,
-    getReportStatus
+    getReportStatus, checkTranscription
   };
 })();

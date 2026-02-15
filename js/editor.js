@@ -9,7 +9,8 @@ const EDITOR = {
   report: null,
   sections: {},     // { sectionId: { content: '...', generated: false, editedManually: false } }
   activeSection: null,
-  headerFields: {}
+  headerFields: {},
+  transcriptReady: false  // Buffer: true = transcriptie volledig, mag genereren
 };
 
 // ---- GENERATION PROGRESS TRACKER ----
@@ -175,14 +176,21 @@ function openEditor(reportId) {
   // Render document
   renderEditorDocument();
 
-  // Start transcriptie status polling als status 'transcribing' of 'uploading' is
-  if (EDITOR.report.status === 'transcribing' || EDITOR.report.status === 'uploading') {
-    startTranscriptStatusPolling();
-  }
-
-  // Probeer secties van server te laden
+  // ── TRANSCRIPTIE BUFFER CHECK ──
+  // Check transcriptie-status en blokkeer generatie als deze niet klaar is
+  EDITOR.transcriptReady = false; // Start pessimistisch
   const serverId = EDITOR.report.serverReportId || EDITOR.report.reportId;
+
   if (API.isConfigured() && serverId && !serverId.startsWith('local_')) {
+    // Check transcriptie completeness
+    checkAndUpdateTranscriptStatus(serverId);
+
+    // Start polling als status 'transcribing' of 'uploading' is
+    if (EDITOR.report.status === 'transcribing' || EDITOR.report.status === 'uploading') {
+      startTranscriptStatusPolling();
+    }
+
+    // Probeer secties van server te laden
     API.getSections(serverId).then(data => {
       if (data.sections) {
         for (const [id, sec] of Object.entries(data.sections)) {
@@ -201,6 +209,82 @@ function openEditor(reportId) {
       }
     }).catch(err => console.warn('Kon secties niet laden:', err));
   }
+}
+
+/**
+ * Controleer bij de server of de transcriptie volledig is.
+ * Update EDITOR.transcriptReady en de UI dienovereenkomstig.
+ */
+async function checkAndUpdateTranscriptStatus(serverId) {
+  try {
+    const status = await API.getReportStatus(serverId);
+
+    if (status.status === 'transcribed' || status.status === 'done') {
+      // Transcriptie is klaar - extra verificatie
+      if (status.hasTranscript) {
+        EDITOR.transcriptReady = true;
+        updateGenerateButtonsState(true);
+        updateTranscriptStatusUI(status);
+      } else {
+        EDITOR.transcriptReady = false;
+        updateGenerateButtonsState(false, 'Transcriptie voltooid maar bestand ontbreekt');
+      }
+    } else if (status.status === 'transcribing') {
+      EDITOR.transcriptReady = false;
+      updateGenerateButtonsState(false,
+        `Transcriptie bezig: ${status.transcriptProgress || 0}% (${status.transcriptCurrent || 0}/${status.transcriptFragments || '?'} fragmenten)`
+      );
+      updateTranscriptStatusUI(status);
+      // Start polling als dat nog niet loopt
+      if (!_statusPollInterval) startTranscriptStatusPolling();
+    } else if (status.status === 'created') {
+      EDITOR.transcriptReady = false;
+      updateGenerateButtonsState(false, 'Upload eerst een audio-opname om secties te genereren');
+    } else if (status.status === 'error') {
+      EDITOR.transcriptReady = false;
+      updateGenerateButtonsState(false, 'Fout bij transcriptie: ' + (status.error || 'onbekend'));
+      updateTranscriptStatusUI(status);
+    } else {
+      // Onbekende status - laat generatie toe als er al secties zijn
+      const hasAnySections = Object.values(EDITOR.sections).some(s => s.content);
+      EDITOR.transcriptReady = hasAnySections || status.hasTranscript;
+      updateGenerateButtonsState(EDITOR.transcriptReady);
+    }
+  } catch (err) {
+    console.warn('Transcriptie status check mislukt:', err);
+    // Bij fout: laat generatie toe als er al secties gegenereerd zijn
+    const hasAnySections = Object.values(EDITOR.sections).some(s => s.content);
+    EDITOR.transcriptReady = hasAnySections;
+    updateGenerateButtonsState(hasAnySections);
+  }
+}
+
+/**
+ * Enable/disable alle genereer-knoppen in de editor
+ */
+function updateGenerateButtonsState(enabled, reason) {
+  // Sidebar "Alles Genereren" knop
+  const genAllBtn = document.querySelector('.sidebar-footer .btn-primary');
+  if (genAllBtn) {
+    genAllBtn.disabled = !enabled;
+    if (!enabled && reason) {
+      genAllBtn.title = reason;
+      genAllBtn.innerHTML = `<span class="material-symbols-outlined">hourglass_empty</span> Wacht op transcriptie`;
+    } else {
+      genAllBtn.title = '';
+      genAllBtn.innerHTML = `<span class="material-symbols-outlined">auto_awesome</span> Alles Genereren`;
+    }
+  }
+
+  // Individuele "Genereer" knoppen in sectie-headers
+  document.querySelectorAll('.section-block-actions .btn-primary').forEach(btn => {
+    btn.disabled = !enabled;
+    if (!enabled) {
+      btn.title = reason || 'Wacht op transcriptie';
+    } else {
+      btn.title = 'Genereer vanuit transcriptie';
+    }
+  });
 }
 
 // ---- SECTION LIST (SIDEBAR) ----
@@ -356,6 +440,12 @@ function onSectionEdit(sectionId) {
 
 // ---- GENERATE SECTION ----
 async function generateSingleSection(sectionId, opts = {}) {
+  // ── TRANSCRIPTIE BUFFER CHECK ──
+  if (!EDITOR.transcriptReady && !opts._bulkMode) {
+    showToast('Transcriptie is nog niet volledig. Wacht tot alle audio is getranscribeerd.', 'error');
+    return;
+  }
+
   const el = document.getElementById('content-' + sectionId);
   if (el) el.classList.add('generating');
 
@@ -443,6 +533,12 @@ async function regenerateSingleSection(sectionId) {
 
 // ---- GENERATE ALL ----
 async function generateAllSections() {
+  // ── TRANSCRIPTIE BUFFER CHECK ──
+  if (!EDITOR.transcriptReady) {
+    showToast('Transcriptie is nog niet volledig. Wacht tot alle audio is getranscribeerd voordat je secties genereert.', 'error');
+    return;
+  }
+
   const generatable = MRA_SECTIONS.filter(s => s.generatable);
   // Filter secties die al gegenereerd zijn
   const toGenerate = generatable.filter(s => !EDITOR.sections[s.id] || !EDITOR.sections[s.id].content);
@@ -624,14 +720,24 @@ function startTranscriptStatusPolling() {
       updateTranscriptStatusUI(status);
 
       if (status.status === 'transcribed' || status.status === 'done' || status.status === 'generating') {
-        // Transcriptie klaar - stop polling
+        // Transcriptie klaar - stop polling, activeer generatie knoppen
         stopTranscriptStatusPolling();
+        EDITOR.transcriptReady = true;
+        updateGenerateButtonsState(true);
 
         if (status.status === 'transcribed' && status.hasTranscript) {
           showToast('Transcriptie voltooid! Je kunt nu secties genereren.', 'success');
         }
+      } else if (status.status === 'transcribing') {
+        // Update voortgang in knoppen
+        EDITOR.transcriptReady = false;
+        updateGenerateButtonsState(false,
+          `Transcriptie: ${status.transcriptProgress || 0}% (${status.transcriptCurrent || 0}/${status.transcriptFragments || '?'})`
+        );
       } else if (status.status === 'error') {
         stopTranscriptStatusPolling();
+        EDITOR.transcriptReady = false;
+        updateGenerateButtonsState(false, 'Transcriptie fout: ' + (status.error || 'onbekend'));
         showToast('Fout bij transcriptie: ' + (status.error || 'onbekend'), 'error');
       }
     } catch (err) {

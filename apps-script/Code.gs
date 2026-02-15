@@ -629,6 +629,139 @@ function finalizeJob_(job, partsFolder, docId) {
  ****************************************************/
 
 /**
+ * Controleert of de transcriptie VOLLEDIG is afgerond voor een rapport.
+ * Dit is de buffer/gate tussen audio-upload en sectie-generatie.
+ *
+ * Verificaties:
+ * 1. Is er een actieve transcriptie-job? → check of die klaar is
+ * 2. Zijn ALLE fragmenten getranscribeerd? (nextIndex >= fragments.length)
+ * 3. Bestaat het finale transcript .txt bestand?
+ * 4. Is het transcript niet leeg?
+ *
+ * @returns {Object} { complete: boolean, message: string, progress: number }
+ */
+function checkTranscriptionComplete_(reportId) {
+  const reportPrefix = "report_" + reportId;
+  const meetingFolderId = PROPS.getProperty(reportPrefix + "_meetingFolderId") || reportId;
+  const jobKey = "job_" + meetingFolderId;
+
+  const jobState = PROPS.getProperty(jobKey + "_state") || "";
+  const reportStatus = PROPS.getProperty(reportPrefix + "_status") || "created";
+
+  // Case 1: Nog geen audio geüpload / geen job gestart
+  if (!jobState && reportStatus === "created") {
+    // Check of er misschien al direct een transcript is gekoppeld (via linkTranscript)
+    const directTranscript = PROPS.getProperty(reportPrefix + "_transcriptTxtFileId") || "";
+    if (directTranscript) {
+      // Verifieer dat het bestand echt bestaat en niet leeg is
+      try {
+        const file = DriveApp.getFileById(directTranscript);
+        const size = file.getSize();
+        if (size < 100) {
+          return { complete: false, message: "Transcriptie bestand is te klein (" + size + " bytes). Mogelijk onvolledig.", progress: 0 };
+        }
+        return { complete: true, message: "Transcriptie gereed (" + size + " bytes).", progress: 100 };
+      } catch (e) {
+        return { complete: false, message: "Transcriptie bestand niet gevonden: " + String(e), progress: 0 };
+      }
+    }
+    return { complete: false, message: "Geen audio geüpload. Upload eerst een audio-opname om te transcriberen.", progress: 0 };
+  }
+
+  // Case 2: Job is bezig met voorbereiden
+  if (jobState === "preparing") {
+    return { complete: false, message: "Audio wordt voorbereid voor transcriptie. Wacht tot de voorbereiding klaar is.", progress: 5 };
+  }
+
+  // Case 3: Job staat klaar maar is nog niet begonnen
+  if (jobState === "ready") {
+    return { complete: false, message: "Transcriptie staat in de wachtrij. Wacht tot de transcriptie begint.", progress: 10 };
+  }
+
+  // Case 4: Job is bezig met transcriberen - check fragment voortgang
+  if (jobState === "transcribing") {
+    const fragmentsJson = PROPS.getProperty(jobKey + "_fragmentsJson") || "[]";
+    const fragments = JSON.parse(fragmentsJson);
+    const totalFragments = fragments.length;
+    const currentIndex = parseInt(PROPS.getProperty(jobKey + "_nextIndex") || "0", 10);
+    const progress = totalFragments > 0 ? Math.round((currentIndex / totalFragments) * 100) : 0;
+
+    return {
+      complete: false,
+      message: `Transcriptie bezig: fragment ${currentIndex} van ${totalFragments} verwerkt (${progress}%). Wacht tot alle fragmenten zijn getranscribeerd.`,
+      progress: progress
+    };
+  }
+
+  // Case 5: Job is klaar (done) - verifieer het finale transcript
+  if (jobState === "done") {
+    const transcriptTxtFileId =
+      PROPS.getProperty(reportPrefix + "_transcriptTxtFileId") ||
+      PROPS.getProperty(jobKey + "_transcriptTxtFileId") || "";
+
+    if (!transcriptTxtFileId) {
+      return { complete: false, message: "Transcriptie-job is afgerond maar het transcript bestand ontbreekt. Neem contact op met de beheerder.", progress: 100 };
+    }
+
+    // Verifieer dat het transcript bestand bestaat en inhoud heeft
+    try {
+      const file = DriveApp.getFileById(transcriptTxtFileId);
+      const size = file.getSize();
+
+      if (size < 100) {
+        return { complete: false, message: "Transcriptie is afgerond maar het bestand is te klein (" + size + " bytes). Mogelijk is er een fout opgetreden tijdens de transcriptie.", progress: 100 };
+      }
+
+      // Verifieer dat ALLE fragmenten zijn verwerkt
+      const fragmentsJson = PROPS.getProperty(jobKey + "_fragmentsJson") || "[]";
+      const fragments = JSON.parse(fragmentsJson);
+      const totalFragments = fragments.length;
+      const processedIndex = parseInt(PROPS.getProperty(jobKey + "_nextIndex") || "0", 10);
+
+      if (totalFragments > 0 && processedIndex < totalFragments) {
+        return {
+          complete: false,
+          message: `Transcriptie onvolledig: ${processedIndex} van ${totalFragments} fragmenten verwerkt. Het transcript kan onvolledig zijn.`,
+          progress: Math.round((processedIndex / totalFragments) * 100)
+        };
+      }
+
+      // Alles ok
+      return { complete: true, message: "Transcriptie volledig afgerond (" + size + " bytes, " + totalFragments + " fragmenten).", progress: 100 };
+
+    } catch (e) {
+      return { complete: false, message: "Kan transcript bestand niet lezen: " + String(e), progress: 0 };
+    }
+  }
+
+  // Case 6: Job heeft een fout
+  if (jobState === "error") {
+    const errorMsg = PROPS.getProperty(jobKey + "_error") || "Onbekende fout";
+    return { complete: false, message: "Transcriptie mislukt: " + errorMsg + ". Probeer de audio opnieuw te uploaden.", progress: 0 };
+  }
+
+  // Case 7: Status is al "transcribed" (direct gekoppeld transcript)
+  if (reportStatus === "transcribed") {
+    const transcriptId = PROPS.getProperty(reportPrefix + "_transcriptTxtFileId") || "";
+    if (transcriptId) {
+      try {
+        const file = DriveApp.getFileById(transcriptId);
+        const size = file.getSize();
+        if (size < 100) {
+          return { complete: false, message: "Transcriptie bestand is te klein (" + size + " bytes).", progress: 0 };
+        }
+        return { complete: true, message: "Transcriptie gereed (" + size + " bytes).", progress: 100 };
+      } catch (e) {
+        return { complete: false, message: "Transcriptie bestand niet gevonden: " + String(e), progress: 0 };
+      }
+    }
+  }
+
+  // Fallback: onbekende status
+  return { complete: false, message: "Transcriptie status onbekend (job: " + jobState + ", report: " + reportStatus + "). Upload audio opnieuw.", progress: 0 };
+}
+
+/**
  * Genereert een enkele sectie vanuit de transcriptie
  * @param {string} reportId - Report identifier (meetingFolderId)
  * @param {string} sectionId - Sectie ID uit MRA_SECTIONS (bijv. 'inleiding', 'ambitie')
@@ -642,6 +775,15 @@ function generateSection(reportId, sectionId, overrides) {
   const section = MRA_SECTIONS.find(s => s.id === sectionId);
   if (!section) throw new Error("Onbekende sectie: " + sectionId);
   if (!section.generatable) throw new Error("Sectie " + sectionId + " is niet genereerbaar (handmatig invullen).");
+
+  // ── TRANSCRIPTIE-COMPLETENESS GUARD ──
+  // Blokkeer generatie als transcriptie nog bezig is
+  if (!overrides.transcriptText) {
+    const transcriptionStatus = checkTranscriptionComplete_(reportId);
+    if (!transcriptionStatus.complete) {
+      throw new Error(transcriptionStatus.message);
+    }
+  }
 
   // Haal transcriptie op
   let transcriptText = overrides.transcriptText;
@@ -727,6 +869,12 @@ function generateAllSections(reportId) {
   const generatableSections = MRA_SECTIONS.filter(s => s.generatable);
 
   console.log(`=== GENERATE ALL SECTIONS (${generatableSections.length}) ===`);
+
+  // ── TRANSCRIPTIE-COMPLETENESS GUARD ──
+  const transcriptionStatus = checkTranscriptionComplete_(reportId);
+  if (!transcriptionStatus.complete) {
+    throw new Error(transcriptionStatus.message);
+  }
 
   // Laad transcriptie 1x
   const reportData = loadReportData_(reportId);
@@ -1278,6 +1426,14 @@ function doGet(e) {
         result = getFullReportStatus_(params.reportId);
         break;
 
+      case 'checkTranscription':
+        result = checkTranscriptionComplete_(params.reportId);
+        break;
+
+      case 'diagnoseDrive':
+        result = diagnoseDriveFolders_();
+        break;
+
       default:
         result = { error: 'Onbekende actie: ' + action };
     }
@@ -1291,6 +1447,68 @@ function doGet(e) {
       .createTextOutput(JSON.stringify({ error: String(err) }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+/**
+ * Diagnostische functie: wat zit er in elke Drive folder?
+ */
+function diagnoseDriveFolders_() {
+  const result = { folders: {} };
+  const folderIds = {
+    SOURCE: SOURCE_FOLDER_ID,
+    TARGET: TARGET_FOLDER_ID,
+    TRANSCRIPT: TRANSCRIPT_FOLDER_ID,
+    ARCHIVE: ARCHIVE_FOLDER_ID
+  };
+
+  for (const [name, id] of Object.entries(folderIds)) {
+    try {
+      const folder = DriveApp.getFolderById(id);
+      const files = [];
+      const subfolders = [];
+
+      const fileIter = folder.getFiles();
+      let count = 0;
+      while (fileIter.hasNext() && count < 20) {
+        const f = fileIter.next();
+        files.push({ name: f.getName(), id: f.getId(), mime: f.getMimeType(), size: f.getSize() });
+        count++;
+      }
+
+      const folderIter = folder.getFolders();
+      count = 0;
+      while (folderIter.hasNext() && count < 20) {
+        const sf = folderIter.next();
+        const sfFiles = [];
+        const sfFileIter = sf.getFiles();
+        let sfCount = 0;
+        while (sfFileIter.hasNext() && sfCount < 10) {
+          const sff = sfFileIter.next();
+          sfFiles.push({ name: sff.getName(), id: sff.getId(), mime: sff.getMimeType(), size: sff.getSize() });
+          sfCount++;
+        }
+        subfolders.push({ name: sf.getName(), id: sf.getId(), files: sfFiles });
+        count++;
+      }
+
+      result.folders[name] = { id, folderName: folder.getName(), files, subfolders };
+    } catch (err) {
+      result.folders[name] = { id, error: String(err) };
+    }
+  }
+
+  result.apiKeys = {
+    OPENAI_API_KEY: OPENAI_API_KEY ? 'aanwezig (' + OPENAI_API_KEY.substring(0, 8) + '...)' : 'ONTBREEKT',
+    CLOUDCONVERT_TOKEN: CLOUDCONVERT_TOKEN ? 'aanwezig (' + CLOUDCONVERT_TOKEN.substring(0, 8) + '...)' : 'ONTBREEKT'
+  };
+
+  const allProps = PROPS.getProperties();
+  const jobs = Object.keys(allProps)
+    .filter(k => k.endsWith('_state'))
+    .map(k => ({ key: k, state: allProps[k] }));
+  result.jobs = jobs;
+
+  return result;
 }
 
 /**
@@ -1358,6 +1576,10 @@ function doPost(e) {
         result = deleteReport_(body.reportId);
         break;
 
+      case 'linkTranscript':
+        result = linkTranscriptToReport_(body.reportId, body.transcriptFileId);
+        break;
+
       case 'uploadAudio':
         result = uploadAudioFromFrontend_(body);
         break;
@@ -1388,6 +1610,44 @@ function doPost(e) {
 /****************************************************
  * WEB APP HELPER FUNCTIES
  ****************************************************/
+
+/**
+ * Link een bestaand transcript bestand aan een rapport.
+ * Gebruikt voor testing en voor het koppelen van eerder gegenereerde transcripties.
+ */
+function linkTranscriptToReport_(reportId, transcriptFileId) {
+  if (!reportId || !transcriptFileId) {
+    return { error: 'reportId en transcriptFileId zijn verplicht' };
+  }
+
+  // Controleer of het bestand bestaat
+  try {
+    const file = DriveApp.getFileById(transcriptFileId);
+    const fileName = file.getName();
+    const fileSize = file.getSize();
+
+    // Sla de link op
+    const reportKey = "report_" + reportId;
+    PROPS.setProperty(reportKey + "_transcriptTxtFileId", transcriptFileId);
+    PROPS.setProperty(reportKey + "_status", "transcribed");
+
+    // Lees eerste 500 chars als preview
+    const content = file.getBlob().getDataAsString();
+    const preview = content.substring(0, 500);
+
+    return {
+      status: 'success',
+      reportId: reportId,
+      transcriptFileId: transcriptFileId,
+      transcriptFileName: fileName,
+      transcriptFileSize: fileSize,
+      transcriptPreview: preview,
+      totalCharacters: content.length
+    };
+  } catch (err) {
+    return { error: 'Kon transcript bestand niet vinden: ' + String(err) };
+  }
+}
 
 function createNewReport_(data) {
   data = data || {};

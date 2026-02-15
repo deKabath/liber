@@ -513,6 +513,22 @@ body {
 @keyframes spinning { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .spinning { animation: spinning 1.5s linear infinite; }
 
+/* Disabled generate buttons - transcriptie buffer */
+.btn:disabled, .btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: auto; /* Zodat tooltip/title nog werkt */
+}
+.btn:disabled:hover, .btn[disabled]:hover {
+  transform: none;
+  box-shadow: none;
+}
+.sidebar-footer .btn:disabled {
+  background: var(--gray-300);
+  color: var(--gray-500);
+  border-color: var(--gray-300);
+}
+
 /* Header fields table in editor */
 .header-fields-table {
   width: 100%;
