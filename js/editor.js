@@ -176,7 +176,7 @@ function renderEditorDocument() {
             data-section="${sec.id}"
             data-placeholder="Klik op 'Genereer' of typ hier de inhoud van ${sec.title}..."
             id="content-${sec.id}"
-            oninput="onSectionEdit('${sec.id}')">${escapeHtml(content)}</div>`;
+            oninput="onSectionEdit('${sec.id}')">${escapeHtml(content).replace(/\n/g, '<br>')}</div>`;
     }
 
     html += `</div>`;
@@ -245,11 +245,25 @@ async function generateSingleSection(sectionId) {
 async function regenerateSingleSection(sectionId) {
   if (!confirm(`Weet je zeker dat je "${sectionId}" opnieuw wilt genereren? De huidige tekst wordt overschreven.`)) return;
 
+  // Bewaar oude content voor herstel bij fouten
+  const backup = EDITOR.sections[sectionId] ? JSON.parse(JSON.stringify(EDITOR.sections[sectionId])) : null;
+
   delete EDITOR.sections[sectionId];
   EDITOR.report.sections = EDITOR.sections;
   saveLocalReports();
 
-  await generateSingleSection(sectionId);
+  try {
+    await generateSingleSection(sectionId);
+  } catch (err) {
+    // Herstel oude content als generatie mislukt
+    if (backup) {
+      EDITOR.sections[sectionId] = backup;
+      EDITOR.report.sections = EDITOR.sections;
+      saveLocalReports();
+      renderEditorDocument();
+      showToast('Generatie mislukt – vorige tekst hersteld', 'error');
+    }
+  }
 }
 
 // ---- GENERATE ALL ----

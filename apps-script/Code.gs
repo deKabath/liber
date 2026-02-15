@@ -682,6 +682,9 @@ function generateAllSections(reportId) {
 
   // Laad transcriptie 1x
   const reportData = loadReportData_(reportId);
+  if (!reportData || !reportData.transcriptTxtFileId) {
+    throw new Error("Geen transcriptie gevonden voor report " + reportId + ". Upload eerst een audio-opname.");
+  }
   const transcriptText = DriveApp.getFileById(reportData.transcriptTxtFileId).getBlob().getDataAsString("UTF-8");
 
   const results = [];
@@ -852,15 +855,11 @@ function assembleReport(reportId, headerFields) {
   appendSectionHeader_(body, 'Nulmeting', ORANJE);
 
   if (sections.nulmeting_dna) {
-    const dnaIntro = body.appendParagraph('Het DNA werd als volgt beschreven:');
-    dnaIntro.setItalic(true).setFontSize(10);
     appendPlainText_(body, sections.nulmeting_dna.content);
   }
 
   if (sections.nulmeting_quickscan) {
     body.appendParagraph(''); // spacing
-    const qsIntro = body.appendParagraph('De door de procesbegeleider gemaakte quick scan:');
-    qsIntro.setItalic(true).setFontSize(10);
     appendPlainText_(body, sections.nulmeting_quickscan.content);
   }
 
@@ -1323,6 +1322,11 @@ function createNewReport_(data) {
   PROPS.setProperty(reportKey + "_template", data.template || "rabobank_mra");
   PROPS.setProperty(reportKey + "_status", "created");
 
+  // Sla transcriptie file ID op als die is meegegeven
+  if (data.transcriptTxtFileId) {
+    PROPS.setProperty(reportKey + "_transcriptTxtFileId", data.transcriptTxtFileId);
+  }
+
   // Sla header velden op
   if (data.headerFields) {
     PROPS.setProperty(reportKey + "_headerFields", JSON.stringify(data.headerFields));
@@ -1449,7 +1453,9 @@ function loadReportData_(reportId) {
     meetingName: PROPS.getProperty(reportPrefix + "_meetingName") || PROPS.getProperty(jobPrefix + "_meetingName") || "",
     meetingFolderId: PROPS.getProperty(reportPrefix + "_meetingFolderId") || PROPS.getProperty(jobPrefix + "_meetingFolderId") || reportId,
     transcriptTxtFileId: PROPS.getProperty(reportPrefix + "_transcriptTxtFileId") ||
-      PROPS.getProperty("analysis_" + reportId + "_transcriptTxtFileId") || "",
+      PROPS.getProperty("analysis_" + reportId + "_transcriptTxtFileId") ||
+      PROPS.getProperty("secgen_" + reportId + "_transcriptTxtFileId") ||
+      PROPS.getProperty(jobPrefix + "_transcriptTxtFileId") || "",
     docId: PROPS.getProperty(reportPrefix + "_docId") || ""
   };
 }

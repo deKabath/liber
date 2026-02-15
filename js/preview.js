@@ -9,10 +9,10 @@ function renderPreview() {
   const sec = EDITOR.sections || {};
   const name = hf['<<naam vereniging>>'] || EDITOR.report?.meetingName || '';
 
-  container.innerHTML = '';
+  let html = '';
 
   // ---- PAGE 1: Header + Inleiding + Nulmeting ----
-  container.innerHTML += buildPreviewPage(1, `
+  html += buildPreviewPage(1, `
     <div class="page-logo">Li<span style="color:var(--orange)">Be</span>R</div>
     <div class="page-divider"></div>
 
@@ -43,7 +43,7 @@ function renderPreview() {
   `);
 
   // ---- PAGE 2: Positie + 0-meting + Ambitie ----
-  container.innerHTML += buildPreviewPage(2, `
+  html += buildPreviewPage(2, `
     <div class="page-logo">Li<span style="color:var(--orange)">Be</span>R</div>
     <div class="page-divider"></div>
 
@@ -76,7 +76,7 @@ function renderPreview() {
   `);
 
   // ---- PAGE 3: Advies + Ondersteuning + Experts ----
-  container.innerHTML += buildPreviewPage(3, `
+  html += buildPreviewPage(3, `
     <div class="page-logo">Li<span style="color:var(--orange)">Be</span>R</div>
     <div class="page-divider"></div>
 
@@ -119,7 +119,10 @@ function renderPreview() {
   }
 
   bijlageHtml += '<span class="preview-rabo-watermark">In samenwerking met Rabobank</span>';
-  container.innerHTML += buildPreviewPage(4, bijlageHtml);
+  html += buildPreviewPage(4, bijlageHtml);
+
+  // Eenmalig DOM-update (voorkomt herhaald re-parsen)
+  container.innerHTML = html;
 }
 
 // ---- HELPERS ----
