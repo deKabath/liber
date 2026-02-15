@@ -2,37 +2,21 @@
  * LiBeR Verslaggenerator – API Layer
  * Communiceert met de Google Apps Script Web App backend.
  *
- * v12.5 – Hardcoded deployment URL + auto-migratie van oude URLs.
- * Bij elke deploy: update DEFAULT_URL hieronder en push naar GitHub Pages.
+ * v12.6 – Vaste deployment URL. Geen localStorage meer om cache-problemen te voorkomen.
  */
 
 const API = (() => {
 
-  // ── Huidige deployment URL (v12.6 @13) ──
-  const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbz0AFVa1KwXEqTM4OQ70mYFdMBLOWLYNyZewFSWwnYpugJCTWwctJKhiQUtKwfP5gJsHg/exec';
+  // ── Vaste deployment URL (v12.6 @13) ── Update bij elke deploy ──
+  const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbz0AFVa1KwXEqTM4OQ70mYFdMBLOWLYNyZewFSWwnYpugJCTWwctJKhiQUtKwfP5gJsHg/exec';
 
-  // Auto-migratie: als localStorage een oudere deployment URL heeft, update naar nieuwste
-  const stored = localStorage.getItem('liber_api_url') || '';
-  if (stored && stored !== DEFAULT_URL && stored.includes('script.google.com/macros/s/')) {
-    console.log('[API] Oude deployment URL gedetecteerd, migratie naar v12.4:', DEFAULT_URL);
-    localStorage.setItem('liber_api_url', DEFAULT_URL);
-  } else if (!stored) {
-    localStorage.setItem('liber_api_url', DEFAULT_URL);
-  }
-
-  let WEBAPP_URL = localStorage.getItem('liber_api_url') || DEFAULT_URL;
-
-  function setApiUrl(url) {
-    WEBAPP_URL = url.replace(/\/$/, '');
-    localStorage.setItem('liber_api_url', WEBAPP_URL);
-  }
+  // Ruim eventuele oude localStorage op
+  localStorage.removeItem('liber_api_url');
 
   function getApiUrl() { return WEBAPP_URL; }
-
-  function isConfigured() { return !!WEBAPP_URL; }
+  function isConfigured() { return true; }
 
   async function get(action, params = {}) {
-    if (!WEBAPP_URL) throw new Error('API URL niet geconfigureerd. Ga naar Instellingen.');
     const url = new URL(WEBAPP_URL);
     url.searchParams.set('action', action);
     for (const [k, v] of Object.entries(params)) {
@@ -44,10 +28,9 @@ const API = (() => {
   }
 
   async function post(action, data = {}) {
-    if (!WEBAPP_URL) throw new Error('API URL niet geconfigureerd. Ga naar Instellingen.');
     const res = await fetch(WEBAPP_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain' }, // GAS vereist text/plain
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action, ...data })
     });
     if (!res.ok) throw new Error(`API fout: ${res.status}`);
@@ -88,7 +71,7 @@ const API = (() => {
   async function checkTranscription(reportId)            { return get('checkTranscription', { reportId }); }
 
   return {
-    setApiUrl, getApiUrl, isConfigured,
+    getApiUrl, isConfigured,
     status, getTemplate, listReports, getReport,
     getSections, getSection, getTranscriptStatus,
     createReport, generateSection, regenerateSection,

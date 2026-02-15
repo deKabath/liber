@@ -202,10 +202,11 @@ async function createReport() {
 
 /**
  * Upload audio bestand naar de server via base64.
- * Splitst in chunks van ~5MB voor GAS limiet.
+ * Splitst in chunks van ~750KB base64 om binnen GAS limieten te blijven.
+ * Chunks worden server-side opgeslagen als Drive-bestanden (niet Properties).
  */
 async function uploadAudioToServer(reportId, file) {
-  const MAX_CHUNK_SIZE = 5 * 1024 * 1024; // 5MB base64 per chunk
+  const MAX_CHUNK_SIZE = 750 * 1024; // 750KB base64 per chunk (≈ 562KB binary)
 
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
