@@ -368,20 +368,13 @@ function loadLocalReports() {
 }
 
 // ---- SETTINGS CHECK ----
+// v12.5: API URL is nu hardcoded als default. Deze functie is alleen nog nodig
+// als iemand handmatig de localStorage wist.
 function checkApiConfig() {
   if (!API.isConfigured()) {
-    const url = prompt(
-      'Welkom bij LiBeR Verslaggenerator!\n\n' +
-      'Voer je Google Apps Script Web App URL in om te beginnen.\n' +
-      'Formaat: https://script.google.com/macros/s/.../exec\n\n' +
-      'Je kunt dit later wijzigen via de browser console met:\n' +
-      'API.setApiUrl("jouw-url")\n\n' +
-      'Laat leeg om alleen offline te werken.'
-    );
-    if (url && url.trim()) {
-      API.setApiUrl(url.trim());
-      showToast('API URL opgeslagen!', 'success');
-    }
+    console.warn('[App] Geen API URL geconfigureerd - dit zou niet moeten gebeuren.');
+    // Fallback: probeer opnieuw de default in te stellen
+    API.setApiUrl(API.getApiUrl() || '');
   }
 }
 

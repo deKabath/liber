@@ -2,14 +2,25 @@
  * LiBeR Verslaggenerator – API Layer
  * Communiceert met de Google Apps Script Web App backend.
  *
- * CONFIGURATIE:
- * Stel de WEBAPP_URL in naar je eigen gedeployde Apps Script Web App URL.
+ * v12.5 – Hardcoded deployment URL + auto-migratie van oude URLs.
+ * Bij elke deploy: update DEFAULT_URL hieronder en push naar GitHub Pages.
  */
 
 const API = (() => {
 
-  // !! WIJZIG DIT naar je eigen Apps Script Web App URL !!
-  let WEBAPP_URL = localStorage.getItem('liber_api_url') || '';
+  // ── Huidige deployment URL (v12.4 @11) ──
+  const DEFAULT_URL = 'https://script.google.com/macros/s/AKfycbzzgbXnI8CEH35WM9ocXlMgNmjx7B5t4Jhn9ljxpMabNWVdLytELe7Tr4tGcMvZq05XQw/exec';
+
+  // Auto-migratie: als localStorage een oudere deployment URL heeft, update naar nieuwste
+  const stored = localStorage.getItem('liber_api_url') || '';
+  if (stored && stored !== DEFAULT_URL && stored.includes('script.google.com/macros/s/')) {
+    console.log('[API] Oude deployment URL gedetecteerd, migratie naar v12.4:', DEFAULT_URL);
+    localStorage.setItem('liber_api_url', DEFAULT_URL);
+  } else if (!stored) {
+    localStorage.setItem('liber_api_url', DEFAULT_URL);
+  }
+
+  let WEBAPP_URL = localStorage.getItem('liber_api_url') || DEFAULT_URL;
 
   function setApiUrl(url) {
     WEBAPP_URL = url.replace(/\/$/, '');
