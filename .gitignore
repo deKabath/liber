@@ -1,0 +1,24 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Secrets (nooit committen!)
+.env
+*.env
+credentials.json
+token.json
+
+# Node (indien later toegevoegd)
+node_modules/
+package-lock.json
+
+# Build output
+dist/
+build/
