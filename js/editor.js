@@ -12,6 +12,143 @@ const EDITOR = {
   headerFields: {}
 };
 
+// ---- GENERATION PROGRESS TRACKER ----
+const GenProgress = (() => {
+  let _timer = null;
+  let _startTime = 0;
+  let _stepStartTime = 0;
+  let _steps = [];
+  let _currentIdx = -1;
+  let _total = 0;
+  let _completed = 0;
+  let _durations = []; // voor ETA berekening
+
+  const TIPS = [
+    'AI analyseert de transcriptie en schrijft de inhoud...',
+    'Elke sectie wordt individueel gegenereerd vanuit de transcriptie.',
+    'De AI controleert of het minimum aantal woorden is bereikt.',
+    'Secties die te kort zijn worden automatisch hergegenereerd.',
+    'Het verslag volgt het Rabobank MRA template.',
+    'Na generatie kun je elke sectie handmatig aanpassen.',
+  ];
+
+  function show(sectionIds, sectionTitles) {
+    _steps = sectionIds.map((id, i) => ({ id, title: sectionTitles[i], status: 'pending', duration: null, words: null }));
+    _total = _steps.length;
+    _completed = 0;
+    _currentIdx = -1;
+    _durations = [];
+    _startTime = Date.now();
+
+    const modal = document.getElementById('modal-generation');
+    modal.hidden = false;
+
+    document.getElementById('gen-title').textContent =
+      _total === 1 ? 'Sectie genereren' : `${_total} secties genereren`;
+    document.getElementById('gen-subtitle').textContent = 'Voorbereiden...';
+    document.getElementById('gen-progress-bar').style.width = '0%';
+    document.getElementById('gen-percent').textContent = '0%';
+    document.getElementById('gen-elapsed').textContent = '0:00';
+    document.getElementById('gen-eta').textContent = 'Berekenen...';
+    document.getElementById('gen-counter').textContent = `0 / ${_total}`;
+    document.getElementById('gen-tip').textContent = TIPS[0];
+
+    _renderSteps();
+    _startTimer();
+  }
+
+  function startStep(sectionId) {
+    _currentIdx = _steps.findIndex(s => s.id === sectionId);
+    if (_currentIdx === -1) return;
+    _stepStartTime = Date.now();
+    _steps[_currentIdx].status = 'active';
+    const title = _steps[_currentIdx].title;
+    document.getElementById('gen-subtitle').textContent = `Genereren: ${title}`;
+    document.getElementById('gen-tip').textContent = TIPS[(_completed + 1) % TIPS.length];
+    _renderSteps();
+    // Scroll actieve stap in zicht
+    const stepsEl = document.getElementById('gen-steps');
+    const activeEl = stepsEl.querySelector('.gen-step.active');
+    if (activeEl) activeEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  function completeStep(sectionId, wordCount) {
+    const idx = _steps.findIndex(s => s.id === sectionId);
+    if (idx === -1) return;
+    const dur = (Date.now() - _stepStartTime) / 1000;
+    _steps[idx].status = 'done';
+    _steps[idx].duration = dur;
+    _steps[idx].words = wordCount || null;
+    _completed++;
+    _durations.push(dur);
+
+    const pct = Math.round((_completed / _total) * 100);
+    document.getElementById('gen-progress-bar').style.width = pct + '%';
+    document.getElementById('gen-percent').textContent = pct + '%';
+    document.getElementById('gen-counter').textContent = `${_completed} / ${_total}`;
+
+    // ETA
+    const avgDur = _durations.reduce((a, b) => a + b, 0) / _durations.length;
+    const remaining = _total - _completed;
+    if (remaining > 0) {
+      const etaSec = Math.round(avgDur * remaining);
+      document.getElementById('gen-eta').textContent = etaSec < 60
+        ? `~${etaSec}s resterend`
+        : `~${Math.ceil(etaSec / 60)}min resterend`;
+    } else {
+      document.getElementById('gen-eta').textContent = 'Klaar!';
+    }
+
+    _renderSteps();
+  }
+
+  function failStep(sectionId) {
+    const idx = _steps.findIndex(s => s.id === sectionId);
+    if (idx === -1) return;
+    _steps[idx].status = 'error';
+    _steps[idx].duration = (Date.now() - _stepStartTime) / 1000;
+    _completed++;
+    _renderSteps();
+    document.getElementById('gen-counter').textContent = `${_completed} / ${_total}`;
+  }
+
+  function hide() {
+    clearInterval(_timer);
+    _timer = null;
+    document.getElementById('modal-generation').hidden = true;
+  }
+
+  function _startTimer() {
+    clearInterval(_timer);
+    _timer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - _startTime) / 1000);
+      const min = Math.floor(elapsed / 60);
+      const sec = elapsed % 60;
+      document.getElementById('gen-elapsed').textContent = `${min}:${sec.toString().padStart(2, '0')}`;
+    }, 1000);
+  }
+
+  function _renderSteps() {
+    const container = document.getElementById('gen-steps');
+    container.innerHTML = _steps.map(s => {
+      const icon = s.status === 'done' ? 'check_circle'
+        : s.status === 'active' ? 'auto_awesome'
+        : s.status === 'error' ? 'error'
+        : 'radio_button_unchecked';
+      const durStr = s.duration != null ? `${s.duration.toFixed(1)}s` : '';
+      const wordStr = s.words != null ? `${s.words} wrd` : '';
+      return `<div class="gen-step ${s.status}">
+        <span class="material-symbols-outlined step-icon">${icon}</span>
+        <span class="step-name">${s.title}</span>
+        <span class="step-words">${wordStr}</span>
+        <span class="step-time">${durStr}</span>
+      </div>`;
+    }).join('');
+  }
+
+  return { show, startStep, completeStep, failStep, hide };
+})();
+
 // ---- OPEN EDITOR ----
 function openEditor(reportId) {
   EDITOR.reportId = reportId;
@@ -212,16 +349,24 @@ function onSectionEdit(sectionId) {
 }
 
 // ---- GENERATE SECTION ----
-async function generateSingleSection(sectionId) {
+async function generateSingleSection(sectionId, opts = {}) {
   const el = document.getElementById('content-' + sectionId);
   if (el) el.classList.add('generating');
 
-  showToast(`${sectionId} wordt gegenereerd...`);
+  // Toon voortgangsmodal (tenzij onderdeel van bulk-generatie)
+  const showProgress = !opts._bulkMode;
+  const sectionDef = MRA_SECTIONS.find(s => s.id === sectionId);
+  const sectionTitle = sectionDef ? sectionDef.title : sectionId;
+
+  if (showProgress) {
+    GenProgress.show([sectionId], [sectionTitle]);
+    GenProgress.startStep(sectionId);
+  }
 
   try {
     let content = '';
-
     let isOffline = false;
+
     if (API.isConfigured() && EDITOR.report.serverReportId) {
       const result = await API.generateSection(EDITOR.report.serverReportId, sectionId);
       content = result.content || '';
@@ -230,6 +375,8 @@ async function generateSingleSection(sectionId) {
       content = generateOfflineContent(sectionId);
       isOffline = true;
     }
+
+    const wordCount = content.trim().split(/\s+/).length;
 
     EDITOR.sections[sectionId] = {
       content,
@@ -241,13 +388,23 @@ async function generateSingleSection(sectionId) {
     saveLocalReports();
     renderSectionList();
     renderEditorDocument();
+
+    if (showProgress) {
+      GenProgress.completeStep(sectionId, wordCount);
+      setTimeout(() => GenProgress.hide(), 1200);
+    }
+
     if (isOffline) {
-      showToast(`${sectionId} – VOORBEELDTEKST (niet uit transcriptie). Verbind de API om echte content te genereren.`, 'warning');
+      showToast(`${sectionTitle} – VOORBEELDTEKST (niet uit transcriptie). Verbind de API om echte content te genereren.`, 'warning');
     } else {
-      showToast(`${sectionId} gegenereerd uit transcriptie!`, 'success');
+      showToast(`${sectionTitle} gegenereerd (${wordCount} woorden)`, 'success');
     }
 
   } catch (err) {
+    if (showProgress) {
+      GenProgress.failStep(sectionId);
+      setTimeout(() => GenProgress.hide(), 2000);
+    }
     showToast(`Fout bij genereren: ${err.message}`, 'error');
     if (el) el.classList.remove('generating');
   }
@@ -280,48 +437,74 @@ async function regenerateSingleSection(sectionId) {
 // ---- GENERATE ALL ----
 async function generateAllSections() {
   const generatable = MRA_SECTIONS.filter(s => s.generatable);
-  showToast(`Alle ${generatable.length} secties worden gegenereerd...`);
+  // Filter secties die al gegenereerd zijn
+  const toGenerate = generatable.filter(s => !EDITOR.sections[s.id] || !EDITOR.sections[s.id].content);
 
-  if (API.isConfigured() && EDITOR.report.serverReportId) {
+  if (toGenerate.length === 0) {
+    showToast('Alle secties zijn al gegenereerd.', 'success');
+    return;
+  }
+
+  // Toon progress modal
+  GenProgress.show(
+    toGenerate.map(s => s.id),
+    toGenerate.map(s => s.title)
+  );
+
+  const isOnline = API.isConfigured() && EDITOR.report.serverReportId;
+  let completed = 0;
+
+  for (const sec of toGenerate) {
+    GenProgress.startStep(sec.id);
+
     try {
-      const result = await API.generateAllSections(EDITOR.report.serverReportId);
-      if (result.results) {
-        for (const r of result.results) {
-          if (r.content) {
-            EDITOR.sections[r.sectionId] = {
-              content: r.content,
-              generated: true,
-              generatedAt: r.generatedAt
-            };
-          }
-        }
+      let content = '';
+      let isOffline = false;
+
+      if (isOnline) {
+        const result = await API.generateSection(EDITOR.report.serverReportId, sec.id);
+        content = result.content || '';
+      } else {
+        // Offline: sjabloontekst
+        await new Promise(r => setTimeout(r, 400)); // simuleer vertraging
+        content = generateOfflineContent(sec.id);
+        isOffline = true;
       }
+
+      const wordCount = content.trim().split(/\s+/).length;
+
+      EDITOR.sections[sec.id] = {
+        content,
+        generated: true,
+        offline: isOffline,
+        generatedAt: new Date().toISOString()
+      };
       EDITOR.report.sections = EDITOR.sections;
       saveLocalReports();
       renderSectionList();
       renderEditorDocument();
-      showToast(`${result.completed || 0} secties gegenereerd!`, 'success');
+
+      GenProgress.completeStep(sec.id, wordCount);
+      completed++;
+
     } catch (err) {
-      showToast(`Fout: ${err.message}`, 'error');
+      GenProgress.failStep(sec.id);
+      console.error(`Fout bij ${sec.id}:`, err);
     }
-  } else {
-    // Offline: genereer alle secties met VOORBEELDTEKST (niet uit transcriptie!)
-    for (const sec of generatable) {
-      if (EDITOR.sections[sec.id] && EDITOR.sections[sec.id].content) continue;
-      EDITOR.sections[sec.id] = {
-        content: generateOfflineContent(sec.id),
-        generated: true,
-        offline: true,
-        generatedAt: new Date().toISOString()
-      };
-      renderSectionList();
-      renderEditorDocument();
-      await new Promise(r => setTimeout(r, 300));
-    }
-    EDITOR.report.sections = EDITOR.sections;
-    saveLocalReports();
-    showToast('⚠️ VOORBEELDTEKST gegenereerd – NIET uit audio/transcriptie! Verbind de API voor echte content.', 'warning');
   }
+
+  // Alles klaar
+  EDITOR.report.sections = EDITOR.sections;
+  saveLocalReports();
+
+  setTimeout(() => {
+    GenProgress.hide();
+    if (!isOnline) {
+      showToast('⚠️ VOORBEELDTEKST gegenereerd – NIET uit audio/transcriptie!', 'warning');
+    } else {
+      showToast(`${completed} secties gegenereerd uit transcriptie!`, 'success');
+    }
+  }, 1500);
 }
 
 // ---- SAVE ALL ----
