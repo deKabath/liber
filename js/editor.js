@@ -172,11 +172,15 @@ function renderEditorDocument() {
       html += `</div>`;
     } else {
       // Editable text content
-      html += `<div class="section-block-content" contenteditable="true"
+      const isOffline = sectionData && sectionData.offline;
+      html += `<div class="section-block-content${isOffline ? ' offline-content' : ''}" contenteditable="true"
             data-section="${sec.id}"
             data-placeholder="Klik op 'Genereer' of typ hier de inhoud van ${sec.title}..."
             id="content-${sec.id}"
             oninput="onSectionEdit('${sec.id}')">${escapeHtml(content).replace(/\n/g, '<br>')}</div>`;
+      if (isOffline) {
+        html += `<div class="offline-badge">⚠️ Voorbeeldtekst – niet uit transcriptie</div>`;
+      }
     }
 
     html += `</div>`;
@@ -217,24 +221,31 @@ async function generateSingleSection(sectionId) {
   try {
     let content = '';
 
+    let isOffline = false;
     if (API.isConfigured() && EDITOR.report.serverReportId) {
       const result = await API.generateSection(EDITOR.report.serverReportId, sectionId);
       content = result.content || '';
     } else {
-      // Offline: simuleer generatie
+      // Offline: simuleer generatie met sjabloontekst (NIET uit transcriptie)
       content = generateOfflineContent(sectionId);
+      isOffline = true;
     }
 
     EDITOR.sections[sectionId] = {
       content,
       generated: true,
+      offline: isOffline,
       generatedAt: new Date().toISOString()
     };
     EDITOR.report.sections = EDITOR.sections;
     saveLocalReports();
     renderSectionList();
     renderEditorDocument();
-    showToast(`${sectionId} gegenereerd!`, 'success');
+    if (isOffline) {
+      showToast(`${sectionId} – VOORBEELDTEKST (niet uit transcriptie). Verbind de API om echte content te genereren.`, 'warning');
+    } else {
+      showToast(`${sectionId} gegenereerd uit transcriptie!`, 'success');
+    }
 
   } catch (err) {
     showToast(`Fout bij genereren: ${err.message}`, 'error');
@@ -294,12 +305,13 @@ async function generateAllSections() {
       showToast(`Fout: ${err.message}`, 'error');
     }
   } else {
-    // Offline: genereer alle secties met vertraging
+    // Offline: genereer alle secties met VOORBEELDTEKST (niet uit transcriptie!)
     for (const sec of generatable) {
       if (EDITOR.sections[sec.id] && EDITOR.sections[sec.id].content) continue;
       EDITOR.sections[sec.id] = {
         content: generateOfflineContent(sec.id),
         generated: true,
+        offline: true,
         generatedAt: new Date().toISOString()
       };
       renderSectionList();
@@ -308,7 +320,7 @@ async function generateAllSections() {
     }
     EDITOR.report.sections = EDITOR.sections;
     saveLocalReports();
-    showToast('Alle secties gegenereerd (offline modus).', 'success');
+    showToast('⚠️ VOORBEELDTEKST gegenereerd – NIET uit audio/transcriptie! Verbind de API voor echte content.', 'warning');
   }
 }
 

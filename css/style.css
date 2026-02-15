@@ -465,6 +465,19 @@ body {
   0% { background-position: 0 0; }
   100% { background-position: 28px 0; }
 }
+.section-block-content.offline-content {
+  border-left: 3px solid #f59e0b;
+  background: #fffbeb;
+}
+.offline-badge {
+  font-size: 11px;
+  color: #92400e;
+  background: #fef3c7;
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
 
 /* Header fields table in editor */
 .header-fields-table {

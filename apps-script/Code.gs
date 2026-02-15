@@ -634,13 +634,19 @@ function generateSection(reportId, sectionId, overrides) {
 
   // Bouw prompt
   const systemMessage = section.systemPrompt;
+  const MAX_TRANSCRIPT_CHARS = 30000;
+  const truncated = transcriptText.length > MAX_TRANSCRIPT_CHARS;
+  if (truncated) {
+    console.log(`⚠️ Transcriptie afgekapt: ${transcriptText.length} → ${MAX_TRANSCRIPT_CHARS} tekens voor sectie ${sectionId}`);
+  }
   const userMessage = [
     "VERENIGING / ORGANISATIE:",
     meetingName,
     "",
     overrides.extraContext ? ("EXTRA CONTEXT:\n" + overrides.extraContext + "\n") : "",
     "TRANSCRIPTIE:",
-    transcriptText.substring(0, 30000) // limiet voor context window
+    transcriptText.substring(0, MAX_TRANSCRIPT_CHARS),
+    truncated ? "\n[... transcriptie afgekapt, gebruik de bovenstaande informatie ...]" : ""
   ].join("\n");
 
   const payload = {
@@ -661,7 +667,9 @@ function generateSection(reportId, sectionId, overrides) {
     title: section.title,
     content: content,
     generatedAt: new Date().toISOString(),
-    model: GENERATION_MODEL
+    model: GENERATION_MODEL,
+    transcriptChars: transcriptText.length,
+    truncated: truncated
   };
 
   PROPS.setProperty(resultKey, JSON.stringify(result));
