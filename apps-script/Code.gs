@@ -146,6 +146,7 @@ const MRA_SECTIONS = [
     fields: ['<<Inleiding>>'],
     generatable: true,
     systemPrompt: `Je schrijft de inleiding van een Rabobank MRA verslag.
+MINIMUM LENGTE: 20 woorden. Schrijf minstens 2-3 zinnen.
 Formaat: 1-3 korte alinea's.
 Begin ALTIJD met: "Op [datum] hebben we een bezoek gebracht aan [type organisatie] [naam] te [plaats]."
 Tweede zin: "Aan tafel zaten [aantal] personen: [opsomming rollen]."
@@ -160,6 +161,7 @@ Gebruik ALLEEN informatie uit de transcriptie. Verzin NIETS.`
     fields: ['<<Nulmeting_DNA_kernwaarden>>', '<<Nulmeting_DNA_sterke_eigenschappen>>', '<<Nulmeting_DNA_aandachtspunten>>'],
     generatable: true,
     systemPrompt: `Je schrijft de DNA-sectie van de Nulmeting in een Rabobank MRA verslag.
+MINIMUM LENGTE: 30 woorden.
 Begin met de kop "Het DNA werd als volgt beschreven:"
 Genereer exact deze 3 sub-items:
 - "Kernwaarden (eigen interpretatie nav het gesprek):" gevolgd door 3-5 kernwaarden gescheiden door komma's
@@ -177,6 +179,7 @@ Schrijfstijl: beknopt, geen hele zinnen maar kernbegrippen. Nederlands.`
     fields: ['<<Nulmeting_quickscan>>'],
     generatable: true,
     systemPrompt: `Je schrijft de "quick scan" sectie van de Nulmeting in een Rabobank MRA verslag.
+MINIMUM LENGTE: 160 woorden. Dit is een uitgebreide sectie.
 Begin met: "De door de procesbegeleider gemaakte quick scan:"
 Dit zijn observaties over het groepsproces tijdens het gesprek. Focus op:
 - Mate van betrokkenheid en openheid
@@ -186,7 +189,7 @@ Dit zijn observaties over het groepsproces tijdens het gesprek. Focus op:
 - Of acties persoonlijk/incidenteel of gestructureerd zijn
 - Dynamiek: wie nam het woord, luisterde men naar elkaar
 
-Schrijf 4-7 observatie-alinea's. Elke alinea is 2-3 zinnen.
+Schrijf 5-7 observatie-alinea's. Elke alinea is 2-3 zinnen.
 Schrijfstijl: observerend, coachend, direct. Begin veel zinnen met "De aanwezigen..." of "Er is/wordt...".
 Nederlands. Gebruik ALLEEN wat uit de transcriptie af te leiden is.`
   },
@@ -197,6 +200,7 @@ Nederlands. Gebruik ALLEEN wat uit de transcriptie af te leiden is.`
     fields: ['<<Positie organisatie>>'],
     generatable: true,
     systemPrompt: `Je schrijft de sectie "Positie van de vereniging" voor een Rabobank MRA verslag.
+MINIMUM LENGTE: 240 woorden. Dit is een van de langste secties van het verslag.
 Dit beschrijft de huidige situatie van de organisatie. Behandel (indien relevant):
 - Type organisatie, aantal leden, leeftijdsverdeling
 - Locatie en accommodatie (staat van onderhoud)
@@ -211,7 +215,7 @@ Dit beschrijft de huidige situatie van de organisatie. Behandel (indien relevant
 FORMAT: Schrijf losse feitelijke zinnen, elke zin op een NIEUWE REGEL.
 GEEN opsommingstekens, GEEN bullets, GEEN nummering.
 Elke regel is 1-2 zinnen die een feit of observatie beschrijven.
-Schrijf 10-20 regels.
+Schrijf minimaal 12-20 regels.
 Voorbeeld:
 De vereniging telt circa 200 leden waarvan het merendeel 50+.
 Het bestuur bestaat uit 5 personen en is op zoek naar verjonging.
@@ -238,6 +242,7 @@ Gebruik ALLEEN informatie uit de transcriptie. Verzin NIETS.`
     fields: ['<<Ambitie>>'],
     generatable: true,
     systemPrompt: `Je schrijft de sectie "Ambitie" voor een Rabobank MRA verslag.
+MINIMUM LENGTE: 150 woorden. Schrijf een uitgebreide sectie.
 Dit beschrijft de toekomstvisie/dromen van de organisatie.
 Begin ALTIJD met: "Gekozen is om de stip te zetten op [datum/jaar]." of "Er is een stip gekozen voor [jaar]."
 Daarna volgen de concrete ambities als losse zinnen, elk op een nieuwe regel.
@@ -245,7 +250,7 @@ Daarna volgen de concrete ambities als losse zinnen, elk op een nieuwe regel.
 FORMAT: Schrijf losse declaratieve zinnen, elke zin op een NIEUWE REGEL.
 GEEN opsommingstekens, GEEN bullets, GEEN nummering.
 Elke regel is 1-2 zinnen in de tegenwoordige of toekomstige tijd.
-Schrijf 8-15 regels.
+Schrijf minimaal 10-15 regels.
 Voorbeeld:
 De club is financieel gezond.
 Er is een helder beleidsplan voor de komende 3 jaar.
@@ -263,11 +268,12 @@ Gebruik ALLEEN ambities die in de transcriptie benoemd zijn. Verzin NIETS.`
     fields: ['<<Advies>>'],
     generatable: true,
     systemPrompt: `Je schrijft de sectie "Advies" voor een Rabobank MRA verslag.
+MINIMUM LENGTE: 260 woorden. Dit is de langste sectie van het verslag. Schrijf uitgebreid.
 Dit zijn de adviezen van de procesbegeleider.
 
 FORMAT: Schrijf losse alinea's, elke alinea op een NIEUWE REGEL.
 GEEN opsommingstekens, GEEN bullets, GEEN nummering.
-Elke alinea is 2-4 zinnen. Schrijf 6-10 alinea's.
+Elke alinea is 2-4 zinnen. Schrijf minimaal 7-10 alinea's.
 
 VASTE ELEMENTEN die ALTIJD terugkomen (pas de naam van de organisatie aan):
 1. Begin ALTIJD met de Einstein quote: "Einstein zei al: als je doet wat je deed dan krijg je wat je kreeg. [Naam] mag durven nieuwe paden te bewandelen en verder te kijken dan de successen en emoties uit het verleden. Ga met de tijd mee en kijk goed om je heen. Neem de tijd om met elkaar hierover in gesprek te gaan en neem de leden hierin stap voor stap mee (zie ontwikkelmodel van Lev Vygotsky). Het ontwikkelen van een "roadmap" is hiervoor een mooi instrument."
@@ -275,7 +281,7 @@ VASTE ELEMENTEN die ALTIJD terugkomen (pas de naam van de organisatie aan):
 3. Verwijs naar Ryan & Deci zelfdeterminatietheorie: autonomie, verbondenheid, competentie. Leg kort uit hoe dit toepasbaar is op de organisatie.
 4. Sluit ALTIJD af met: "Zorg dat houding (wat je voorstaat) en gedrag (wat je uiteindelijk in handelen laat zien) congruent zijn. Dan krijgen geformuleerde doelen een krachtige inhoud."
 
-Voeg daarnaast 2-4 specifieke advies-alinea's toe op basis van de transcriptie.
+Voeg daarnaast 3-5 specifieke advies-alinea's toe op basis van de transcriptie.
 Schrijfstijl: coachend, inspirerend, direct. Nederlands.`
   },
   {
@@ -285,6 +291,7 @@ Schrijfstijl: coachend, inspirerend, direct. Nederlands.`
     fields: ['<<Ondersteuning_Rabobank>>'],
     generatable: true,
     systemPrompt: `Je schrijft de sectie "Ondersteuning Rabobank" voor een Rabobank MRA verslag.
+MINIMUM LENGTE: 60 woorden.
 Dit beschrijft:
 1. De initiële hulpvraag/wens van de organisatie
 2. De conclusie op basis van het gesprek (wat is de aanbeveling)
@@ -293,7 +300,8 @@ Dit beschrijft:
 Begin met: "De initiële wens is om aan de slag te gaan met..."
 Dan: "Op basis van het gesprek was de conclusie om..."
 Schrijf 2-3 alinea's. Kort en bondig.
-Schrijfstijl: zakelijk, oplossingsgericht. Nederlands.`
+Schrijfstijl: zakelijk, oplossingsgericht. Nederlands.
+Gebruik ALLEEN informatie uit de transcriptie. Verzin NIETS.`
   },
   {
     id: 'experts',
@@ -302,6 +310,7 @@ Schrijfstijl: zakelijk, oplossingsgericht. Nederlands.`
     fields: ['<<expert1_naam>>', '<<expert1_profiel>>', '<<expert2_naam>>', '<<expert2_profiel>>'],
     generatable: true,
     systemPrompt: `Je schrijft de sectie "Voorgestelde expert(s)" voor een Rabobank MRA verslag.
+MINIMUM LENGTE: 10 woorden.
 Als er in de transcriptie een expert wordt voorgesteld, beschrijf dan:
 - Naam van de expert
 - Korte professionele achtergrond (3-4 zinnen)
@@ -658,7 +667,19 @@ function generateSection(reportId, sectionId, overrides) {
     ]
   };
 
-  const content = callOpenAIChat_(payload);
+  let content = callOpenAIChat_(payload);
+
+  // Controleer minimum woordaantal
+  const minWords = extractMinWords_(systemMessage);
+  const wordCount = content.trim().split(/\s+/).length;
+  if (minWords > 0 && wordCount < minWords) {
+    console.log(`⚠️ Sectie ${sectionId}: ${wordCount} woorden < minimum ${minWords}. Hergenereren...`);
+    payload.messages.push({ role: "assistant", content: content });
+    payload.messages.push({ role: "user", content: `Je tekst is ${wordCount} woorden maar het minimum is ${minWords} woorden. Schrijf de sectie opnieuw, langer en gedetailleerder. Gebruik meer informatie uit de transcriptie. Minimaal ${minWords} woorden.` });
+    content = callOpenAIChat_(payload);
+    const newWordCount = content.trim().split(/\s+/).length;
+    console.log(`→ Hergenereerd: ${newWordCount} woorden (was ${wordCount})`);
+  }
 
   // Sla op
   const resultKey = `report_${reportId}_section_${sectionId}`;
@@ -1034,6 +1055,16 @@ function appendBulletContentWithUnderline_(body, content) {
       applyUnderlineMarkdown_(element, trimmed);
     }
   }
+}
+
+/**
+ * Extraheert het minimum woordaantal uit een system prompt.
+ * Zoekt naar "MINIMUM LENGTE: X woorden" in de prompt tekst.
+ * Retourneert 0 als er geen minimum gevonden wordt.
+ */
+function extractMinWords_(systemPrompt) {
+  const match = systemPrompt.match(/MINIMUM LENGTE:\s*(\d+)\s*woorden/i);
+  return match ? parseInt(match[1], 10) : 0;
 }
 
 /**
