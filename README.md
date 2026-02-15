@@ -23,16 +23,15 @@ Webapplicatie voor het genereren van Rabobank MRA (Maatschappelijke Relevantie A
 
 ```
 Liber/
-├── frontend/           # Webapplicatie (HTML/CSS/JS)
-│   ├── index.html      # Hoofdpagina (SPA)
-│   ├── css/
-│   │   └── style.css   # Stylesheet
-│   ├── js/
-│   │   ├── api.js      # API communicatie met Apps Script backend
-│   │   ├── app.js      # Hoofdcontroller (navigatie, dashboard, create)
-│   │   ├── editor.js   # Document editor (per-sectie generatie)
-│   │   └── preview.js  # Verslagpreview (print-ready)
-│   └── assets/         # Afbeeldingen en iconen
+├── index.html          # Hoofdpagina (SPA)
+├── css/
+│   └── style.css       # Stylesheet
+├── js/
+│   ├── api.js          # API communicatie met Apps Script backend
+│   ├── app.js          # Hoofdcontroller (navigatie, dashboard, create)
+│   ├── editor.js       # Document editor (per-sectie generatie)
+│   └── preview.js      # Verslagpreview (print-ready)
+├── assets/             # Afbeeldingen en iconen
 ├── apps-script/        # Google Apps Script backend
 │   ├── Code.gs         # Volledige backend (v11)
 │   └── appsscript.json # Apps Script manifest
@@ -58,7 +57,7 @@ Liber/
 
 ### 2. Frontend
 
-1. Open `frontend/index.html` in je browser (of host via GitHub Pages / Netlify / etc.)
+1. Open `index.html` in je browser of ga naar de [GitHub Pages site](https://dekabath.github.io/liber/)
 2. Bij de eerste keer openen wordt gevraagd om de Apps Script Web App URL in te voeren.
 3. Plak de URL uit stap 1.8.
 
