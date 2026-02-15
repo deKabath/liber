@@ -481,7 +481,7 @@ body {
   margin-bottom: 8px;
 }
 
-/* Transcript status bar */
+/* Transcript status bar (legacy) */
 .transcript-status {
   display: flex;
   align-items: center;
@@ -492,24 +492,162 @@ body {
   font-weight: 500;
   margin-bottom: 8px;
 }
-.transcript-status.transcribing {
-  background: #e3f2fd;
-  color: #1565c0;
-  border: 1px solid #90caf9;
+
+/* v12.4: Pipeline Voortgangs Tracker */
+.pipeline-tracker {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
-.transcript-status.transcribing .material-symbols-outlined {
-  animation: pulse 1.5s ease-in-out infinite;
+.pipeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
-.transcript-status.ready {
-  background: var(--green-light);
-  color: var(--green);
-  border: 1px solid #a5d6a7;
+.pipeline-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
 }
-.transcript-status.error {
-  background: var(--red-light);
-  color: var(--red);
-  border: 1px solid #ef9a9a;
+.pipeline-title .material-symbols-outlined {
+  font-size: 20px;
+  color: #3b82f6;
 }
+.pipeline-eta {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  background: #e2e8f0;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+.pipeline-eta.high { background: #dcfce7; color: #16a34a; }
+.pipeline-eta.medium { background: #fef3c7; color: #d97706; }
+.pipeline-eta.low { background: #fee2e2; color: #dc2626; }
+
+/* Voortgangsbalk */
+.pipeline-progress-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.pipeline-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  border-radius: 3px;
+  transition: width 0.6s ease;
+  position: relative;
+}
+.pipeline-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Pipeline stappen */
+.pipeline-steps {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.pipeline-step {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #f1f5f9;
+  color: #94a3b8;
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+.pipeline-step .material-symbols-outlined {
+  font-size: 14px;
+}
+.pipeline-step.completed {
+  background: #dcfce7;
+  color: #16a34a;
+}
+.pipeline-step.completed .material-symbols-outlined { color: #16a34a; }
+.pipeline-step.active {
+  background: #dbeafe;
+  color: #2563eb;
+  font-weight: 600;
+  box-shadow: 0 0 0 2px #93c5fd;
+  animation: pulse-border 2s ease-in-out infinite;
+}
+.pipeline-step.active .material-symbols-outlined {
+  color: #2563eb;
+  animation: spinning 1.5s linear infinite;
+}
+.pipeline-step.error {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.pipeline-step.skipped {
+  display: none;
+}
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 0 2px #93c5fd; }
+  50% { box-shadow: 0 0 0 3px #60a5fa; }
+}
+
+/* Detail regel */
+.pipeline-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #94a3b8;
+  padding-top: 6px;
+  border-top: 1px solid #e2e8f0;
+}
+.pipeline-function {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.pipeline-elapsed {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pipeline tracker states */
+.pipeline-tracker.done {
+  border-color: #a5d6a7;
+  background: #f0fdf4;
+}
+.pipeline-tracker.done .pipeline-title .material-symbols-outlined {
+  color: #16a34a;
+  animation: none;
+}
+.pipeline-tracker.error {
+  border-color: #ef9a9a;
+  background: #fef2f2;
+}
+.pipeline-tracker.error .pipeline-title .material-symbols-outlined {
+  color: #dc2626;
+  animation: none;
+}
+
 @keyframes spinning { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .spinning { animation: spinning 1.5s linear infinite; }
 

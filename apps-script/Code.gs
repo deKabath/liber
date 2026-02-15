@@ -482,6 +482,12 @@ function resumePendingWork() {
       const frag = job.fragments[i];
       console.log(`Transcriberen ${i + 1}/${job.fragments.length}: ${frag.name}`);
 
+      // ── STAP-TRACKING: Welk fragment wordt nu getranscribeerd ──
+      PROPS.setProperty(job.key + "_currentStep", "whisper");
+      PROPS.setProperty(job.key + "_stepStartedAt", new Date().toISOString());
+      PROPS.setProperty(job.key + "_currentFragmentIndex", String(i));
+      PROPS.setProperty(job.key + "_currentFragmentName", frag.name || `Fragment ${frag.index}`);
+
       const fragFile = DriveApp.getFileById(frag.fileId);
       const text = transcribeWithWhisper_(fragFile) || "";
 
@@ -532,9 +538,15 @@ function prepareMeetingJob_(meetingFolder, meetingName, audioFile) {
   PROPS.setProperty(key + "_createdAt", new Date().toISOString());
   PROPS.setProperty(key + "_nextIndex", "0");
 
+  // ── STAP-TRACKING: Archiveren ──
+  PROPS.setProperty(key + "_currentStep", "archiving");
+  PROPS.setProperty(key + "_stepStartedAt", new Date().toISOString());
   const archivedId = moveFileToArchive_(audioFile, meetingFolder);
   PROPS.setProperty(key + "_archivedOriginalFileId", archivedId);
 
+  // ── STAP-TRACKING: Metadata ophalen ──
+  PROPS.setProperty(key + "_currentStep", "metadata");
+  PROPS.setProperty(key + "_stepStartedAt", new Date().toISOString());
   const metadata = getMetadataViaCloudConvert(DriveApp.getFileById(archivedId));
   if (!metadata) throw new Error("Metadata is leeg.");
 
@@ -544,6 +556,9 @@ function prepareMeetingJob_(meetingFolder, meetingName, audioFile) {
   );
   PROPS.setProperty(key + "_durationSec", String(duration));
 
+  // ── STAP-TRACKING: Audio splitsen ──
+  PROPS.setProperty(key + "_currentStep", "splitting");
+  PROPS.setProperty(key + "_stepStartedAt", new Date().toISOString());
   const maxFragmentDuration = calculateMaxFragmentDuration();
   let fragments = [];
   let workFolderId = "";
@@ -551,6 +566,8 @@ function prepareMeetingJob_(meetingFolder, meetingName, audioFile) {
   const archivedFile = DriveApp.getFileById(archivedId);
 
   if (duration <= maxFragmentDuration) {
+    PROPS.setProperty(key + "_currentStep", "converting");
+    PROPS.setProperty(key + "_stepStartedAt", new Date().toISOString());
     const result = convertDirect(archivedFile);
     workFolderId = result.subFolder.getId();
     fragments = [{ fileId: result.file.getId(), name: result.file.getName(), startSec: 0, endSec: duration, index: 1 }];
@@ -567,10 +584,16 @@ function prepareMeetingJob_(meetingFolder, meetingName, audioFile) {
   const doc = createTranscriptDoc_(meetingName + " - Transcriptie", `Vergadering: ${meetingName}\n\n`, transcriptFolder);
   PROPS.setProperty(key + "_docId", doc.getId());
   PROPS.setProperty(key + "_state", "ready");
+  PROPS.setProperty(key + "_currentStep", "queued");
+  PROPS.setProperty(key + "_stepStartedAt", new Date().toISOString());
   console.log("✓ Job voorbereid. Fragments:", fragments.length);
 }
 
 function finalizeJob_(job, partsFolder, docId) {
+  // ── STAP-TRACKING: Finaliseren ──
+  PROPS.setProperty(job.key + "_currentStep", "finalizing");
+  PROPS.setProperty(job.key + "_stepStartedAt", new Date().toISOString());
+
   const transcriptFolder = DriveApp.getFolderById(TRANSCRIPT_FOLDER_ID);
 
   const partFiles = partsFolder.getFiles();
@@ -1884,6 +1907,10 @@ function uploadAudioFromFrontend_(body) {
   PROPS.setProperty("report_" + reportId + "_meetingFolderId", meetingFolderId);
   PROPS.setProperty("report_" + reportId + "_status", "transcribing");
 
+  // ── STAP-TRACKING: Upload klaar, start pipeline ──
+  const uploadJobKey = "job_" + meetingFolderId;
+  PROPS.setProperty(uploadJobKey + "_uploadCompletedAt", new Date().toISOString());
+
   // Start transcriptie pipeline
   try {
     prepareMeetingJob_(meetingFolder, meetingName, audioFile);
@@ -2028,6 +2055,21 @@ function getFullReportStatus_(reportId) {
     PROPS.setProperty(reportPrefix + "_transcriptTxtFileId", transcriptTxtFileId);
   }
 
+  // ── GEDETAILLEERDE STAP-INFO (v12.4) ──
+  const currentStep = PROPS.getProperty(jobKey + "_currentStep") || "";
+  const stepStartedAt = PROPS.getProperty(jobKey + "_stepStartedAt") || "";
+  const createdAt = PROPS.getProperty(jobKey + "_createdAt") || "";
+  const durationSec = parseInt(PROPS.getProperty(jobKey + "_durationSec") || "0", 10);
+  const currentFragmentIndex = parseInt(PROPS.getProperty(jobKey + "_currentFragmentIndex") || "0", 10);
+  const currentFragmentName = PROPS.getProperty(jobKey + "_currentFragmentName") || "";
+  const uploadCompletedAt = PROPS.getProperty(jobKey + "_uploadCompletedAt") || "";
+
+  // Bouw gedetailleerde pipeline stappen
+  const pipelineSteps = buildPipelineSteps_(jobState, currentStep, transcriptFragments, transcriptCurrent, durationSec, createdAt, stepStartedAt, currentFragmentIndex);
+
+  // Bereken ETA
+  const eta = calculateETA_(jobState, currentStep, transcriptFragments, transcriptCurrent, durationSec, createdAt, stepStartedAt);
+
   return {
     reportId: reportId,
     meetingFolderId: meetingFolderId,
@@ -2040,8 +2082,249 @@ function getFullReportStatus_(reportId) {
     generatedSections: generatedSections,
     totalSections: MRA_SECTIONS.filter(s => s.generatable).length,
     hasTranscript: !!transcriptTxtFileId,
-    error: PROPS.getProperty(reportPrefix + "_error") || PROPS.getProperty(jobKey + "_error") || ""
+    error: PROPS.getProperty(reportPrefix + "_error") || PROPS.getProperty(jobKey + "_error") || "",
+    // v12.4: Gedetailleerde pipeline info
+    pipeline: {
+      currentStep: currentStep,
+      currentStepLabel: getStepLabel_(currentStep, jobState),
+      currentFunction: getStepFunction_(currentStep, jobState),
+      stepStartedAt: stepStartedAt,
+      jobCreatedAt: createdAt,
+      audioDurationSec: durationSec,
+      audioDurationFormatted: formatDuration_(durationSec),
+      currentFragmentIndex: currentFragmentIndex,
+      currentFragmentName: currentFragmentName,
+      steps: pipelineSteps,
+      eta: eta
+    }
   };
+}
+
+/**
+ * Bouwt een array van pipeline-stappen met hun status.
+ */
+function buildPipelineSteps_(jobState, currentStep, totalFragments, currentIdx, durationSec, createdAt, stepStartedAt, fragIdx) {
+  const steps = [
+    { id: 'upload',     label: 'Audio uploaden',           icon: 'upload_file',   status: 'pending' },
+    { id: 'archiving',  label: 'Audio archiveren',         icon: 'archive',       status: 'pending' },
+    { id: 'metadata',   label: 'Metadata ophalen',         icon: 'info',          status: 'pending' },
+    { id: 'splitting',  label: 'Audio splitsen in fragmenten', icon: 'call_split', status: 'pending' },
+    { id: 'converting', label: 'Audio converteren naar MP3', icon: 'transform',   status: 'pending' },
+    { id: 'queued',     label: 'Wachtrij voor transcriptie', icon: 'schedule',    status: 'pending' },
+    { id: 'whisper',    label: 'Whisper transcriptie',      icon: 'mic',           status: 'pending',
+      detail: totalFragments > 0 ? `Fragment ${Math.min(currentIdx + 1, totalFragments)} van ${totalFragments}` : '' },
+    { id: 'finalizing', label: 'Transcriptie afronden',    icon: 'check_circle',  status: 'pending' },
+    { id: 'done',       label: 'Gereed',                   icon: 'verified',      status: 'pending' }
+  ];
+
+  if (!jobState) return steps;
+
+  // Bepaal welke stap actief is en markeer voltooide stappen
+  const stepOrder = ['upload', 'archiving', 'metadata', 'splitting', 'converting', 'queued', 'whisper', 'finalizing', 'done'];
+
+  // Als job "done" is, zijn alle stappen voltooid
+  if (jobState === "done") {
+    steps.forEach(s => s.status = 'completed');
+    return steps;
+  }
+
+  // Als job "error" is, markeer tot de huidige stap
+  if (jobState === "error") {
+    let foundCurrent = false;
+    for (const step of steps) {
+      if (step.id === currentStep) {
+        step.status = 'error';
+        foundCurrent = true;
+      } else if (!foundCurrent) {
+        step.status = 'completed';
+      }
+    }
+    return steps;
+  }
+
+  // Bepaal de actieve stap
+  let activeStepId = currentStep;
+  if (!activeStepId) {
+    // Afleiden uit jobState
+    if (jobState === "preparing") activeStepId = "archiving";
+    else if (jobState === "ready") activeStepId = "queued";
+    else if (jobState === "transcribing") activeStepId = "whisper";
+  }
+
+  // Upload is altijd klaar als er een job is
+  let passedActive = false;
+  for (const step of steps) {
+    if (step.id === activeStepId) {
+      step.status = 'active';
+      passedActive = true;
+      // Voeg timing info toe aan actieve stap
+      if (stepStartedAt) {
+        const elapsed = Math.round((Date.now() - new Date(stepStartedAt).getTime()) / 1000);
+        step.elapsedSec = elapsed;
+        step.elapsedFormatted = formatDuration_(elapsed);
+      }
+    } else if (!passedActive) {
+      step.status = 'completed';
+    }
+    // Na active: pending (default)
+  }
+
+  // Speciale aanpassing: als we splitsen, is converting overbodig (of andersom)
+  if (currentStep === 'converting' || (jobState === 'preparing' && durationSec <= 840)) {
+    // Korte audio: "splitting" slaan we over, "converting" is actief
+    const splitStep = steps.find(s => s.id === 'splitting');
+    if (splitStep && splitStep.status === 'pending') splitStep.status = 'skipped';
+  } else if (currentStep === 'splitting' || (jobState === 'preparing' && durationSec > 840)) {
+    // Lange audio: "converting" slaan we over, "splitting" is actief
+    const convStep = steps.find(s => s.id === 'converting');
+    if (convStep && convStep.status === 'pending') convStep.status = 'skipped';
+  }
+
+  return steps;
+}
+
+/**
+ * Berekent geschatte resterende tijd.
+ */
+function calculateETA_(jobState, currentStep, totalFragments, currentIdx, durationSec, createdAt, stepStartedAt) {
+  const now = Date.now();
+
+  if (jobState === "done") return { remainingSec: 0, formatted: "Gereed", confidence: "high" };
+  if (!jobState || jobState === "error") return { remainingSec: -1, formatted: "Onbekend", confidence: "none" };
+
+  // Geschatte tijden per stap (in seconden, conservatief)
+  const STEP_ESTIMATES = {
+    archiving: 15,    // Verplaatsen naar archive
+    metadata: 30,     // CloudConvert metadata
+    splitting: 90,    // Audio splitsen (afhankelijk van duur)
+    converting: 45,   // Directe conversie naar MP3
+    queued: 5,        // Wachttijd
+    whisper: 120,     // Per fragment (~2 min per 14 min audio)
+    finalizing: 20    // Samenvoegen transcripties
+  };
+
+  let remainingSec = 0;
+  let confidence = "medium";
+
+  if (jobState === "preparing") {
+    // Schat resterende preparing stappen
+    const stepOrder = ['archiving', 'metadata', 'splitting', 'converting', 'queued'];
+    let foundCurrent = false;
+    for (const stepId of stepOrder) {
+      if (stepId === currentStep) {
+        foundCurrent = true;
+        // Huidige stap: schat resterende tijd op basis van verstreken tijd
+        if (stepStartedAt) {
+          const elapsed = (now - new Date(stepStartedAt).getTime()) / 1000;
+          const estimate = STEP_ESTIMATES[stepId] || 30;
+          remainingSec += Math.max(0, estimate - elapsed);
+        } else {
+          remainingSec += STEP_ESTIMATES[stepId] || 30;
+        }
+      } else if (foundCurrent) {
+        // Toekomstige stappen
+        if (stepId === 'splitting' && durationSec <= 840) continue; // Slaat splitting over
+        if (stepId === 'converting' && durationSec > 840) continue; // Slaat converting over
+        remainingSec += STEP_ESTIMATES[stepId] || 30;
+      }
+    }
+    // Plus whisper + finalize
+    const estFragments = durationSec > 840 ? Math.ceil(durationSec / 840) : 1;
+    remainingSec += estFragments * STEP_ESTIMATES.whisper + STEP_ESTIMATES.finalizing;
+    confidence = "low";
+
+  } else if (jobState === "ready") {
+    // Alle preparing klaar, alleen transcriptie + finalize
+    remainingSec = totalFragments * STEP_ESTIMATES.whisper + STEP_ESTIMATES.finalizing;
+    confidence = "medium";
+
+  } else if (jobState === "transcribing") {
+    // Bereken op basis van verwerkte fragmenten
+    const remainingFragments = totalFragments - currentIdx;
+
+    if (currentIdx > 0 && createdAt) {
+      // Bereken gemiddelde tijd per fragment op basis van werkelijke data
+      const totalElapsed = (now - new Date(createdAt).getTime()) / 1000;
+      const avgPerFragment = totalElapsed / currentIdx;
+      remainingSec = Math.round(remainingFragments * avgPerFragment) + STEP_ESTIMATES.finalizing;
+      confidence = "high";
+    } else {
+      // Eerste fragment nog bezig - gebruik schatting
+      remainingSec = remainingFragments * STEP_ESTIMATES.whisper + STEP_ESTIMATES.finalizing;
+      if (stepStartedAt) {
+        const elapsed = (now - new Date(stepStartedAt).getTime()) / 1000;
+        remainingSec = Math.max(0, remainingSec - elapsed);
+      }
+      confidence = "medium";
+    }
+  }
+
+  return {
+    remainingSec: Math.round(remainingSec),
+    formatted: formatDuration_(Math.round(remainingSec)),
+    confidence: confidence
+  };
+}
+
+/**
+ * Vertaalt een step-ID naar een leesbaar Nederlands label.
+ */
+function getStepLabel_(currentStep, jobState) {
+  const labels = {
+    'archiving':  'Audio wordt gearchiveerd...',
+    'metadata':   'Audio metadata wordt opgehaald via CloudConvert...',
+    'splitting':  'Audio wordt opgesplitst in fragmenten...',
+    'converting': 'Audio wordt geconverteerd naar MP3...',
+    'queued':     'In wachtrij voor transcriptie...',
+    'whisper':    'Whisper AI transcribeert het audio fragment...',
+    'finalizing': 'Transcripties worden samengevoegd tot eindbestand...',
+    'done':       'Transcriptie voltooid'
+  };
+  if (currentStep && labels[currentStep]) return labels[currentStep];
+  // Fallback op jobState
+  const stateLabels = {
+    'preparing':    'Audio wordt voorbereid...',
+    'ready':        'Klaar om te transcriberen...',
+    'transcribing': 'Bezig met transcriberen...',
+    'done':         'Transcriptie voltooid',
+    'error':        'Fout opgetreden'
+  };
+  return stateLabels[jobState] || 'Status onbekend';
+}
+
+/**
+ * Vertaalt een step-ID naar de GAS functienaam.
+ */
+function getStepFunction_(currentStep, jobState) {
+  const functions = {
+    'archiving':  'moveFileToArchive_()',
+    'metadata':   'getMetadataViaCloudConvert()',
+    'splitting':  'splitAudioUltraRobust()',
+    'converting': 'convertDirect()',
+    'queued':     'scheduleResume_()',
+    'whisper':    'transcribeWithWhisper_()',
+    'finalizing': 'finalizeJob_()'
+  };
+  if (currentStep && functions[currentStep]) return functions[currentStep];
+  const stateFunctions = {
+    'preparing':    'prepareMeetingJob_()',
+    'ready':        'resumePendingWork()',
+    'transcribing': 'resumePendingWork()',
+    'done':         'finalizeJob_()'
+  };
+  return stateFunctions[jobState] || '';
+}
+
+/**
+ * Formatteert seconden naar mm:ss of uu:mm:ss string.
+ */
+function formatDuration_(totalSec) {
+  if (!totalSec || totalSec <= 0) return '0:00';
+  const hours = Math.floor(totalSec / 3600);
+  const minutes = Math.floor((totalSec % 3600) / 60);
+  const seconds = totalSec % 60;
+  if (hours > 0) return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
 /****************************************************

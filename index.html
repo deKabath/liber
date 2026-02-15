@@ -196,9 +196,23 @@
       <!-- Center: Document Editor -->
       <div class="editor-main">
         <!-- Transcriptie status balk -->
-        <div class="transcript-status" id="transcript-status-bar" hidden>
-          <span class="material-symbols-outlined">mic</span>
-          <span>Transcriptie status laden...</span>
+        <!-- v12.4: Uitgebreide pipeline voortgangsbalk -->
+        <div class="pipeline-tracker" id="pipeline-tracker" hidden>
+          <div class="pipeline-header">
+            <div class="pipeline-title">
+              <span class="material-symbols-outlined spinning">settings</span>
+              <span id="pipeline-step-label">Pipeline actief...</span>
+            </div>
+            <div class="pipeline-eta" id="pipeline-eta"></div>
+          </div>
+          <div class="pipeline-progress-bar">
+            <div class="pipeline-progress-fill" id="pipeline-progress-fill" style="width: 0%"></div>
+          </div>
+          <div class="pipeline-steps" id="pipeline-steps"></div>
+          <div class="pipeline-detail" id="pipeline-detail">
+            <span class="pipeline-function" id="pipeline-function"></span>
+            <span class="pipeline-elapsed" id="pipeline-elapsed"></span>
+          </div>
         </div>
 
         <div class="editor-toolbar">

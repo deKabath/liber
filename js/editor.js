@@ -231,15 +231,19 @@ async function checkAndUpdateTranscriptStatus(serverId) {
       }
     } else if (status.status === 'transcribing') {
       EDITOR.transcriptReady = false;
-      updateGenerateButtonsState(false,
-        `Transcriptie bezig: ${status.transcriptProgress || 0}% (${status.transcriptCurrent || 0}/${status.transcriptFragments || '?'} fragmenten)`
-      );
+      const pl = status.pipeline || {};
+      const eta = pl.eta || {};
+      let btnMsg = `Transcriptie bezig: ${status.transcriptProgress || 0}%`;
+      if (eta.remainingSec > 0) btnMsg += ` (nog ~${eta.formatted})`;
+      else btnMsg += ` (${status.transcriptCurrent || 0}/${status.transcriptFragments || '?'} fragmenten)`;
+      updateGenerateButtonsState(false, btnMsg);
       updateTranscriptStatusUI(status);
       // Start polling als dat nog niet loopt
       if (!_statusPollInterval) startTranscriptStatusPolling();
     } else if (status.status === 'created') {
       EDITOR.transcriptReady = false;
       updateGenerateButtonsState(false, 'Upload eerst een audio-opname om secties te genereren');
+      updateTranscriptStatusUI(status); // Verberg pipeline tracker
     } else if (status.status === 'error') {
       EDITOR.transcriptReady = false;
       updateGenerateButtonsState(false, 'Fout bij transcriptie: ' + (status.error || 'onbekend'));
@@ -729,11 +733,14 @@ function startTranscriptStatusPolling() {
           showToast('Transcriptie voltooid! Je kunt nu secties genereren.', 'success');
         }
       } else if (status.status === 'transcribing') {
-        // Update voortgang in knoppen
+        // Update voortgang in knoppen met pipeline info
         EDITOR.transcriptReady = false;
-        updateGenerateButtonsState(false,
-          `Transcriptie: ${status.transcriptProgress || 0}% (${status.transcriptCurrent || 0}/${status.transcriptFragments || '?'})`
-        );
+        const pl = status.pipeline || {};
+        const eta = pl.eta || {};
+        let btnMsg = `Transcriptie: ${status.transcriptProgress || 0}%`;
+        if (eta.remainingSec > 0) btnMsg += ` (nog ~${eta.formatted})`;
+        else btnMsg += ` (${status.transcriptCurrent || 0}/${status.transcriptFragments || '?'} fragmenten)`;
+        updateGenerateButtonsState(false, btnMsg);
       } else if (status.status === 'error') {
         stopTranscriptStatusPolling();
         EDITOR.transcriptReady = false;
@@ -746,7 +753,7 @@ function startTranscriptStatusPolling() {
   }
 
   poll(); // Eerste keer direct
-  _statusPollInterval = setInterval(poll, 15000); // Elke 15 seconden
+  _statusPollInterval = setInterval(poll, 10000); // Elke 10 seconden
 }
 
 function stopTranscriptStatusPolling() {
@@ -757,34 +764,148 @@ function stopTranscriptStatusPolling() {
 }
 
 function updateTranscriptStatusUI(status) {
-  const statusBar = document.getElementById('transcript-status-bar');
-  if (!statusBar) return;
+  const tracker = document.getElementById('pipeline-tracker');
+  if (!tracker) return;
 
-  if (status.status === 'transcribing') {
-    statusBar.hidden = false;
-    statusBar.className = 'transcript-status transcribing';
-    statusBar.innerHTML = `
-      <span class="material-symbols-outlined spinning">mic</span>
-      <span>Transcriptie bezig... ${status.transcriptProgress || 0}% (fragment ${status.transcriptCurrent || 0}/${status.transcriptFragments || '?'})</span>
-    `;
-  } else if (status.status === 'transcribed') {
-    statusBar.hidden = false;
-    statusBar.className = 'transcript-status ready';
-    statusBar.innerHTML = `
-      <span class="material-symbols-outlined">check_circle</span>
-      <span>Transcriptie gereed – klik "Genereer Alles" om secties te genereren</span>
-    `;
-    setTimeout(() => { statusBar.hidden = true; }, 10000);
-  } else if (status.status === 'error') {
-    statusBar.hidden = false;
-    statusBar.className = 'transcript-status error';
-    statusBar.innerHTML = `
-      <span class="material-symbols-outlined">error</span>
-      <span>Fout: ${status.error || 'Onbekende fout'}</span>
-    `;
-  } else {
-    statusBar.hidden = true;
+  // Verberg als er geen actieve pipeline is
+  const hasActiveJob = status.transcriptStatus && status.transcriptStatus !== 'none';
+  const isProcessing = status.status === 'transcribing' || status.status === 'error';
+
+  if (!hasActiveJob && !isProcessing) {
+    if (status.status === 'transcribed' || status.status === 'done') {
+      // Transcript beschikbaar (direct gekoppeld of al klaar) - kort "gereed" tonen
+      showPipelineDone_(tracker, status);
+      setTimeout(() => { tracker.hidden = true; }, 8000);
+    } else {
+      tracker.hidden = true;
+    }
+    return;
   }
+
+  // Toon de tracker
+  tracker.hidden = false;
+  tracker.className = 'pipeline-tracker';
+
+  const pipeline = status.pipeline || {};
+  const steps = pipeline.steps || [];
+  const eta = pipeline.eta || {};
+
+  // === HEADER: Stap-label + ETA ===
+  const labelEl = document.getElementById('pipeline-step-label');
+  const etaEl = document.getElementById('pipeline-eta');
+
+  if (status.status === 'transcribed' || status.status === 'done') {
+    showPipelineDone_(tracker, status);
+    setTimeout(() => { tracker.hidden = true; }, 8000);
+    return;
+  }
+
+  if (status.status === 'error') {
+    tracker.className = 'pipeline-tracker error';
+    labelEl.textContent = 'Fout: ' + (status.error || 'Onbekende fout');
+    etaEl.textContent = '';
+    etaEl.className = 'pipeline-eta';
+    renderPipelineSteps_(steps);
+    document.getElementById('pipeline-function').textContent = pipeline.currentFunction || '';
+    document.getElementById('pipeline-elapsed').textContent = '';
+    return;
+  }
+
+  // Actieve status
+  labelEl.textContent = pipeline.currentStepLabel || 'Pipeline actief...';
+
+  // ETA
+  if (eta.remainingSec > 0) {
+    etaEl.textContent = `⏱ ${eta.formatted} resterend`;
+    etaEl.className = 'pipeline-eta ' + (eta.confidence || 'medium');
+  } else if (eta.remainingSec === 0) {
+    etaEl.textContent = '✓ Bijna klaar';
+    etaEl.className = 'pipeline-eta high';
+  } else {
+    etaEl.textContent = '';
+    etaEl.className = 'pipeline-eta';
+  }
+
+  // === PROGRESS BAR ===
+  const progressFill = document.getElementById('pipeline-progress-fill');
+  const progress = status.transcriptProgress || 0;
+  // Bereken gewogen voortgang: preparing=10%, transcribing=10-90%, finalizing=90-100%
+  let visualProgress = progress;
+  if (pipeline.currentStep === 'archiving') visualProgress = 3;
+  else if (pipeline.currentStep === 'metadata') visualProgress = 6;
+  else if (pipeline.currentStep === 'splitting' || pipeline.currentStep === 'converting') visualProgress = 10;
+  else if (pipeline.currentStep === 'queued') visualProgress = 12;
+  else if (pipeline.currentStep === 'whisper') {
+    // 15% - 90% range voor whisper, gebaseerd op fragmenten
+    const fragProgress = status.transcriptFragments > 0
+      ? (status.transcriptCurrent / status.transcriptFragments) : 0;
+    visualProgress = 15 + Math.round(fragProgress * 75);
+  } else if (pipeline.currentStep === 'finalizing') visualProgress = 92;
+  progressFill.style.width = visualProgress + '%';
+
+  // === STAPPEN VISUALISATIE ===
+  renderPipelineSteps_(steps);
+
+  // === DETAIL REGEL ===
+  const functionEl = document.getElementById('pipeline-function');
+  const elapsedEl = document.getElementById('pipeline-elapsed');
+
+  functionEl.textContent = pipeline.currentFunction || '';
+
+  // Audio duur info
+  let detailParts = [];
+  if (pipeline.audioDurationFormatted && pipeline.audioDurationSec > 0) {
+    detailParts.push(`Audio: ${pipeline.audioDurationFormatted}`);
+  }
+  if (pipeline.currentFragmentName && pipeline.currentStep === 'whisper') {
+    detailParts.push(`Fragment: ${pipeline.currentFragmentName}`);
+  }
+  if (status.transcriptFragments > 0) {
+    detailParts.push(`${status.transcriptCurrent}/${status.transcriptFragments} fragmenten`);
+  }
+  elapsedEl.textContent = detailParts.join(' · ');
+}
+
+function showPipelineDone_(tracker, status) {
+  tracker.hidden = false;
+  tracker.className = 'pipeline-tracker done';
+  document.getElementById('pipeline-step-label').textContent = '✓ Transcriptie voltooid – je kunt nu secties genereren';
+  document.getElementById('pipeline-eta').textContent = '';
+  document.getElementById('pipeline-eta').className = 'pipeline-eta';
+  document.getElementById('pipeline-progress-fill').style.width = '100%';
+  document.getElementById('pipeline-function').textContent = '';
+  document.getElementById('pipeline-elapsed').textContent = '';
+
+  // Render alle stappen als completed
+  const pipeline = status.pipeline || {};
+  const steps = (pipeline.steps || []).map(s => ({ ...s, status: 'completed' }));
+  renderPipelineSteps_(steps);
+}
+
+function renderPipelineSteps_(steps) {
+  const container = document.getElementById('pipeline-steps');
+  if (!container || !steps.length) {
+    if (container) container.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = steps.map(step => {
+    let icon = step.icon || 'circle';
+    // Override icoon op basis van status
+    if (step.status === 'completed') icon = 'check_circle';
+    else if (step.status === 'error') icon = 'error';
+    else if (step.status === 'active') icon = step.icon || 'pending';
+
+    let label = step.label || step.id;
+    if (step.detail && step.status === 'active') {
+      label += ` (${step.detail})`;
+    }
+
+    return `<div class="pipeline-step ${step.status || 'pending'}" title="${step.label}${step.elapsedFormatted ? ' - ' + step.elapsedFormatted + ' verstreken' : ''}">
+      <span class="material-symbols-outlined">${icon}</span>
+      <span>${label}</span>
+    </div>`;
+  }).join('');
 }
 
 // ---- OFFLINE CONTENT GENERATION ----
