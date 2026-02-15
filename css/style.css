@@ -481,6 +481,38 @@ body {
   margin-bottom: 8px;
 }
 
+/* Transcript status bar */
+.transcript-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.transcript-status.transcribing {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #90caf9;
+}
+.transcript-status.transcribing .material-symbols-outlined {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+.transcript-status.ready {
+  background: var(--green-light);
+  color: var(--green);
+  border: 1px solid #a5d6a7;
+}
+.transcript-status.error {
+  background: var(--red-light);
+  color: var(--red);
+  border: 1px solid #ef9a9a;
+}
+@keyframes spinning { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.spinning { animation: spinning 1.5s linear infinite; }
+
 /* Header fields table in editor */
 .header-fields-table {
   width: 100%;

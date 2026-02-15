@@ -63,12 +63,26 @@ const API = (() => {
   async function insertImage(rid, fileId, pos, idx)    { return post('insertImage', { reportId: rid, imageFileId: fileId, position: pos, index: idx }); }
   async function deleteReport(reportId)                 { return post('deleteReport', { reportId }); }
 
+  // v12: Audio upload
+  async function uploadAudio(reportId, fileName, mimeType, audioBase64) {
+    return post('uploadAudio', { reportId, fileName, mimeType, audioBase64 });
+  }
+  async function uploadAudioChunk(reportId, fileName, mimeType, chunkIndex, totalChunks, chunkBase64) {
+    return post('uploadAudioChunk', { reportId, fileName, mimeType, chunkIndex, totalChunks, chunkBase64 });
+  }
+  async function finalizeAudioUpload(reportId) {
+    return post('finalizeAudioUpload', { reportId });
+  }
+  async function getReportStatus(reportId)               { return get('getReportStatus', { reportId }); }
+
   return {
     setApiUrl, getApiUrl, isConfigured,
     status, getTemplate, listReports, getReport,
     getSections, getSection, getTranscriptStatus,
     createReport, generateSection, regenerateSection,
     generateAllSections, updateSection, updateHeader,
-    assembleReport, insertImage, deleteReport
+    assembleReport, insertImage, deleteReport,
+    uploadAudio, uploadAudioChunk, finalizeAudioUpload,
+    getReportStatus
   };
 })();

@@ -591,8 +591,20 @@ function finalizeJob_(job, partsFolder, docId) {
   cleanupMP3FragmentsByIds_(job.fragments.map(x => x.fileId), job.workFolderId);
 
   PROPS.setProperty(job.key + "_state", "done");
+  PROPS.setProperty(job.key + "_transcriptTxtFileId", finalTxt.getId());
   PROCESSED_PROP.setProperty("folder_" + job.meetingFolderId, "done");
   console.log("✓ Transcriptie job afgerond:", job.meetingName);
+
+  // v12: Koppel transcript aan alle reports die dit meetingFolderId gebruiken
+  const allProps = PROPS.getProperties();
+  for (const key of Object.keys(allProps)) {
+    if (key.endsWith("_meetingFolderId") && allProps[key] === job.meetingFolderId && key.startsWith("report_")) {
+      const rId = key.replace("report_", "").replace("_meetingFolderId", "");
+      PROPS.setProperty("report_" + rId + "_transcriptTxtFileId", finalTxt.getId());
+      PROPS.setProperty("report_" + rId + "_status", "transcribed");
+      console.log("✓ Transcript gekoppeld aan report:", rId);
+    }
+  }
 
   // Queue placeholder analyse
   try {
@@ -681,7 +693,7 @@ function generateSection(reportId, sectionId, overrides) {
     console.log(`→ Hergenereerd: ${newWordCount} woorden (was ${wordCount})`);
   }
 
-  // Sla op
+  // Sla op onder reportId
   const resultKey = `report_${reportId}_section_${sectionId}`;
   const result = {
     sectionId: sectionId,
@@ -694,6 +706,13 @@ function generateSection(reportId, sectionId, overrides) {
   };
 
   PROPS.setProperty(resultKey, JSON.stringify(result));
+
+  // Sla ook op onder meetingFolderId als dat anders is (voor compatibiliteit)
+  const reportData = loadReportData_(reportId);
+  if (reportData.meetingFolderId && reportData.meetingFolderId !== reportId) {
+    PROPS.setProperty(`report_${reportData.meetingFolderId}_section_${sectionId}`, JSON.stringify(result));
+  }
+
   console.log(`✓ Sectie ${sectionId} gegenereerd (${content.length} chars)`);
 
   return result;
@@ -1255,6 +1274,10 @@ function doGet(e) {
         result = getTranscriptStatus_(params.reportId);
         break;
 
+      case 'getReportStatus':
+        result = getFullReportStatus_(params.reportId);
+        break;
+
       default:
         result = { error: 'Onbekende actie: ' + action };
     }
@@ -1333,6 +1356,18 @@ function doPost(e) {
 
       case 'deleteReport':
         result = deleteReport_(body.reportId);
+        break;
+
+      case 'uploadAudio':
+        result = uploadAudioFromFrontend_(body);
+        break;
+
+      case 'uploadAudioChunk':
+        result = uploadAudioChunk_(body);
+        break;
+
+      case 'finalizeAudioUpload':
+        result = finalizeAudioUpload_(body);
         break;
 
       default:
@@ -1524,14 +1559,228 @@ function loadReportData_(reportId) {
   const reportPrefix = "report_" + reportId;
   const jobPrefix = "job_" + reportId;
 
+  // meetingFolderId kan anders zijn dan reportId (als report via frontend is aangemaakt)
+  const meetingFolderId = PROPS.getProperty(reportPrefix + "_meetingFolderId") ||
+    PROPS.getProperty(jobPrefix + "_meetingFolderId") || reportId;
+
+  // Zoek transcriptTxtFileId op ALLE mogelijke locaties
+  const transcriptTxtFileId =
+    PROPS.getProperty(reportPrefix + "_transcriptTxtFileId") ||
+    PROPS.getProperty("analysis_" + reportId + "_transcriptTxtFileId") ||
+    PROPS.getProperty("secgen_" + reportId + "_transcriptTxtFileId") ||
+    PROPS.getProperty(jobPrefix + "_transcriptTxtFileId") ||
+    // Ook zoeken onder meetingFolderId als die anders is
+    (meetingFolderId !== reportId ? (
+      PROPS.getProperty("secgen_" + meetingFolderId + "_transcriptTxtFileId") ||
+      PROPS.getProperty("job_" + meetingFolderId + "_transcriptTxtFileId") ||
+      PROPS.getProperty("analysis_" + meetingFolderId + "_transcriptTxtFileId") ||
+      PROPS.getProperty("report_" + meetingFolderId + "_transcriptTxtFileId")
+    ) : "") || "";
+
   return {
-    meetingName: PROPS.getProperty(reportPrefix + "_meetingName") || PROPS.getProperty(jobPrefix + "_meetingName") || "",
-    meetingFolderId: PROPS.getProperty(reportPrefix + "_meetingFolderId") || PROPS.getProperty(jobPrefix + "_meetingFolderId") || reportId,
-    transcriptTxtFileId: PROPS.getProperty(reportPrefix + "_transcriptTxtFileId") ||
-      PROPS.getProperty("analysis_" + reportId + "_transcriptTxtFileId") ||
-      PROPS.getProperty("secgen_" + reportId + "_transcriptTxtFileId") ||
-      PROPS.getProperty(jobPrefix + "_transcriptTxtFileId") || "",
+    meetingName: PROPS.getProperty(reportPrefix + "_meetingName") || PROPS.getProperty(jobPrefix + "_meetingName") ||
+      (meetingFolderId !== reportId ? PROPS.getProperty("job_" + meetingFolderId + "_meetingName") : "") || "",
+    meetingFolderId: meetingFolderId,
+    transcriptTxtFileId: transcriptTxtFileId,
     docId: PROPS.getProperty(reportPrefix + "_docId") || ""
+  };
+}
+
+/****************************************************
+ * ═══════════════════════════════════════════════════
+ * FASE 6: AUDIO UPLOAD VANUIT FRONTEND (v12)
+ * ═══════════════════════════════════════════════════
+ ****************************************************/
+
+/**
+ * Upload audio in 1 keer (voor bestanden < 10MB base64).
+ * Frontend stuurt {reportId, fileName, mimeType, audioBase64}
+ */
+function uploadAudioFromFrontend_(body) {
+  const reportId = body.reportId;
+  const fileName = body.fileName || 'audio.mp3';
+  const mimeType = body.mimeType || 'audio/mpeg';
+  const audioBase64 = body.audioBase64;
+
+  if (!reportId) throw new Error("reportId is vereist");
+  if (!audioBase64) throw new Error("audioBase64 is vereist");
+
+  console.log(`=== UPLOAD AUDIO: ${fileName} voor report ${reportId} ===`);
+
+  // Maak een submap in SOURCE_FOLDER voor dit verslag
+  const meetingName = PROPS.getProperty("report_" + reportId + "_meetingName") || "Verslag";
+  const sourceFolder = DriveApp.getFolderById(SOURCE_FOLDER_ID);
+  const meetingFolder = sourceFolder.createFolder(meetingName);
+  const meetingFolderId = meetingFolder.getId();
+
+  // Decodeer base64 en sla op als bestand
+  const audioBytes = Utilities.base64Decode(audioBase64);
+  const audioBlob = Utilities.newBlob(audioBytes, mimeType, fileName);
+  const audioFile = meetingFolder.createFile(audioBlob);
+
+  console.log(`✓ Audio opgeslagen: ${audioFile.getName()} (${audioBytes.length} bytes) in ${meetingFolderId}`);
+
+  // Koppel meetingFolderId aan reportId
+  PROPS.setProperty("report_" + reportId + "_meetingFolderId", meetingFolderId);
+  PROPS.setProperty("report_" + reportId + "_status", "transcribing");
+
+  // Start transcriptie pipeline
+  try {
+    prepareMeetingJob_(meetingFolder, meetingName, audioFile);
+    scheduleResume_(1); // Schedule resume voor transcriptie
+    console.log("✓ Transcriptie pipeline gestart voor:", meetingName);
+  } catch (err) {
+    console.log("!!! Fout bij starten transcriptie:", err);
+    PROPS.setProperty("report_" + reportId + "_status", "error");
+    PROPS.setProperty("report_" + reportId + "_error", String(err));
+    return { status: 'error', error: String(err) };
+  }
+
+  return {
+    status: 'transcribing',
+    reportId: reportId,
+    meetingFolderId: meetingFolderId,
+    message: 'Audio ontvangen, transcriptie gestart.'
+  };
+}
+
+/**
+ * Chunked upload - ontvang een chunk van de audio.
+ * Body: {reportId, fileName, mimeType, chunkIndex, totalChunks, chunkBase64}
+ */
+function uploadAudioChunk_(body) {
+  const reportId = body.reportId;
+  const chunkIndex = body.chunkIndex || 0;
+  const totalChunks = body.totalChunks || 1;
+  const chunkBase64 = body.chunkBase64;
+
+  if (!reportId) throw new Error("reportId is vereist");
+  if (!chunkBase64) throw new Error("chunkBase64 is vereist");
+
+  const chunkKey = `upload_${reportId}_chunk_${chunkIndex}`;
+  PROPS.setProperty(chunkKey, chunkBase64);
+  PROPS.setProperty(`upload_${reportId}_totalChunks`, String(totalChunks));
+  PROPS.setProperty(`upload_${reportId}_fileName`, body.fileName || 'audio.mp3');
+  PROPS.setProperty(`upload_${reportId}_mimeType`, body.mimeType || 'audio/mpeg');
+
+  console.log(`✓ Chunk ${chunkIndex + 1}/${totalChunks} ontvangen voor report ${reportId}`);
+
+  return {
+    status: 'chunk_received',
+    chunkIndex: chunkIndex,
+    totalChunks: totalChunks
+  };
+}
+
+/**
+ * Finaliseer chunked upload - assembleer alle chunks en start transcriptie.
+ * Body: {reportId}
+ */
+function finalizeAudioUpload_(body) {
+  const reportId = body.reportId;
+  if (!reportId) throw new Error("reportId is vereist");
+
+  const totalChunks = parseInt(PROPS.getProperty(`upload_${reportId}_totalChunks`) || "1", 10);
+  const fileName = PROPS.getProperty(`upload_${reportId}_fileName`) || 'audio.mp3';
+  const mimeType = PROPS.getProperty(`upload_${reportId}_mimeType`) || 'audio/mpeg';
+
+  console.log(`=== FINALIZE UPLOAD: ${totalChunks} chunks voor report ${reportId} ===`);
+
+  // Assembleer alle chunks
+  let fullBase64 = '';
+  for (let i = 0; i < totalChunks; i++) {
+    const chunkKey = `upload_${reportId}_chunk_${i}`;
+    const chunk = PROPS.getProperty(chunkKey);
+    if (!chunk) throw new Error(`Chunk ${i} niet gevonden voor report ${reportId}`);
+    fullBase64 += chunk;
+    PROPS.deleteProperty(chunkKey); // Cleanup
+  }
+  PROPS.deleteProperty(`upload_${reportId}_totalChunks`);
+  PROPS.deleteProperty(`upload_${reportId}_fileName`);
+  PROPS.deleteProperty(`upload_${reportId}_mimeType`);
+
+  // Gebruik de volledige upload functie
+  return uploadAudioFromFrontend_({
+    reportId: reportId,
+    fileName: fileName,
+    mimeType: mimeType,
+    audioBase64: fullBase64
+  });
+}
+
+/**
+ * Geeft de volledige status van een report terug (upload, transcriptie, generatie).
+ */
+function getFullReportStatus_(reportId) {
+  if (!reportId) return { error: 'reportId is vereist' };
+
+  const reportPrefix = "report_" + reportId;
+  const meetingFolderId = PROPS.getProperty(reportPrefix + "_meetingFolderId") || reportId;
+  const jobKey = "job_" + meetingFolderId;
+  const secgenKey = "secgen_" + meetingFolderId;
+
+  const reportStatus = PROPS.getProperty(reportPrefix + "_status") || "created";
+  const jobState = PROPS.getProperty(jobKey + "_state") || "";
+  const secgenState = PROPS.getProperty(secgenKey + "_state") || "";
+
+  // Transcriptie voortgang
+  let transcriptProgress = 0;
+  let transcriptFragments = 0;
+  let transcriptCurrent = 0;
+  if (jobState) {
+    const fragmentsJson = PROPS.getProperty(jobKey + "_fragmentsJson") || "[]";
+    const fragments = JSON.parse(fragmentsJson);
+    transcriptFragments = fragments.length;
+    transcriptCurrent = parseInt(PROPS.getProperty(jobKey + "_nextIndex") || "0", 10);
+    transcriptProgress = transcriptFragments > 0 ? Math.round((transcriptCurrent / transcriptFragments) * 100) : 0;
+    if (jobState === "done") transcriptProgress = 100;
+  }
+
+  // Bepaal de overkoepelende status
+  let overallStatus = reportStatus;
+  if (jobState === "preparing" || jobState === "ready" || jobState === "transcribing") {
+    overallStatus = "transcribing";
+  } else if (jobState === "done" && secgenState !== "done") {
+    overallStatus = "transcribed"; // klaar voor generatie
+  } else if (secgenState === "generating") {
+    overallStatus = "generating";
+  } else if (secgenState === "done") {
+    overallStatus = "done";
+  }
+  if (jobState === "error") overallStatus = "error";
+
+  // Check hoeveel secties al gegenereerd zijn
+  let generatedSections = 0;
+  for (const sec of MRA_SECTIONS) {
+    if (PROPS.getProperty(`report_${reportId}_section_${sec.id}`) ||
+        PROPS.getProperty(`report_${meetingFolderId}_section_${sec.id}`)) {
+      generatedSections++;
+    }
+  }
+
+  // Check of transcript txt file bestaat
+  const transcriptTxtFileId = PROPS.getProperty(reportPrefix + "_transcriptTxtFileId") ||
+    PROPS.getProperty("secgen_" + meetingFolderId + "_transcriptTxtFileId") ||
+    PROPS.getProperty(jobKey + "_transcriptTxtFileId") || "";
+
+  // Koppel transcriptTxtFileId als dat nog niet gedaan is
+  if (transcriptTxtFileId && !PROPS.getProperty(reportPrefix + "_transcriptTxtFileId")) {
+    PROPS.setProperty(reportPrefix + "_transcriptTxtFileId", transcriptTxtFileId);
+  }
+
+  return {
+    reportId: reportId,
+    meetingFolderId: meetingFolderId,
+    status: overallStatus,
+    transcriptStatus: jobState || "none",
+    transcriptProgress: transcriptProgress,
+    transcriptFragments: transcriptFragments,
+    transcriptCurrent: transcriptCurrent,
+    sectionGenerationStatus: secgenState || "none",
+    generatedSections: generatedSections,
+    totalSections: MRA_SECTIONS.filter(s => s.generatable).length,
+    hasTranscript: !!transcriptTxtFileId,
+    error: PROPS.getProperty(reportPrefix + "_error") || PROPS.getProperty(jobKey + "_error") || ""
   };
 }
 

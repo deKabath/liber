@@ -175,9 +175,15 @@ function openEditor(reportId) {
   // Render document
   renderEditorDocument();
 
+  // Start transcriptie status polling als status 'transcribing' of 'uploading' is
+  if (EDITOR.report.status === 'transcribing' || EDITOR.report.status === 'uploading') {
+    startTranscriptStatusPolling();
+  }
+
   // Probeer secties van server te laden
-  if (API.isConfigured() && EDITOR.report.serverReportId) {
-    API.getSections(EDITOR.report.serverReportId).then(data => {
+  const serverId = EDITOR.report.serverReportId || EDITOR.report.reportId;
+  if (API.isConfigured() && serverId && !serverId.startsWith('local_')) {
+    API.getSections(serverId).then(data => {
       if (data.sections) {
         for (const [id, sec] of Object.entries(data.sections)) {
           if (sec.content && sec.content.content) {
@@ -309,7 +315,7 @@ function renderEditorDocument() {
       html += `</div>`;
     } else {
       // Editable text content
-      const isOffline = sectionData && sectionData.offline;
+      const isOffline = data && data.offline;
       html += `<div class="section-block-content${isOffline ? ' offline-content' : ''}" contenteditable="true"
             data-section="${sec.id}"
             data-placeholder="Klik op 'Genereer' of typ hier de inhoud van ${sec.title}..."
@@ -367,8 +373,9 @@ async function generateSingleSection(sectionId, opts = {}) {
     let content = '';
     let isOffline = false;
 
-    if (API.isConfigured() && EDITOR.report.serverReportId) {
-      const result = await API.generateSection(EDITOR.report.serverReportId, sectionId);
+    const serverId = EDITOR.report.serverReportId || EDITOR.report.reportId;
+    if (API.isConfigured() && serverId && !serverId.startsWith('local_')) {
+      const result = await API.generateSection(serverId, sectionId);
       content = result.content || '';
     } else {
       // Offline: simuleer generatie met sjabloontekst (NIET uit transcriptie)
@@ -451,7 +458,8 @@ async function generateAllSections() {
     toGenerate.map(s => s.title)
   );
 
-  const isOnline = API.isConfigured() && EDITOR.report.serverReportId;
+  const serverId = EDITOR.report.serverReportId || EDITOR.report.reportId;
+  const isOnline = API.isConfigured() && serverId && !serverId.startsWith('local_');
   let completed = 0;
 
   for (const sec of toGenerate) {
@@ -462,7 +470,7 @@ async function generateAllSections() {
       let isOffline = false;
 
       if (isOnline) {
-        const result = await API.generateSection(EDITOR.report.serverReportId, sec.id);
+        const result = await API.generateSection(serverId, sec.id);
         content = result.content || '';
       } else {
         // Offline: sjabloontekst
@@ -521,14 +529,15 @@ function saveAllSections() {
   saveLocalReports();
 
   // Sync naar server
-  if (API.isConfigured() && EDITOR.report.serverReportId) {
-    for (const [sid, data] of Object.entries(EDITOR.sections)) {
-      if (data.editedManually && data.content) {
-        API.updateSection(EDITOR.report.serverReportId, sid, data.content)
+  const syncId = EDITOR.report.serverReportId || EDITOR.report.reportId;
+  if (API.isConfigured() && syncId && !syncId.startsWith('local_')) {
+    for (const [sid, sdata] of Object.entries(EDITOR.sections)) {
+      if (sdata.editedManually && sdata.content) {
+        API.updateSection(syncId, sid, sdata.content)
           .catch(err => console.warn('Sync failed for', sid, err));
       }
     }
-    API.updateHeader(EDITOR.report.serverReportId, EDITOR.headerFields)
+    API.updateHeader(syncId, EDITOR.headerFields)
       .catch(err => console.warn('Header sync failed:', err));
   }
 
@@ -539,10 +548,11 @@ function saveAllSections() {
 async function assembleReport() {
   saveAllSections();
 
-  if (API.isConfigured() && EDITOR.report.serverReportId) {
+  const assembleId = EDITOR.report.serverReportId || EDITOR.report.reportId;
+  if (API.isConfigured() && assembleId && !assembleId.startsWith('local_')) {
     showToast('Google Doc wordt samengesteld...');
     try {
-      const result = await API.assembleReport(EDITOR.report.serverReportId, EDITOR.headerFields);
+      const result = await API.assembleReport(assembleId, EDITOR.headerFields);
       if (result.docUrl) {
         window.open(result.docUrl, '_blank');
         showToast('Google Doc aangemaakt!', 'success');
@@ -597,6 +607,78 @@ function uploadImageForSection(sectionId) {
     }
   };
   input.click();
+}
+
+// ---- TRANSCRIPTIE STATUS POLLING ----
+let _statusPollInterval = null;
+
+function startTranscriptStatusPolling() {
+  stopTranscriptStatusPolling();
+
+  const serverId = EDITOR.report.serverReportId || EDITOR.report.reportId;
+  if (!serverId || serverId.startsWith('local_') || !API.isConfigured()) return;
+
+  async function poll() {
+    try {
+      const status = await API.getReportStatus(serverId);
+      updateTranscriptStatusUI(status);
+
+      if (status.status === 'transcribed' || status.status === 'done' || status.status === 'generating') {
+        // Transcriptie klaar - stop polling
+        stopTranscriptStatusPolling();
+
+        if (status.status === 'transcribed' && status.hasTranscript) {
+          showToast('Transcriptie voltooid! Je kunt nu secties genereren.', 'success');
+        }
+      } else if (status.status === 'error') {
+        stopTranscriptStatusPolling();
+        showToast('Fout bij transcriptie: ' + (status.error || 'onbekend'), 'error');
+      }
+    } catch (err) {
+      console.warn('Status poll mislukt:', err);
+    }
+  }
+
+  poll(); // Eerste keer direct
+  _statusPollInterval = setInterval(poll, 15000); // Elke 15 seconden
+}
+
+function stopTranscriptStatusPolling() {
+  if (_statusPollInterval) {
+    clearInterval(_statusPollInterval);
+    _statusPollInterval = null;
+  }
+}
+
+function updateTranscriptStatusUI(status) {
+  const statusBar = document.getElementById('transcript-status-bar');
+  if (!statusBar) return;
+
+  if (status.status === 'transcribing') {
+    statusBar.hidden = false;
+    statusBar.className = 'transcript-status transcribing';
+    statusBar.innerHTML = `
+      <span class="material-symbols-outlined spinning">mic</span>
+      <span>Transcriptie bezig... ${status.transcriptProgress || 0}% (fragment ${status.transcriptCurrent || 0}/${status.transcriptFragments || '?'})</span>
+    `;
+  } else if (status.status === 'transcribed') {
+    statusBar.hidden = false;
+    statusBar.className = 'transcript-status ready';
+    statusBar.innerHTML = `
+      <span class="material-symbols-outlined">check_circle</span>
+      <span>Transcriptie gereed – klik "Genereer Alles" om secties te genereren</span>
+    `;
+    setTimeout(() => { statusBar.hidden = true; }, 10000);
+  } else if (status.status === 'error') {
+    statusBar.hidden = false;
+    statusBar.className = 'transcript-status error';
+    statusBar.innerHTML = `
+      <span class="material-symbols-outlined">error</span>
+      <span>Fout: ${status.error || 'Onbekende fout'}</span>
+    `;
+  } else {
+    statusBar.hidden = true;
+  }
 }
 
 // ---- OFFLINE CONTENT GENERATION ----

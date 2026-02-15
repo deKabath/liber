@@ -124,7 +124,7 @@ function renderDashboard() {
 }
 
 // ---- CREATE REPORT ----
-function createReport() {
+async function createReport() {
   const vereniging = document.getElementById('field-vereniging').value.trim();
   const datum = document.getElementById('field-datum').value;
   const contact = document.getElementById('field-contact').value.trim();
@@ -136,45 +136,116 @@ function createReport() {
     return;
   }
 
-  const reportId = 'local_' + Date.now();
-  const report = {
-    reportId,
-    meetingName: vereniging,
-    status: 'created',
-    template: 'rabobank_mra',
-    createdAt: new Date().toISOString(),
-    headerFields: {
-      '<<naam vereniging>>': vereniging,
-      '<<datum>>': datum,
-      '<<contactpersoon>>': contact,
-      '<<onderwerp>>': onderwerp || 'verslag intake',
-      '<<opgesteld_door>>': opgesteld || 'Lutger Brenninkmeijer',
-      '<<opdrachtgever>>': 'Rabobank Kring Metropool Regio Amsterdam'
-    },
-    sections: {}
-  };
-
-  // Sla lokaal op
-  APP.reports.push(report);
-  saveLocalReports();
-
-  // Probeer ook naar API te sturen
-  if (API.isConfigured()) {
-    API.createReport({
-      meetingName: vereniging,
-      template: 'rabobank_mra',
-      headerFields: report.headerFields
-    }).then(res => {
-      if (res.reportId) {
-        // Update lokaal met server ID
-        report.serverReportId = res.reportId;
-        saveLocalReports();
-      }
-    }).catch(err => console.warn('API create failed:', err));
+  if (!API.isConfigured()) {
+    showToast('Configureer eerst de API URL in de instellingen.', 'error');
+    return;
   }
 
-  showToast(`Verslag "${vereniging}" aangemaakt!`, 'success');
-  navigateTo('editor', reportId);
+  const headerFields = {
+    '<<naam vereniging>>': vereniging,
+    '<<datum>>': datum,
+    '<<contactpersoon>>': contact,
+    '<<onderwerp>>': onderwerp || 'verslag intake',
+    '<<opgesteld_door>>': opgesteld || 'Lutger Brenninkmeijer',
+    '<<opdrachtgever>>': 'Rabobank Kring Metropool Regio Amsterdam'
+  };
+
+  try {
+    showToast('Verslag aanmaken op server...');
+
+    // Maak report aan op server
+    const res = await API.createReport({
+      meetingName: vereniging,
+      template: 'rabobank_mra',
+      headerFields: headerFields
+    });
+
+    if (!res.reportId) throw new Error('Server gaf geen reportId terug');
+
+    const serverReportId = res.reportId;
+    const report = {
+      reportId: serverReportId,
+      serverReportId: serverReportId,
+      meetingName: vereniging,
+      status: 'created',
+      template: 'rabobank_mra',
+      createdAt: new Date().toISOString(),
+      headerFields: headerFields,
+      sections: {}
+    };
+
+    APP.reports.push(report);
+    saveLocalReports();
+
+    // Upload audio als er een bestand is geselecteerd
+    if (APP.audioFile) {
+      showToast('Audio uploaden naar server...');
+      report.status = 'uploading';
+      saveLocalReports();
+
+      await uploadAudioToServer(serverReportId, APP.audioFile);
+      report.status = 'transcribing';
+      saveLocalReports();
+
+      showToast(`Audio geüpload! Transcriptie is gestart.`, 'success');
+    } else {
+      showToast(`Verslag "${vereniging}" aangemaakt. Upload later audio om te transcriberen.`, 'success');
+    }
+
+    navigateTo('editor', serverReportId);
+
+  } catch (err) {
+    console.error('Create report failed:', err);
+    showToast(`Fout bij aanmaken: ${err.message}`, 'error');
+  }
+}
+
+/**
+ * Upload audio bestand naar de server via base64.
+ * Splitst in chunks van ~5MB voor GAS limiet.
+ */
+async function uploadAudioToServer(reportId, file) {
+  const MAX_CHUNK_SIZE = 5 * 1024 * 1024; // 5MB base64 per chunk
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      try {
+        const base64Full = e.target.result.split(',')[1]; // Strip data:audio/...;base64,
+        const fileName = file.name;
+        const mimeType = file.type || 'audio/mpeg';
+
+        if (base64Full.length <= MAX_CHUNK_SIZE) {
+          // Kleine bestanden: upload in 1 keer
+          showToast('Audio uploaden (klein bestand)...');
+          const result = await API.uploadAudio(reportId, fileName, mimeType, base64Full);
+          if (result.error) throw new Error(result.error);
+          resolve(result);
+        } else {
+          // Grote bestanden: chunked upload
+          const totalChunks = Math.ceil(base64Full.length / MAX_CHUNK_SIZE);
+          showToast(`Audio uploaden in ${totalChunks} delen...`);
+
+          for (let i = 0; i < totalChunks; i++) {
+            const chunk = base64Full.substring(i * MAX_CHUNK_SIZE, (i + 1) * MAX_CHUNK_SIZE);
+            showToast(`Audio uploaden: deel ${i + 1}/${totalChunks}...`);
+            const chunkResult = await API.uploadAudioChunk(reportId, fileName, mimeType, i, totalChunks, chunk);
+            if (chunkResult.error) throw new Error(chunkResult.error);
+          }
+
+          // Finaliseer
+          showToast('Audio samenvoegen en transcriptie starten...');
+          const finalResult = await API.finalizeAudioUpload(reportId);
+          if (finalResult.error) throw new Error(finalResult.error);
+          resolve(finalResult);
+        }
+      } catch (err) {
+        reject(err);
+      }
+    };
+    reader.onerror = () => reject(new Error('Kon audiobestand niet lezen'));
+    reader.readAsDataURL(file);
+  });
 }
 
 // ---- DELETE REPORT ----
@@ -188,10 +259,10 @@ async function deleteReport(reportId) {
   APP.reports = APP.reports.filter(r => r.reportId !== reportId);
   saveLocalReports();
 
-  // Verwijder op server
-  if (API.isConfigured() && report && report.serverReportId) {
+  // Verwijder op server (reportId IS de serverReportId in v12)
+  if (API.isConfigured()) {
     try {
-      await API.deleteReport(report.serverReportId);
+      await API.deleteReport(reportId);
     } catch (err) {
       console.warn('Server delete mislukt:', err);
     }
