@@ -1331,6 +1331,10 @@ function doPost(e) {
         result = { status: 'success', count: (body.imageFileIds || []).length };
         break;
 
+      case 'deleteReport':
+        result = deleteReport_(body.reportId);
+        break;
+
       default:
         result = { error: 'Onbekende actie: ' + action };
     }
@@ -1373,6 +1377,38 @@ function createNewReport_(data) {
 
   console.log("✓ Nieuw report aangemaakt:", reportId);
   return { reportId, status: 'created' };
+}
+
+function deleteReport_(reportId) {
+  if (!reportId) throw new Error("reportId is vereist");
+
+  const all = PROPS.getProperties();
+  const prefixes = [
+    "report_" + reportId,
+    "job_" + reportId,
+    "secgen_" + reportId,
+    "analysis_" + reportId
+  ];
+
+  let deletedCount = 0;
+  for (const key of Object.keys(all)) {
+    if (prefixes.some(p => key.startsWith(p + "_"))) {
+      PROPS.deleteProperty(key);
+      deletedCount++;
+    }
+  }
+
+  // Verwijder ook section data
+  for (const sec of MRA_SECTIONS) {
+    const sectionKey = `report_${reportId}_section_${sec.id}`;
+    if (PROPS.getProperty(sectionKey)) {
+      PROPS.deleteProperty(sectionKey);
+      deletedCount++;
+    }
+  }
+
+  console.log(`✓ Report ${reportId} verwijderd (${deletedCount} properties)`);
+  return { status: 'deleted', reportId, deletedProperties: deletedCount };
 }
 
 function listAllReports_() {

@@ -61,6 +61,7 @@ const API = (() => {
   async function updateHeader(reportId, fields)        { return post('updateHeader', { reportId, fields }); }
   async function assembleReport(reportId, headerFields){ return post('assembleReport', { reportId, headerFields }); }
   async function insertImage(rid, fileId, pos, idx)    { return post('insertImage', { reportId: rid, imageFileId: fileId, position: pos, index: idx }); }
+  async function deleteReport(reportId)                 { return post('deleteReport', { reportId }); }
 
   return {
     setApiUrl, getApiUrl, isConfigured,
@@ -68,6 +69,6 @@ const API = (() => {
     getSections, getSection, getTranscriptStatus,
     createReport, generateSection, regenerateSection,
     generateAllSections, updateSection, updateHeader,
-    assembleReport, insertImage
+    assembleReport, insertImage, deleteReport
   };
 })();

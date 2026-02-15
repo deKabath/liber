@@ -560,6 +560,12 @@ function assembleAndPreview() {
   navigateTo('preview');
 }
 
+// ---- DELETE CURRENT REPORT FROM EDITOR ----
+function deleteCurrentReport() {
+  if (!EDITOR.reportId) return;
+  deleteReport(EDITOR.reportId);
+}
+
 // ---- IMAGE UPLOAD ----
 function uploadImageForSection(sectionId) {
   const input = document.createElement('input');

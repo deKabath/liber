@@ -115,6 +115,9 @@ function renderDashboard() {
         ${r.docId ? `<a href="https://docs.google.com/document/d/${r.docId}/edit" target="_blank" class="btn btn-ghost btn-sm">
           <span class="material-symbols-outlined" style="font-size:16px">open_in_new</span> Doc
         </a>` : ''}
+        <button class="btn btn-ghost btn-sm btn-delete" onclick="deleteReport('${r.reportId}')">
+          <span class="material-symbols-outlined" style="font-size:16px">delete</span>
+        </button>
       </td>
     </tr>`;
   }).join('');
@@ -172,6 +175,30 @@ function createReport() {
 
   showToast(`Verslag "${vereniging}" aangemaakt!`, 'success');
   navigateTo('editor', reportId);
+}
+
+// ---- DELETE REPORT ----
+async function deleteReport(reportId) {
+  const report = APP.reports.find(r => r.reportId === reportId);
+  const name = report ? report.meetingName : reportId;
+
+  if (!confirm(`Weet je zeker dat je het verslag "${name}" wilt verwijderen?\n\nDit kan niet ongedaan worden gemaakt.`)) return;
+
+  // Verwijder lokaal
+  APP.reports = APP.reports.filter(r => r.reportId !== reportId);
+  saveLocalReports();
+
+  // Verwijder op server
+  if (API.isConfigured() && report && report.serverReportId) {
+    try {
+      await API.deleteReport(report.serverReportId);
+    } catch (err) {
+      console.warn('Server delete mislukt:', err);
+    }
+  }
+
+  showToast(`Verslag "${name}" verwijderd.`, 'success');
+  renderDashboard();
 }
 
 // ---- AUDIO UPLOAD HANDLING ----

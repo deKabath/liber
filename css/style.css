@@ -105,6 +105,8 @@ body {
 .btn-secondary:hover { background: var(--gray-300); }
 .btn-ghost { background: none; color: var(--gray-600); }
 .btn-ghost:hover { background: var(--gray-100); }
+.btn-delete { color: var(--gray-400); }
+.btn-delete:hover { color: var(--red); background: #fef2f2; }
 .btn-sm { padding: 4px 8px; font-size: 12px; }
 .btn-lg { padding: 12px 28px; font-size: 16px; }
 .btn-block { width: 100%; justify-content: center; }
