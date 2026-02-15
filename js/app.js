@@ -204,47 +204,81 @@ async function createReport() {
  * Upload audio bestand naar de server via base64.
  * Splitst in stukken van ~5MB voor transport naar GAS.
  * Server slaat stukken op als tijdelijke Drive-bestanden en voegt ze samen.
+ * Toont voortgang in de upload-progress balk.
  */
 async function uploadAudioToServer(reportId, file) {
   const MAX_CHUNK_SIZE = 5 * 1024 * 1024; // 5MB base64 per stuk
+  const prog = document.getElementById('upload-progress');
+  const progLabel = document.getElementById('upload-progress-label');
+  const progFill = document.getElementById('upload-progress-fill');
+  const progDetail = document.getElementById('upload-progress-detail');
+
+  function showProgress(label, percent, detail) {
+    prog.hidden = false;
+    prog.className = 'upload-progress';
+    progLabel.textContent = label;
+    progFill.style.width = percent + '%';
+    progDetail.textContent = detail || '';
+  }
+
+  function showDone() {
+    prog.className = 'upload-progress done';
+    progLabel.textContent = '✓ Upload voltooid — transcriptie gestart';
+    progFill.style.width = '100%';
+    progDetail.textContent = '';
+    // Verberg na 5 seconden
+    setTimeout(() => { prog.hidden = true; }, 5000);
+  }
+
+  showProgress('Audio inlezen...', 0, `${(file.size / 1024 / 1024).toFixed(1)} MB`);
 
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = async function(e) {
       try {
-        const base64Full = e.target.result.split(',')[1]; // Strip data:audio/...;base64,
+        const base64Full = e.target.result.split(',')[1];
         const fileName = file.name;
         const mimeType = file.type || 'audio/mpeg';
 
         if (base64Full.length <= MAX_CHUNK_SIZE) {
-          // Kleine bestanden: upload in 1 keer
-          showToast('Audio uploaden (klein bestand)...');
+          showProgress('Audio uploaden...', 50, fileName);
           const result = await API.uploadAudio(reportId, fileName, mimeType, base64Full);
           if (result.error) throw new Error(result.error);
+          showDone();
           resolve(result);
         } else {
-          // Grote bestanden: chunked upload
           const totalChunks = Math.ceil(base64Full.length / MAX_CHUNK_SIZE);
-          showToast(`Audio uploaden in ${totalChunks} delen...`);
 
           for (let i = 0; i < totalChunks; i++) {
             const chunk = base64Full.substring(i * MAX_CHUNK_SIZE, (i + 1) * MAX_CHUNK_SIZE);
-            showToast(`Audio uploaden: deel ${i + 1}/${totalChunks}...`);
+            const pct = Math.round(((i + 1) / (totalChunks + 1)) * 100); // +1 voor finalize stap
+            showProgress(
+              `Audio uploaden: deel ${i + 1} van ${totalChunks}`,
+              pct,
+              `${fileName} — ${pct}%`
+            );
             const chunkResult = await API.uploadAudioChunk(reportId, fileName, mimeType, i, totalChunks, chunk);
             if (chunkResult.error) throw new Error(chunkResult.error);
           }
 
-          // Finaliseer
-          showToast('Audio samenvoegen en transcriptie starten...');
+          showProgress('Audio samenvoegen en transcriptie starten...', 95, 'Even geduld...');
           const finalResult = await API.finalizeAudioUpload(reportId);
           if (finalResult.error) throw new Error(finalResult.error);
+          showDone();
           resolve(finalResult);
         }
       } catch (err) {
+        prog.className = 'upload-progress';
+        progLabel.textContent = '⚠ Upload mislukt';
+        progFill.style.width = '0%';
+        progDetail.textContent = err.message;
         reject(err);
       }
     };
-    reader.onerror = () => reject(new Error('Kon audiobestand niet lezen'));
+    reader.onerror = () => {
+      prog.hidden = true;
+      reject(new Error('Kon audiobestand niet lezen'));
+    };
     reader.readAsDataURL(file);
   });
 }

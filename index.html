@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LiBeR Verslaggenerator</title>
-  <link rel="stylesheet" href="css/style.css?v=12.6b">
+  <link rel="stylesheet" href="css/style.css?v=12.7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
@@ -113,6 +113,17 @@
             <button class="btn btn-ghost btn-sm" onclick="removeAudio()">
               <span class="material-symbols-outlined">close</span>
             </button>
+          </div>
+          <!-- Upload voortgang -->
+          <div id="upload-progress" class="upload-progress" hidden>
+            <div class="upload-progress-header">
+              <span class="material-symbols-outlined spinning">cloud_upload</span>
+              <span id="upload-progress-label">Audio uploaden...</span>
+            </div>
+            <div class="upload-progress-bar">
+              <div class="upload-progress-fill" id="upload-progress-fill"></div>
+            </div>
+            <div class="upload-progress-detail" id="upload-progress-detail"></div>
           </div>
         </div>
       </div>
@@ -333,9 +344,9 @@
   <!-- TOAST NOTIFICATIONS -->
   <div class="toast-container" id="toast-container"></div>
 
-  <script src="js/api.js?v=12.6b"></script>
-  <script src="js/app.js?v=12.6b"></script>
-  <script src="js/editor.js?v=12.6b"></script>
-  <script src="js/preview.js?v=12.6b"></script>
+  <script src="js/api.js?v=12.7"></script>
+  <script src="js/app.js?v=12.7"></script>
+  <script src="js/editor.js?v=12.7"></script>
+  <script src="js/preview.js?v=12.7"></script>
 </body>
 </html>

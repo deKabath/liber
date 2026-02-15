@@ -263,6 +263,52 @@ body {
 }
 .file-preview .material-symbols-outlined { color: var(--orange); }
 
+/* Upload voortgangsbalk */
+.upload-progress {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+}
+.upload-progress-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: var(--gray-800);
+}
+.upload-progress-header .material-symbols-outlined {
+  color: var(--orange);
+  font-size: 20px;
+}
+.upload-progress-bar {
+  height: 8px;
+  background: var(--gray-200);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.upload-progress-fill {
+  height: 100%;
+  background: var(--orange);
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+.upload-progress-detail {
+  font-size: 13px;
+  color: var(--gray-500);
+}
+.upload-progress.done .upload-progress-fill {
+  background: var(--green, #22c55e);
+}
+.upload-progress.done .upload-progress-header .material-symbols-outlined {
+  color: var(--green, #22c55e);
+}
+
 .images-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
