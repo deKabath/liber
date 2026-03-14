@@ -41,6 +41,7 @@ function navigateTo(page, reportId) {
   APP.currentPage = page;
 
   if (page === 'dashboard') loadDashboard();
+  if (page === 'jotform') loadJotformPage();
   if (page === 'editor' && reportId) openEditor(reportId);
   if (page === 'preview') renderPreview();
 }
@@ -424,6 +425,143 @@ function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
   return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+// ---- JOTFORM INTAKE ----
+async function loadJotformPage() {
+  // Toon webhook URL
+  const urlDisplay = document.getElementById('webhook-url-display');
+  if (urlDisplay) {
+    urlDisplay.textContent = API.getApiUrl();
+  }
+  // Stel datum in op vandaag
+  const datumEl = document.getElementById('jf-datum');
+  if (datumEl && !datumEl.value) {
+    datumEl.value = new Date().toISOString().split('T')[0];
+  }
+  loadJotformSubmissions();
+}
+
+async function loadJotformSubmissions() {
+  const tbody = document.getElementById('jotform-tbody');
+  if (!tbody) return;
+
+  try {
+    const data = await API.listJotformSubmissions();
+    const submissions = data.submissions || [];
+
+    if (submissions.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Nog geen inzendingen ontvangen. Configureer de JotForm webhook of dien handmatig een transcriptie in.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = submissions.map(s => {
+      const statusMap = {
+        'jotform_received': '<span class="status-badge status-progress">📥 Ontvangen</span>',
+        'transcribing':     '<span class="status-badge status-progress">🎙️ Transcriptie...</span>',
+        'transcribed':      '<span class="status-badge status-done">📝 Getranscribeerd</span>',
+        'generating':       '<span class="status-badge status-progress">⏳ Genereren...</span>',
+        'created':          '<span class="status-badge status-progress">📝 Aangemaakt</span>',
+        'done':             '<span class="status-badge status-done">✓ Voltooid</span>',
+        'error':            '<span class="status-badge status-error">⚠️ Fout</span>',
+      };
+      const status = statusMap[s.status] || `<span class="status-badge">${s.status}</span>`;
+      const source = s.source === 'jotform'
+        ? '<span class="source-badge source-jotform">JotForm</span>'
+        : '<span class="source-badge source-manual">Handmatig</span>';
+      const date = s.createdAt ? new Date(s.createdAt).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+
+      return `<tr>
+        <td><strong>${escapeHtml(s.meetingName)}</strong>${s.error ? `<br><small class="error-text">${escapeHtml(s.error).substring(0, 80)}</small>` : ''}</td>
+        <td>${source}</td>
+        <td>${status}</td>
+        <td>${date}</td>
+        <td>
+          <button class="btn btn-ghost btn-sm" onclick="navigateTo('editor','${s.reportId}')">
+            <span class="material-symbols-outlined" style="font-size:16px">edit</span> Editor
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+
+  } catch (err) {
+    console.error('JotForm submissions laden mislukt:', err);
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="5">Fout bij laden: ${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+async function submitTranscription() {
+  const naam = document.getElementById('jf-naam').value.trim();
+  const datum = document.getElementById('jf-datum').value;
+  const tekst = document.getElementById('jf-transcriptie').value.trim();
+
+  if (!naam) {
+    showToast('Vul de naam van de vereniging in.', 'error');
+    return;
+  }
+  if (!tekst || tekst.length < 50) {
+    showToast('De transcriptie tekst is te kort (minimaal 50 tekens).', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit-transcription');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-symbols-outlined spinning">hourglass_top</span> Verwerken...';
+
+  try {
+    const result = await API.submitTranscription({
+      meetingName: naam,
+      transcriptionText: tekst,
+      headerFields: {
+        '<<naam vereniging>>': naam,
+        '<<datum>>': datum,
+        '<<contactpersoon>>': '',
+        '<<onderwerp>>': 'verslag intake',
+        '<<opgesteld_door>>': 'Lutger Brenninkmeijer',
+        '<<opdrachtgever>>': 'Rabobank Kring Metropool Regio Amsterdam'
+      }
+    });
+
+    if (result.error) {
+      showToast(result.error, 'error');
+      return;
+    }
+
+    showToast(`Transcriptie "${naam}" ingediend! Klaar voor sectie-generatie.`, 'success');
+
+    // Reset formulier
+    document.getElementById('jf-naam').value = '';
+    document.getElementById('jf-transcriptie').value = '';
+
+    // Ververs lijst en ga naar editor
+    loadJotformSubmissions();
+
+    if (result.reportId) {
+      setTimeout(() => navigateTo('editor', result.reportId), 1500);
+    }
+
+  } catch (err) {
+    showToast(`Fout: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-outlined">send</span> Transcriptie Indienen';
+  }
+}
+
+function copyWebhookUrl() {
+  const url = API.getApiUrl();
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('Webhook URL gekopieerd!', 'success');
+  }).catch(() => {
+    // Fallback
+    const textarea = document.createElement('textarea');
+    textarea.value = url;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showToast('Webhook URL gekopieerd!', 'success');
+  });
 }
 
 // ---- INIT ----

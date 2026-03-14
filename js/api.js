@@ -70,6 +70,10 @@ const API = (() => {
   async function getReportStatus(reportId)               { return get('getReportStatus', { reportId }); }
   async function checkTranscription(reportId)            { return get('checkTranscription', { reportId }); }
 
+  // JotForm / Transcriptie endpoints
+  async function listJotformSubmissions()    { return get('listJotformSubmissions'); }
+  async function submitTranscription(data)   { return post('submitTranscription', data); }
+
   return {
     getApiUrl, isConfigured,
     status, getTemplate, listReports, getReport,
@@ -78,6 +82,7 @@ const API = (() => {
     generateAllSections, updateSection, updateHeader,
     assembleReport, insertImage, deleteReport,
     uploadAudio, uploadAudioChunk, finalizeAudioUpload,
-    getReportStatus, checkTranscription
+    getReportStatus, checkTranscription,
+    listJotformSubmissions, submitTranscription
   };
 })();

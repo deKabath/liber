@@ -178,6 +178,53 @@ body {
 .status-progress { background: var(--orange-light); color: var(--orange); }
 .status-error { background: var(--red-light); color: var(--red); }
 
+/* ---- SOURCE BADGES ---- */
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.source-jotform { background: #E3F2FD; color: #1565C0; }
+.source-manual { background: var(--gray-200); color: var(--gray-700); }
+
+/* ---- JOTFORM PAGE ---- */
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.webhook-steps {
+  list-style: decimal;
+  padding-left: 24px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.webhook-steps li { margin-bottom: 8px; }
+.webhook-url {
+  display: inline-block;
+  background: var(--gray-100);
+  border: 1px solid var(--gray-300);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  word-break: break-all;
+  margin: 6px 0;
+  max-width: 100%;
+}
+.error-text {
+  color: var(--red);
+  font-size: 11px;
+}
+
 /* ---- CREATE PAGE ---- */
 .create-container { max-width: 800px; margin: 0 auto; }
 .create-container h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }

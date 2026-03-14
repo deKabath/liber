@@ -19,6 +19,7 @@
     <div class="topnav-center">
       <a href="#" class="nav-link active" data-page="dashboard">Dashboard</a>
       <a href="#" class="nav-link" data-page="create">Nieuw Verslag</a>
+      <a href="#" class="nav-link" data-page="jotform">JotForm Intake</a>
     </div>
     <div class="topnav-right">
       <span class="user-name">Lutger Brenninkmeijer</span>
@@ -180,6 +181,92 @@
         <button class="btn btn-primary btn-lg" id="btn-create-report" onclick="createReport()">
           <span class="material-symbols-outlined">rocket_launch</span> Verslag Aanmaken
         </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- PAGE: JOTFORM INTAKE -->
+  <main id="page-jotform" class="page">
+    <div class="create-container">
+      <h1>JotForm Intake</h1>
+      <p class="subtitle">Ontvangen audio-opnames via JotForm worden hier automatisch getranscribeerd en verwerkt tot verslagen.</p>
+
+      <!-- OPTIE 1: Handmatige transcriptie inzending -->
+      <div class="card step-card">
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <h3>Handmatige transcriptie invoeren <span class="optional-badge">optioneel</span></h3>
+        </div>
+        <div class="step-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="jf-naam">Naam Vereniging *</label>
+              <input type="text" id="jf-naam" class="form-input" placeholder="bijv. KV de Geuzen">
+            </div>
+            <div class="form-group">
+              <label for="jf-datum">Datum</label>
+              <input type="date" id="jf-datum" class="form-input">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 12px;">
+            <label for="jf-transcriptie">Transcriptie tekst</label>
+            <textarea id="jf-transcriptie" class="form-input form-textarea" rows="8" placeholder="Plak hier de transcriptie tekst..."></textarea>
+          </div>
+          <div class="create-actions" style="margin-top: 16px;">
+            <button class="btn btn-primary" id="btn-submit-transcription" onclick="submitTranscription()">
+              <span class="material-symbols-outlined">send</span> Transcriptie Indienen
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OVERZICHT: JotForm inzendingen -->
+      <div class="card">
+        <div class="dashboard-header" style="margin-bottom: 0;">
+          <h2>Ontvangen Inzendingen</h2>
+          <button class="btn btn-ghost" onclick="loadJotformSubmissions()">
+            <span class="material-symbols-outlined">refresh</span> Verversen
+          </button>
+        </div>
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Vereniging</th>
+              <th>Bron</th>
+              <th>Status</th>
+              <th>Ontvangen</th>
+              <th>Acties</th>
+            </tr>
+          </thead>
+          <tbody id="jotform-tbody">
+            <tr class="empty-row">
+              <td colspan="5">Laden...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WEBHOOK INFO -->
+      <div class="card step-card">
+        <div class="step-header">
+          <span class="step-number"><span class="material-symbols-outlined">webhook</span></span>
+          <h3>JotForm Webhook Configuratie</h3>
+        </div>
+        <div class="step-body">
+          <p>Om JotForm automatisch audiobestanden te laten versturen naar LiBeR:</p>
+          <ol class="webhook-steps">
+            <li>Open je JotForm formulier in de Form Builder</li>
+            <li>Ga naar <strong>Instellingen</strong> → <strong>Integraties</strong> → <strong>Webhooks</strong></li>
+            <li>Voeg een nieuwe webhook toe met de URL:<br>
+              <code class="webhook-url" id="webhook-url-display">Laden...</code>
+              <button class="btn btn-ghost btn-sm" onclick="copyWebhookUrl()" title="Kopieer URL">
+                <span class="material-symbols-outlined" style="font-size:16px">content_copy</span>
+              </button>
+            </li>
+            <li>Zorg dat je formulier een <strong>Bestandsupload</strong> veld bevat voor de audio-opname</li>
+            <li>Bij elke inzending wordt de audio automatisch gedownload, getranscribeerd en verwerkt</li>
+          </ol>
+        </div>
       </div>
     </div>
   </main>

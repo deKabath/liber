@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiBeR – Transcriptie & Verslaggenerator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+  <style>
+    :root {
+      --orange: #E87722;
+      --orange-light: #FFF3EB;
+      --orange-dark: #C4611A;
+      --green: #2E7D32;
+      --green-light: #E8F5E9;
+      --red: #C62828;
+      --red-light: #FFEBEE;
+      --blue: #1565C0;
+      --blue-light: #E3F2FD;
+      --g50: #FAFAFA; --g100: #F5F5F5; --g200: #EEEEEE; --g300: #E0E0E0;
+      --g400: #BDBDBD; --g500: #9E9E9E; --g600: #757575; --g700: #616161;
+      --g800: #424242; --g900: #212121;
+      --white: #FFFFFF;
+      --shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+      --radius: 10px;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--g100); color: var(--g900); min-height: 100vh; }
+
+    /* ── NAV ── */
+    .nav {
+      background: var(--white); border-bottom: 1px solid var(--g200);
+      padding: 0 24px; display: flex; align-items: center; height: 56px;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-right: 32px; }
+    .nav-logo .accent { color: var(--orange); }
+    .nav-steps { display: flex; gap: 4px; flex: 1; }
+    .nav-step {
+      display: flex; align-items: center; gap: 6px; padding: 8px 16px;
+      border-radius: 24px; font-size: 13px; font-weight: 500;
+      color: var(--g500); cursor: pointer; transition: all 0.2s;
+      border: none; background: none; position: relative;
+    }
+    .nav-step:hover { color: var(--g700); background: var(--g100); }
+    .nav-step.active { color: var(--orange); background: var(--orange-light); }
+    .nav-step.done { color: var(--green); }
+    .nav-step .material-symbols-outlined { font-size: 18px; }
+    .nav-step .step-num {
+      width: 22px; height: 22px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; font-size: 11px;
+      font-weight: 700; background: var(--g300); color: var(--white);
+    }
+    .nav-step.active .step-num { background: var(--orange); }
+    .nav-step.done .step-num { background: var(--green); }
+    .nav-step.disabled { opacity: 0.4; pointer-events: none; }
+
+    /* ── LAYOUT ── */
+    .container { max-width: 860px; margin: 0 auto; padding: 32px 24px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+    h2 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+    .subtitle { color: var(--g600); font-size: 14px; margin-bottom: 28px; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 24px; margin-bottom: 20px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px; border: none;
+      border-radius: 8px; font-family: var(--font); font-size: 13px;
+      font-weight: 600; padding: 10px 20px; cursor: pointer; transition: all 0.2s;
+    }
+    .btn:disabled { opacity: 0.5; pointer-events: none; }
+    .btn .material-symbols-outlined { font-size: 18px; }
+    .btn-primary { background: var(--orange); color: var(--white); }
+    .btn-primary:hover { background: var(--orange-dark); }
+    .btn-secondary { background: var(--g200); color: var(--g800); }
+    .btn-secondary:hover { background: var(--g300); }
+    .btn-ghost { background: transparent; color: var(--g600); padding: 8px 12px; }
+    .btn-ghost:hover { background: var(--g100); color: var(--g900); }
+    .btn-lg { padding: 14px 28px; font-size: 15px; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-block { width: 100%; justify-content: center; }
+    .btn-success { background: var(--green); color: var(--white); }
+    .btn-success:hover { background: #1B5E20; }
+
+    /* ── FORMS ── */
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--g700); }
+    .form-input {
+      width: 100%; padding: 10px 14px; border: 1.5px solid var(--g300);
+      border-radius: 8px; font-family: var(--font); font-size: 14px;
+      transition: border-color 0.2s; background: var(--white);
+    }
+    .form-input:focus { outline: none; border-color: var(--orange); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    textarea.form-input { resize: vertical; min-height: 100px; line-height: 1.6; }
+
+    /* ── UPLOAD ZONE ── */
+    .upload-zone {
+      border: 2px dashed var(--g300); border-radius: var(--radius);
+      padding: 48px 24px; text-align: center; cursor: pointer;
+      transition: all 0.2s; background: var(--g50);
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--orange); background: var(--orange-light);
+    }
+    .upload-zone .material-symbols-outlined { font-size: 48px; color: var(--g400); margin-bottom: 12px; display: block; }
+    .upload-zone:hover .material-symbols-outlined { color: var(--orange); }
+    .upload-zone p { color: var(--g600); font-size: 14px; }
+    .upload-zone .hint { font-size: 12px; color: var(--g500); margin-top: 8px; }
+
+    .file-info {
+      display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+      background: var(--g50); border: 1px solid var(--g200); border-radius: 8px;
+      margin-top: 12px;
+    }
+    .file-info .material-symbols-outlined { font-size: 28px; color: var(--orange); }
+    .file-info .file-meta { flex: 1; }
+    .file-info .file-name { font-weight: 600; font-size: 14px; }
+    .file-info .file-size { font-size: 12px; color: var(--g500); }
+
+    /* ── PROGRESS ── */
+    .progress-wrap { margin: 20px 0; }
+    .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .progress-label { font-size: 13px; font-weight: 600; color: var(--g700); }
+    .progress-pct { font-size: 13px; font-weight: 700; color: var(--orange); }
+    .progress-bar {
+      height: 8px; background: var(--g200); border-radius: 4px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: linear-gradient(90deg, var(--orange), #F4A261);
+      border-radius: 4px; transition: width 0.5s ease; width: 0%;
+    }
+    .progress-fill.done { background: linear-gradient(90deg, var(--green), #66BB6A); }
+    .progress-detail {
+      display: flex; justify-content: space-between; margin-top: 8px;
+      font-size: 12px; color: var(--g500);
+    }
+
+    /* ── PIPELINE STEPS ── */
+    .pipeline { margin: 20px 0; }
+    .pipe-step {
+      display: flex; align-items: center; gap: 12px; padding: 10px 0;
+      border-bottom: 1px solid var(--g100); font-size: 13px; color: var(--g500);
+    }
+    .pipe-step:last-child { border-bottom: none; }
+    .pipe-step .material-symbols-outlined { font-size: 20px; }
+    .pipe-step.active { color: var(--orange); font-weight: 600; }
+    .pipe-step.active .material-symbols-outlined { animation: spin 1.5s linear infinite; }
+    .pipe-step.done { color: var(--green); }
+    .pipe-step.error { color: var(--red); }
+    .pipe-step .pipe-detail { margin-left: auto; font-size: 11px; font-weight: 400; }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .spinning { animation: spin 1.5s linear infinite; }
+
+    /* ── TRANSCRIPTIE VIEWER ── */
+    .transcript-box {
+      background: var(--g50); border: 1px solid var(--g200); border-radius: 8px;
+      padding: 20px; max-height: 400px; overflow-y: auto; font-size: 14px;
+      line-height: 1.8; white-space: pre-wrap; color: var(--g800);
+    }
+
+    /* ── SECTION LIST ── */
+    .section-list { list-style: none; }
+    .section-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      border-radius: 8px; margin-bottom: 6px; cursor: pointer;
+      transition: background 0.15s; font-size: 14px;
+    }
+    .section-item:hover { background: var(--g100); }
+    .section-item.active { background: var(--orange-light); color: var(--orange); font-weight: 600; }
+    .section-item .material-symbols-outlined { font-size: 18px; color: var(--g400); }
+    .section-item.generated .material-symbols-outlined { color: var(--green); }
+    .section-item.active .material-symbols-outlined { color: var(--orange); }
+    .section-item .section-title { flex: 1; }
+    .section-item .section-words { font-size: 11px; color: var(--g500); }
+
+    /* ── EDITOR ── */
+    .editor-area {
+      min-height: 200px; padding: 20px; border: 1.5px solid var(--g200);
+      border-radius: 8px; font-size: 14px; line-height: 1.8;
+      outline: none; white-space: pre-wrap; background: var(--white);
+    }
+    .editor-area:focus { border-color: var(--orange); }
+    .editor-toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px;
+    }
+    .section-gen-status {
+      display: flex; align-items: center; gap: 8px; padding: 12px 16px;
+      background: var(--orange-light); border-radius: 8px; margin-bottom: 16px;
+      font-size: 13px; color: var(--orange);
+    }
+
+    /* ── REPORT PREVIEW ── */
+    .report-page {
+      background: var(--white); box-shadow: var(--shadow-lg);
+      border-radius: 4px; padding: 48px 56px; margin-bottom: 24px;
+      max-width: 800px; margin-left: auto; margin-right: auto;
+      font-size: 14px; line-height: 1.7;
+    }
+    .report-page h3 {
+      color: var(--orange); font-style: italic; font-size: 16px;
+      margin: 24px 0 12px; border-bottom: 1px solid var(--orange-light); padding-bottom: 6px;
+    }
+    .report-header-table { width: 100%; margin-bottom: 16px; }
+    .report-header-table td { padding: 4px 8px; font-size: 13px; }
+    .report-header-table td:first-child { font-style: italic; color: var(--g600); width: 140px; }
+    .report-divider { border: none; border-top: 2px solid var(--orange); margin: 16px 0; }
+
+    /* ── TOAST ── */
+    .toast-box { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 500;
+      box-shadow: var(--shadow-lg); animation: slideIn 0.3s ease;
+      min-width: 280px;
+    }
+    .toast.success { background: var(--green); color: var(--white); }
+    .toast.error { background: var(--red); color: var(--white); }
+    .toast.info { background: var(--g800); color: var(--white); }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* ── STATUS BADGES ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
+      border-radius: 20px; font-size: 12px; font-weight: 500;
+    }
+    .badge-green { background: var(--green-light); color: var(--green); }
+    .badge-orange { background: var(--orange-light); color: var(--orange); }
+    .badge-red { background: var(--red-light); color: var(--red); }
+    .badge-blue { background: var(--blue-light); color: var(--blue); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center; padding: 48px 24px; color: var(--g500);
+    }
+    .empty-state .material-symbols-outlined { font-size: 56px; margin-bottom: 16px; color: var(--g300); display: block; }
+
+    /* ── SPLIT LAYOUT ── */
+    .split { display: grid; grid-template-columns: 280px 1fr; gap: 20px; }
+    @media (max-width: 768px) {
+      .split { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .container { padding: 16px; }
+      .nav-steps { overflow-x: auto; }
+      .nav-step span:not(.step-num):not(.material-symbols-outlined) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-logo">Li<span class="accent">Be</span>R</div>
+    <div class="nav-steps">
+      <button class="nav-step active" data-step="upload" onclick="goStep('upload')">
+        <span class="step-num">1</span>
+        <span class="material-symbols-outlined">mic</span>
+        <span>Upload</span>
+      </button>
+      <button class="nav-step disabled" data-step="transcribe" onclick="goStep('transcribe')">
+        <span class="step-num">2</span>
+        <span class="material-symbols-outlined">subtitles</span>
+        <span>Transcriptie</span>
+      </button>
+      <button class="nav-step disabled" data-step="generate" onclick="goStep('generate')">
+        <span class="step-num">3</span>
+        <span class="material-symbols-outlined">auto_awesome</span>
+        <span>Genereren</span>
+      </button>
+      <button class="nav-step disabled" data-step="report" onclick="goStep('report')">
+        <span class="step-num">4</span>
+        <span class="material-symbols-outlined">description</span>
+        <span>Verslag</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- TOAST -->
+  <div class="toast-box" id="toast-box"></div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- STAP 1: UPLOAD -->
+  <!-- ════════════════════════════════════════════ -->
+  <div class="container page active" id="page-upload">
+    <h1>Audio uploaden</h1>
+    <p class="subtitle">Upload een audio-opname van het intake gesprek. De app transcribeert de audio en genereert automatisch een MRA verslag.</p>
+
+    <div class="card">
+      <h2>Basisgegevens</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inp-naam">Naam Vereniging *</label>
+          <input type="text" id="inp-naam" class="form-input" placeholder="bijv. KV de Geuzen">
+        </div>
+        <div class="form-group">
+          <label for="inp-datum">Datum Intake</label>
+          <input type="date" id="inp-datum" class="form-input">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="inp-contact">Contactpersoon</label>
+          <input type="text" id="inp-contact" class="form-input" placeholder="bijv. Ron Leegwater">
+        </div>
+        <div class="form-group">
+          <label for="inp-opgesteld">Opgesteld door</label>
+          <input type="text" id="inp-opgesteld" class="form-input" value="Lutger Brenninkmeijer">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Audio-opname</h2>
+      <div class="upload-zone" id="drop-zone">
+        <span class="material-symbols-outlined">mic</span>
+        <p>Sleep je audiobestand hierheen of klik om te selecteren</p>
+        <p class="hint">MP3, WAV, M4A, AAC, OGG, FLAC – max 500MB</p>
+        <input type="file" id="file-input" accept="audio/*" hidden>
+      </div>
+      <div class="file-info" id="file-info" hidden>
+        <span class="material-symbols-outlined">audio_file</span>
+        <div class="file-meta">
+          <div class="file-name" id="file-name"></div>
+          <div class="file-size" id="file-size"></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="removeFile()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <!-- Upload progress -->
+      <div class="progress-wrap" id="upload-progress" hidden>
+        <div class="progress-header">
+          <span class="progress-label" id="upload-label">Uploaden...</span>
+          <span class="progress-pct" id="upload-pct">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="upload-fill"></div></div>
+        <div class="progress-detail">
+          <span id="upload-detail"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OF: plak transcriptie -->
+    <div class="card">
+      <h2>Of: plak een transcriptie</h2>
+      <div class="form-group">
+        <label for="inp-transcript-text">Transcriptie tekst</label>
+        <textarea id="inp-transcript-text" class="form-input" rows="6" placeholder="Plak hier een bestaande transcriptie tekst als je geen audio wilt uploaden..."></textarea>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 12px; justify-content: flex-end;">
+      <button class="btn btn-primary btn-lg" id="btn-start" onclick="startProcess()">
+        <span class="material-symbols-outlined">rocket_launch</span> Start Verwerking
+      </button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- STAP 2: TRANSCRIPTIE -->
+  <!-- ════════════════════════════════════════════ -->
+  <div class="container page" id="page-transcribe">
+    <h1>Transcriptie</h1>
+    <p class="subtitle" id="trans-subtitle">Audio wordt getranscribeerd via OpenAI Whisper...</p>
+
+    <!-- Pipeline voortgang -->
+    <div class="card" id="pipeline-card">
+      <div class="progress-wrap">
+        <div class="progress-header">
+          <span class="progress-label" id="pipe-label">Verwerken...</span>
+          <span class="progress-pct" id="pipe-pct">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="pipe-fill"></div></div>
+        <div class="progress-detail">
+          <span id="pipe-eta"></span>
+          <span id="pipe-elapsed"></span>
+        </div>
+      </div>
+      <div class="pipeline" id="pipeline-steps"></div>
+    </div>
+
+    <!-- Transcriptie resultaat -->
+    <div class="card" id="transcript-result" hidden>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h2>Transcriptie</h2>
+        <span class="badge badge-green" id="trans-chars"></span>
+      </div>
+      <div class="transcript-box" id="transcript-text"></div>
+      <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: flex-end;">
+        <button class="btn btn-primary" onclick="goStep('generate')">
+          <span class="material-symbols-outlined">auto_awesome</span> Doorgaan naar Genereren
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- STAP 3: GENEREREN -->
+  <!-- ════════════════════════════════════════════ -->
+  <div class="container page" id="page-generate">
+    <h1>Verslag Genereren</h1>
+    <p class="subtitle">AI genereert de inhoud van elke sectie vanuit de transcriptie.</p>
+
+    <div class="split">
+      <!-- Sectie lijst -->
+      <div class="card" style="height: fit-content;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h2 style="margin:0;">Secties</h2>
+          <span class="badge badge-orange" id="gen-counter">0/0</span>
+        </div>
+        <ul class="section-list" id="section-list"></ul>
+        <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+          <button class="btn btn-primary btn-block" id="btn-gen-all" onclick="generateAll()">
+            <span class="material-symbols-outlined">auto_awesome</span> Alles Genereren
+          </button>
+          <button class="btn btn-secondary btn-block" onclick="goStep('report')" id="btn-to-report" disabled>
+            <span class="material-symbols-outlined">description</span> Bekijk Verslag
+          </button>
+        </div>
+      </div>
+
+      <!-- Editor -->
+      <div>
+        <div class="card" id="section-editor-card">
+          <div class="editor-toolbar">
+            <h2 id="editor-section-title">Selecteer een sectie</h2>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-ghost btn-sm" id="btn-regen" onclick="regenerateCurrentSection()" disabled title="Hergenereren">
+                <span class="material-symbols-outlined">refresh</span>
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btn-save-section" onclick="saveCurrentSection()" disabled>
+                <span class="material-symbols-outlined">save</span> Opslaan
+              </button>
+            </div>
+          </div>
+          <div class="section-gen-status" id="section-gen-status" hidden>
+            <span class="material-symbols-outlined spinning">hourglass_top</span>
+            <span id="section-gen-label">Genereren...</span>
+          </div>
+          <div class="editor-area" id="section-editor" contenteditable="true"
+               data-placeholder="Selecteer een sectie in de lijst om te bewerken, of klik op 'Alles Genereren'."></div>
+        </div>
+
+        <!-- Generatie voortgang -->
+        <div class="card" id="gen-progress-card" hidden>
+          <div class="progress-wrap">
+            <div class="progress-header">
+              <span class="progress-label" id="gen-label">Secties genereren...</span>
+              <span class="progress-pct" id="gen-pct">0%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" id="gen-fill"></div></div>
+            <div class="progress-detail">
+              <span id="gen-eta"></span>
+              <span id="gen-elapsed"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- STAP 4: VERSLAG -->
+  <!-- ════════════════════════════════════════════ -->
+  <div class="container page" id="page-report">
+    <h1>Verslag</h1>
+    <p class="subtitle">Preview van het gegenereerde MRA verslag.</p>
+
+    <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+      <button class="btn btn-primary" onclick="exportToGoogleDoc()">
+        <span class="material-symbols-outlined">description</span> Exporteer als Google Doc
+      </button>
+      <button class="btn btn-secondary" onclick="goStep('generate')">
+        <span class="material-symbols-outlined">edit</span> Terug naar Editor
+      </button>
+    </div>
+
+    <div id="report-preview"></div>
+
+    <div id="export-result" hidden class="card" style="margin-top: 20px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="material-symbols-outlined" style="font-size: 32px; color: var(--green);">check_circle</span>
+        <div>
+          <h2 style="margin:0;">Google Doc aangemaakt</h2>
+          <a id="doc-link" href="#" target="_blank" style="color: var(--blue); font-size: 14px;">Open in Google Docs</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIG & STATE
+// ═══════════════════════════════════════════
+const API_URL = 'https://script.google.com/macros/s/AKfycbz0AFVa1KwXEqTM4OQ70mYFdMBLOWLYNyZewFSWwnYpugJCTWwctJKhiQUtKwfP5gJsHg/exec';
+
+const STATE = {
+  reportId: null,
+  audioFile: null,
+  transcriptText: null,
+  sections: {},
+  activeSection: null,
+  headerFields: {},
+  transcriptReady: false,
+  generatedCount: 0
+};
+
+const MRA_SECTIONS = [
+  { id: 'inleiding',          title: 'Inleiding',                   generatable: true,  page: 1 },
+  { id: 'nulmeting_dna',      title: 'Nulmeting – Het DNA',         generatable: true,  page: 1 },
+  { id: 'nulmeting_quickscan',title: 'Nulmeting – Quick Scan',      generatable: true,  page: 1 },
+  { id: 'positie',            title: 'Positie van de organisatie',   generatable: true,  page: 2 },
+  { id: 'ambitie',            title: 'Ambitie',                     generatable: true,  page: 2 },
+  { id: 'advies',             title: 'Advies',                      generatable: true,  page: 3 },
+  { id: 'ondersteuning',      title: 'Ondersteuning Rabobank',      generatable: true,  page: 3 },
+  { id: 'experts',            title: 'Voorgestelde expert(s)',       generatable: true,  page: 3 }
+];
+
+// ═══════════════════════════════════════════
+// API LAYER
+// ═══════════════════════════════════════════
+async function apiGet(action, params = {}) {
+  const url = new URL(API_URL);
+  url.searchParams.set('action', action);
+  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
+  const res = await fetch(url.toString());
+  if (!res.ok) throw new Error(`API fout: ${res.status}`);
+  return res.json();
+}
+
+async function apiPost(action, data = {}) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({ action, ...data })
+  });
+  if (!res.ok) throw new Error(`API fout: ${res.status}`);
+  return res.json();
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function goStep(step) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + step).classList.add('active');
+
+  document.querySelectorAll('.nav-step').forEach(s => s.classList.remove('active'));
+  const navStep = document.querySelector(`.nav-step[data-step="${step}"]`);
+  if (navStep) navStep.classList.add('active');
+
+  if (step === 'generate') renderSectionList();
+  if (step === 'report') renderReport();
+}
+
+function enableStep(step) {
+  const el = document.querySelector(`.nav-step[data-step="${step}"]`);
+  if (el) el.classList.remove('disabled');
+}
+
+function markStepDone(step) {
+  const el = document.querySelector(`.nav-step[data-step="${step}"]`);
+  if (el) el.classList.add('done');
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+function toast(msg, type = 'info') {
+  const box = document.getElementById('toast-box');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  box.appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+// ═══════════════════════════════════════════
+// STAP 1: UPLOAD
+// ═══════════════════════════════════════════
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  if (e.dataTransfer.files.length) selectFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => { if (fileInput.files.length) selectFile(fileInput.files[0]); });
+
+// Init datum
+document.getElementById('inp-datum').value = new Date().toISOString().split('T')[0];
+
+function selectFile(file) {
+  if (!file.type.startsWith('audio/') && !file.name.match(/\.(mp3|wav|m4a|aac|ogg|flac)$/i)) {
+    toast('Ongeldig audioformaat.', 'error');
+    return;
+  }
+  STATE.audioFile = file;
+  document.getElementById('drop-zone').hidden = true;
+  document.getElementById('file-info').hidden = false;
+  document.getElementById('file-name').textContent = file.name;
+  document.getElementById('file-size').textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB';
+}
+
+function removeFile() {
+  STATE.audioFile = null;
+  fileInput.value = '';
+  document.getElementById('drop-zone').hidden = false;
+  document.getElementById('file-info').hidden = true;
+}
+
+// ── START VERWERKING ──
+async function startProcess() {
+  const naam = document.getElementById('inp-naam').value.trim();
+  if (!naam) { toast('Vul de naam van de vereniging in.', 'error'); return; }
+
+  const pastedText = document.getElementById('inp-transcript-text').value.trim();
+
+  if (!STATE.audioFile && pastedText.length < 50) {
+    toast('Upload een audiobestand of plak een transcriptie (min. 50 tekens).', 'error');
+    return;
+  }
+
+  STATE.headerFields = {
+    '<<naam vereniging>>': naam,
+    '<<datum>>': document.getElementById('inp-datum').value,
+    '<<contactpersoon>>': document.getElementById('inp-contact').value.trim(),
+    '<<onderwerp>>': 'verslag intake',
+    '<<opgesteld_door>>': document.getElementById('inp-opgesteld').value.trim() || 'Lutger Brenninkmeijer',
+    '<<opdrachtgever>>': 'Rabobank Kring Metropool Regio Amsterdam'
+  };
+
+  const btn = document.getElementById('btn-start');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-symbols-outlined spinning">hourglass_top</span> Verwerken...';
+
+  try {
+    // Route A: direct geplakte transcriptie
+    if (pastedText.length >= 50 && !STATE.audioFile) {
+      const res = await apiPost('submitTranscription', {
+        meetingName: naam,
+        transcriptionText: pastedText,
+        headerFields: STATE.headerFields
+      });
+      if (res.error) throw new Error(res.error);
+
+      STATE.reportId = res.reportId;
+      STATE.transcriptText = pastedText;
+      STATE.transcriptReady = true;
+
+      markStepDone('upload');
+      enableStep('transcribe');
+      enableStep('generate');
+      markStepDone('transcribe');
+
+      // Toon transcriptie direct
+      showTranscript(pastedText);
+      goStep('transcribe');
+      toast('Transcriptie opgeslagen!', 'success');
+      return;
+    }
+
+    // Route B: audio upload
+    toast('Verslag aanmaken...');
+    const createRes = await apiPost('createReport', {
+      data: { meetingName: naam, template: 'rabobank_mra', headerFields: STATE.headerFields }
+    });
+    if (!createRes.reportId) throw new Error('Geen reportId ontvangen');
+    STATE.reportId = createRes.reportId;
+
+    // Upload audio
+    await uploadAudio(STATE.reportId, STATE.audioFile);
+
+    markStepDone('upload');
+    enableStep('transcribe');
+    goStep('transcribe');
+
+    // Start polling
+    pollTranscription();
+
+  } catch (err) {
+    toast('Fout: ' + err.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-outlined">rocket_launch</span> Start Verwerking';
+  }
+}
+
+// ── AUDIO UPLOAD ──
+async function uploadAudio(reportId, file) {
+  const CHUNK_SIZE = 5 * 1024 * 1024;
+  const prog = document.getElementById('upload-progress');
+  const label = document.getElementById('upload-label');
+  const pct = document.getElementById('upload-pct');
+  const fill = document.getElementById('upload-fill');
+  const detail = document.getElementById('upload-detail');
+
+  prog.hidden = false;
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const base64 = e.target.result.split(',')[1];
+        const fileName = file.name;
+        const mimeType = file.type || 'audio/mpeg';
+
+        if (base64.length <= CHUNK_SIZE) {
+          label.textContent = 'Audio uploaden...';
+          pct.textContent = '50%';
+          fill.style.width = '50%';
+          const res = await apiPost('uploadAudio', { reportId, fileName, mimeType, audioBase64: base64 });
+          if (res.error) throw new Error(res.error);
+          fill.style.width = '100%';
+          pct.textContent = '100%';
+          label.textContent = 'Upload voltooid';
+          resolve(res);
+        } else {
+          const totalChunks = Math.ceil(base64.length / CHUNK_SIZE);
+          for (let i = 0; i < totalChunks; i++) {
+            const chunk = base64.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+            const p = Math.round(((i + 1) / (totalChunks + 1)) * 100);
+            label.textContent = `Uploaden: deel ${i + 1}/${totalChunks}`;
+            pct.textContent = p + '%';
+            fill.style.width = p + '%';
+            detail.textContent = `${fileName}`;
+            const res = await apiPost('uploadAudioChunk', { reportId, fileName, mimeType, chunkIndex: i, totalChunks, chunkBase64: chunk });
+            if (res.error) throw new Error(res.error);
+          }
+          label.textContent = 'Samenvoegen...';
+          pct.textContent = '95%';
+          fill.style.width = '95%';
+          const finalRes = await apiPost('finalizeAudioUpload', { reportId });
+          if (finalRes.error) throw new Error(finalRes.error);
+          fill.style.width = '100%';
+          pct.textContent = '100%';
+          label.textContent = 'Upload voltooid – transcriptie gestart';
+          resolve(finalRes);
+        }
+      } catch (err) {
+        reject(err);
+      }
+    };
+    reader.onerror = () => reject(new Error('Kan bestand niet lezen'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// ═══════════════════════════════════════════
+// STAP 2: TRANSCRIPTIE POLLING
+// ═══════════════════════════════════════════
+let pollTimer = null;
+let pollStart = Date.now();
+
+function pollTranscription() {
+  pollStart = Date.now();
+  doPoll();
+}
+
+async function doPoll() {
+  if (!STATE.reportId) return;
+
+  try {
+    const status = await apiGet('getReportStatus', { reportId: STATE.reportId });
+
+    // Update progress
+    const progress = status.transcriptProgress || 0;
+    document.getElementById('pipe-fill').style.width = progress + '%';
+    document.getElementById('pipe-pct').textContent = progress + '%';
+
+    // Pipeline label
+    const stepLabel = (status.pipeline && status.pipeline.currentStepLabel) || 'Verwerken...';
+    document.getElementById('pipe-label').textContent = stepLabel;
+
+    // ETA
+    if (status.pipeline && status.pipeline.eta) {
+      document.getElementById('pipe-eta').textContent = status.pipeline.eta.formatted ? `ETA: ${status.pipeline.eta.formatted}` : '';
+    }
+
+    // Elapsed
+    const elapsed = Math.round((Date.now() - pollStart) / 1000);
+    const min = Math.floor(elapsed / 60);
+    const sec = elapsed % 60;
+    document.getElementById('pipe-elapsed').textContent = `${min}:${String(sec).padStart(2, '0')}`;
+
+    // Pipeline steps
+    if (status.pipeline && status.pipeline.steps) {
+      renderPipelineSteps(status.pipeline.steps);
+    }
+
+    // Check completion
+    if (status.status === 'transcribed' || status.status === 'done' || status.transcriptStatus === 'done') {
+      document.getElementById('pipe-fill').style.width = '100%';
+      document.getElementById('pipe-fill').classList.add('done');
+      document.getElementById('pipe-pct').textContent = '100%';
+      document.getElementById('pipe-label').textContent = 'Transcriptie voltooid!';
+
+      enableStep('generate');
+      markStepDone('transcribe');
+      STATE.transcriptReady = true;
+
+      // Haal transcriptie tekst op
+      await loadTranscript();
+      return;
+    }
+
+    if (status.status === 'error') {
+      document.getElementById('pipe-label').textContent = 'Fout: ' + (status.error || 'Onbekende fout');
+      toast('Transcriptie fout: ' + (status.error || 'Onbekend'), 'error');
+      return;
+    }
+
+    // Blijf pollen
+    pollTimer = setTimeout(doPoll, 5000);
+
+  } catch (err) {
+    console.error('Poll fout:', err);
+    pollTimer = setTimeout(doPoll, 8000);
+  }
+}
+
+function renderPipelineSteps(steps) {
+  const container = document.getElementById('pipeline-steps');
+  container.innerHTML = steps.map(step => {
+    let icon = step.icon || 'radio_button_unchecked';
+    let cls = '';
+    if (step.status === 'completed') { icon = 'check_circle'; cls = 'done'; }
+    else if (step.status === 'active') { icon = 'pending'; cls = 'active'; }
+    else if (step.status === 'error') { icon = 'error'; cls = 'error'; }
+    else if (step.status === 'skipped') return '';
+
+    return `<div class="pipe-step ${cls}">
+      <span class="material-symbols-outlined">${icon}</span>
+      <span>${step.label}</span>
+      ${step.detail ? `<span class="pipe-detail">${step.detail}</span>` : ''}
+      ${step.elapsedFormatted ? `<span class="pipe-detail">${step.elapsedFormatted}</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function loadTranscript() {
+  try {
+    const check = await apiGet('checkTranscription', { reportId: STATE.reportId });
+    if (check.complete) {
+      // Haal de secties op om te checken of transcript tekst beschikbaar is
+      const report = await apiGet('getReport', { reportId: STATE.reportId });
+      // De backend slaat de transcriptie op als txt file - we hebben geen directe
+      // endpoint om de tekst op te halen, maar we weten dat het klaar is
+      document.getElementById('trans-subtitle').textContent = 'Transcriptie voltooid! Ga door naar sectie-generatie.';
+      STATE.transcriptReady = true;
+
+      document.getElementById('transcript-result').hidden = false;
+      document.getElementById('transcript-text').textContent = 'Transcriptie is opgeslagen op de server. Klik op "Doorgaan naar Genereren" om de secties te genereren vanuit de transcriptie.';
+      document.getElementById('trans-chars').textContent = check.message || 'Gereed';
+    }
+  } catch (err) {
+    console.error('Transcript laden mislukt:', err);
+  }
+}
+
+function showTranscript(text) {
+  STATE.transcriptText = text;
+  document.getElementById('trans-subtitle').textContent = 'Transcriptie beschikbaar.';
+  document.getElementById('transcript-result').hidden = false;
+  document.getElementById('transcript-text').textContent = text;
+  document.getElementById('trans-chars').textContent = text.length.toLocaleString('nl-NL') + ' tekens';
+  document.getElementById('pipeline-card').hidden = true;
+}
+
+// ═══════════════════════════════════════════
+// STAP 3: SECTIE GENERATIE
+// ═══════════════════════════════════════════
+function renderSectionList() {
+  const list = document.getElementById('section-list');
+  const generatable = MRA_SECTIONS.filter(s => s.generatable);
+
+  let generated = 0;
+  list.innerHTML = generatable.map(sec => {
+    const data = STATE.sections[sec.id];
+    const isGenerated = data && data.content;
+    if (isGenerated) generated++;
+    const isActive = STATE.activeSection === sec.id;
+    const wordCount = isGenerated ? data.content.trim().split(/\s+/).length : 0;
+
+    return `<li class="section-item ${isActive ? 'active' : ''} ${isGenerated ? 'generated' : ''}"
+                onclick="selectSection('${sec.id}')">
+      <span class="material-symbols-outlined">${isGenerated ? 'check_circle' : 'radio_button_unchecked'}</span>
+      <span class="section-title">${sec.title}</span>
+      ${isGenerated ? `<span class="section-words">${wordCount}w</span>` : ''}
+    </li>`;
+  }).join('');
+
+  STATE.generatedCount = generated;
+  document.getElementById('gen-counter').textContent = `${generated}/${generatable.length}`;
+
+  if (generated > 0) {
+    document.getElementById('btn-to-report').disabled = false;
+    enableStep('report');
+  }
+  if (generated === generatable.length) {
+    markStepDone('generate');
+  }
+}
+
+function selectSection(sectionId) {
+  STATE.activeSection = sectionId;
+  const sec = MRA_SECTIONS.find(s => s.id === sectionId);
+  const data = STATE.sections[sectionId];
+
+  document.getElementById('editor-section-title').textContent = sec ? sec.title : '';
+  document.getElementById('section-editor').textContent = data && data.content ? data.content : '';
+  document.getElementById('btn-save-section').disabled = false;
+  document.getElementById('btn-regen').disabled = false;
+
+  renderSectionList();
+}
+
+async function generateAll() {
+  if (!STATE.reportId) { toast('Geen rapport gevonden.', 'error'); return; }
+
+  const btn = document.getElementById('btn-gen-all');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-symbols-outlined spinning">hourglass_top</span> Genereren...';
+
+  const progressCard = document.getElementById('gen-progress-card');
+  progressCard.hidden = false;
+
+  const generatable = MRA_SECTIONS.filter(s => s.generatable);
+  const startTime = Date.now();
+  let completed = 0;
+
+  for (const sec of generatable) {
+    // Skip already generated
+    if (STATE.sections[sec.id] && STATE.sections[sec.id].content) {
+      completed++;
+      continue;
+    }
+
+    // Update UI
+    const pct = Math.round((completed / generatable.length) * 100);
+    document.getElementById('gen-fill').style.width = pct + '%';
+    document.getElementById('gen-pct').textContent = pct + '%';
+    document.getElementById('gen-label').textContent = `Genereren: ${sec.title}`;
+
+    const elapsed = Math.round((Date.now() - startTime) / 1000);
+    document.getElementById('gen-elapsed').textContent = `${Math.floor(elapsed/60)}:${String(elapsed%60).padStart(2,'0')}`;
+    if (completed > 0) {
+      const avg = elapsed / completed;
+      const remaining = Math.round(avg * (generatable.length - completed));
+      document.getElementById('gen-eta').textContent = `~${Math.ceil(remaining/60)} min resterend`;
+    }
+
+    try {
+      const result = await apiPost('generateSection', { reportId: STATE.reportId, sectionId: sec.id });
+      if (result.error) {
+        console.error(`Fout bij ${sec.id}:`, result.error);
+        toast(`Fout bij ${sec.title}: ${result.error}`, 'error');
+      } else {
+        STATE.sections[sec.id] = result;
+      }
+    } catch (err) {
+      console.error(`Fout bij ${sec.id}:`, err);
+      toast(`Fout bij ${sec.title}: ${err.message}`, 'error');
+    }
+
+    completed++;
+    renderSectionList();
+  }
+
+  // Klaar
+  document.getElementById('gen-fill').style.width = '100%';
+  document.getElementById('gen-fill').classList.add('done');
+  document.getElementById('gen-pct').textContent = '100%';
+  document.getElementById('gen-label').textContent = 'Alle secties gegenereerd!';
+
+  btn.disabled = false;
+  btn.innerHTML = '<span class="material-symbols-outlined">auto_awesome</span> Alles Genereren';
+
+  toast('Alle secties gegenereerd!', 'success');
+  renderSectionList();
+  markStepDone('generate');
+  enableStep('report');
+}
+
+async function regenerateCurrentSection() {
+  if (!STATE.activeSection || !STATE.reportId) return;
+
+  const sec = MRA_SECTIONS.find(s => s.id === STATE.activeSection);
+  const statusEl = document.getElementById('section-gen-status');
+  statusEl.hidden = false;
+  document.getElementById('section-gen-label').textContent = `${sec.title} hergenereren...`;
+  document.getElementById('btn-regen').disabled = true;
+
+  try {
+    const result = await apiPost('regenerateSection', { reportId: STATE.reportId, sectionId: STATE.activeSection });
+    if (result.error) throw new Error(result.error);
+    STATE.sections[STATE.activeSection] = result;
+    document.getElementById('section-editor').textContent = result.content || '';
+    toast(`${sec.title} hergegenereerd.`, 'success');
+    renderSectionList();
+  } catch (err) {
+    toast('Fout: ' + err.message, 'error');
+  } finally {
+    statusEl.hidden = true;
+    document.getElementById('btn-regen').disabled = false;
+  }
+}
+
+async function saveCurrentSection() {
+  if (!STATE.activeSection || !STATE.reportId) return;
+
+  const content = document.getElementById('section-editor').textContent;
+  try {
+    await apiPost('updateSection', { reportId: STATE.reportId, sectionId: STATE.activeSection, content });
+    STATE.sections[STATE.activeSection] = STATE.sections[STATE.activeSection] || {};
+    STATE.sections[STATE.activeSection].content = content;
+    toast('Sectie opgeslagen.', 'success');
+    renderSectionList();
+  } catch (err) {
+    toast('Opslaan mislukt: ' + err.message, 'error');
+  }
+}
+
+// ═══════════════════════════════════════════
+// STAP 4: VERSLAG PREVIEW & EXPORT
+// ═══════════════════════════════════════════
+function renderReport() {
+  const container = document.getElementById('report-preview');
+  const h = STATE.headerFields;
+
+  let html = '<div class="report-page">';
+
+  // Header
+  html += `<table class="report-header-table">
+    <tr><td>Opdrachtgever:</td><td>${esc(h['<<opdrachtgever>>'] || 'Rabobank Kring Metropool Regio Amsterdam')}</td></tr>
+    <tr><td>Vereniging:</td><td><strong>${esc(h['<<naam vereniging>>'] || '')}</strong></td></tr>
+    <tr><td>Onderwerp:</td><td>${esc(h['<<onderwerp>>'] || 'verslag intake')}</td></tr>
+    <tr><td>Contact met:</td><td>${esc(h['<<contactpersoon>>'] || '')}</td></tr>
+    <tr><td>Opgesteld door:</td><td>${esc(h['<<opgesteld_door>>'] || 'Lutger Brenninkmeijer')}</td></tr>
+  </table>
+  <hr class="report-divider">`;
+
+  // Secties per pagina
+  const pageBreakAfter = { 1: true, 2: true };
+  let currentPage = 0;
+
+  for (const sec of MRA_SECTIONS.filter(s => s.generatable)) {
+    const data = STATE.sections[sec.id];
+    if (!data || !data.content) continue;
+
+    if (sec.page !== currentPage) {
+      if (currentPage > 0 && pageBreakAfter[currentPage]) {
+        html += '</div><div class="report-page">';
+      }
+      currentPage = sec.page;
+    }
+
+    html += `<h3>${esc(sec.title)}</h3>`;
+    const paragraphs = data.content.split('\n').filter(l => l.trim());
+    for (const p of paragraphs) {
+      html += `<p>${esc(p.trim())}</p>`;
+    }
+  }
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+async function exportToGoogleDoc() {
+  if (!STATE.reportId) { toast('Geen rapport gevonden.', 'error'); return; }
+
+  toast('Google Doc aanmaken...');
+  try {
+    const result = await apiPost('assembleReport', {
+      reportId: STATE.reportId,
+      headerFields: STATE.headerFields
+    });
+
+    if (result.error) throw new Error(result.error);
+
+    document.getElementById('export-result').hidden = false;
+    document.getElementById('doc-link').href = result.docUrl || `https://docs.google.com/document/d/${result.docId}/edit`;
+    document.getElementById('doc-link').textContent = result.title || 'Open Google Doc';
+
+    toast('Google Doc aangemaakt!', 'success');
+  } catch (err) {
+    toast('Export mislukt: ' + err.message, 'error');
+  }
+}
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function esc(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+// Check of er al een report in de URL staat
+(function init() {
+  const params = new URLSearchParams(window.location.search);
+  const rid = params.get('reportId');
+  if (rid) {
+    STATE.reportId = rid;
+    enableStep('transcribe');
+    enableStep('generate');
+    enableStep('report');
+    // Laad secties
+    loadExistingReport(rid);
+  }
+})();
+
+async function loadExistingReport(reportId) {
+  try {
+    const data = await apiGet('getReport', { reportId });
+    if (data.error) return;
+
+    STATE.reportId = reportId;
+    STATE.headerFields = data.headerFields || {};
+
+    // Vul formulier
+    if (STATE.headerFields['<<naam vereniging>>']) document.getElementById('inp-naam').value = STATE.headerFields['<<naam vereniging>>'];
+    if (STATE.headerFields['<<datum>>']) document.getElementById('inp-datum').value = STATE.headerFields['<<datum>>'];
+    if (STATE.headerFields['<<contactpersoon>>']) document.getElementById('inp-contact').value = STATE.headerFields['<<contactpersoon>>'];
+
+    // Laad secties
+    if (data.sections) {
+      for (const [id, sec] of Object.entries(data.sections)) {
+        if (sec.content) STATE.sections[id] = sec.content;
+      }
+    }
+
+    const sections = await apiGet('getSections', { reportId });
+    if (sections.sections) {
+      for (const [id, sec] of Object.entries(sections.sections)) {
+        if (sec.generated && sec.content) STATE.sections[id] = sec.content;
+      }
+    }
+
+    markStepDone('upload');
+    enableStep('transcribe');
+    enableStep('generate');
+    enableStep('report');
+    renderSectionList();
+    toast('Bestaand rapport geladen.', 'success');
+  } catch (err) {
+    console.error('Laden mislukt:', err);
+  }
+}
+</script>
+</body>
+</html>
