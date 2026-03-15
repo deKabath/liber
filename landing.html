@@ -176,81 +176,145 @@
     <div class="section-inner">
       <h2 class="section-title">Track <span class="accent">Record</span></h2>
       <p class="section-sub">Meer dan 25 jaar ervaring, samengevat in mijlpalen.</p>
-      <div style="text-align:center;margin-bottom:40px;">
+      <div style="text-align:center;margin-bottom:48px;">
         <a href="tijdlijn.html" class="btn btn-primary btn-lg" style="gap:10px;">
-          <span class="material-symbols-outlined">play_circle</span> Bekijk de animatie-tijdlijn
+          <span class="material-symbols-outlined">play_circle</span> Bekijk de fullscreen tijdlijn
         </a>
       </div>
 
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-year">1997</div>
-          <div class="timeline-content">
+      <div class="vtl" id="vtl">
+        <!-- Animated progress line -->
+        <div class="vtl-track">
+          <div class="vtl-progress" id="vtl-progress"></div>
+        </div>
+
+        <div class="vtl-item vtl-left">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card">
+            <div class="vtl-year">1997</div>
             <h4>Oprichting LiBeR</h4>
             <p>Op 1 mei — Dag van de Arbeid — start Lutger R. Brenninkmeijer LiBeR Advies Begeleiding Concepten in Amsterdam.</p>
+            <div class="vtl-badge">&#127942; Het begin</div>
           </div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">1998</div>
-          <div class="timeline-content">
-            <h4>Revitalisering Hockeyclub Amsterdam</h4>
+
+        <div class="vtl-item vtl-right">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card">
+            <div class="vtl-year">1998</div>
+            <h4>Revitalisering HC Amsterdam</h4>
             <p>Start van de revitalisering van AH&BC: vernieuwde visie, nieuw technisch beleid en modernisering van de accommodatie.</p>
+            <div class="vtl-badge">&#127919; AH&BC</div>
           </div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">1999</div>
-          <div class="timeline-content">
+
+        <div class="vtl-item vtl-left">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card">
+            <div class="vtl-year">1999</div>
             <h4>Het Sidneyveld</h4>
-            <p>Realisatie van het Sidneyveld bij Hockeyclub Amsterdam — voorbereidingsveld voor de nationale teams richting de Olympische Spelen in Sydney 2000, waar het herenteam goud won.</p>
+            <p>Voorbereidingsveld voor de Olympische Spelen in Sydney 2000 — het herenteam won goud!</p>
+            <div class="vtl-badge">&#129351; Olympisch goud</div>
           </div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">2003</div>
-          <div class="timeline-content">
+
+        <div class="vtl-item vtl-right">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card">
+            <div class="vtl-year">2003</div>
             <h4>Lid van Verdienste AH&BC</h4>
-            <p>Bij de opening van het nieuwe clubhuis van Hockeyclub Amsterdam wordt Lutger benoemd tot Lid van Verdienste voor zijn bijdrage aan de club.</p>
+            <p>Bij de opening van het nieuwe clubhuis wordt Lutger benoemd tot Lid van Verdienste voor zijn bijdrage aan de club.</p>
+            <div class="vtl-badge">&#127941; Erkenning</div>
           </div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">2010</div>
-          <div class="timeline-content">
-            <h4>20 jaar SportWays</h4>
-            <p>Viering van 20 jaar SportWays Hockeykampen — medeopgericht door Lutger, uitgegroeid tot de grootste hockeykamporganisatie van Europa met kampen in Nederland, België, Spanje en Ierland.</p>
+
+        <div class="vtl-item vtl-left">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card">
+            <div class="vtl-year">2005</div>
+            <h4>Eerste Nieuwjaarskaart</h4>
+            <p>Het begin van een traditie: elk jaar een unieke nieuwjaarskaart. Tot op de dag van vandaag — 20 kaarten in 21 jaar.</p>
+            <div class="vtl-badge">&#9993; Traditie</div>
           </div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">2011</div>
-          <div class="timeline-content">
-            <h4>Fletiomare: van 80 naar 2.200+ leden</h4>
-            <p>Jarenlange begeleiding van MHC Fletiomare in Leidsche Rijn. De club groeit van 80 naar meer dan 2.200 leden. Het Lutger Brenninkmeijerveld wordt onthuld.</p>
+
+        <div class="vtl-item vtl-right">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card">
+            <div class="vtl-year">2007</div>
+            <h4>10 Jaar LiBeR</h4>
+            <p>Een decennium van groei, verbinding en impact in de sportwereld. Van Amsterdam tot clubs door het hele land.</p>
+            <div class="vtl-badge">&#127874; Jubileum</div>
           </div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">2019</div>
-          <div class="timeline-content">
+
+        <div class="vtl-item vtl-left">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card">
+            <div class="vtl-year">2010</div>
+            <h4>20 Jaar SportWays</h4>
+            <p>Medeopgericht door Lutger — uitgegroeid tot de grootste hockeykamporganisatie van Europa met kampen in 4 landen.</p>
+            <div class="vtl-badge">&#127757; Europa's grootste</div>
+          </div>
+        </div>
+
+        <div class="vtl-item vtl-right">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card">
+            <div class="vtl-year">2011</div>
+            <h4>Fletiomare: 80 → 2.200+ leden</h4>
+            <p>MHC Fletiomare groeit spectaculair onder begeleiding van LiBeR. Het Lutger Brenninkmeijerveld wordt onthuld.</p>
+            <div class="vtl-badge">&#128200; 2.750% groei</div>
+          </div>
+        </div>
+
+        <div class="vtl-item vtl-left">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card">
+            <div class="vtl-year">2019</div>
             <h4>SailWise & Zambia</h4>
-            <p>Begeleiding van SailWise bij de renovatie van het Robinson Crusoe-eiland in de Loosdrechtse Plassen. Daarnaast een hockeyproject in Zambia: een zeecontainer vol materiaal voor de Zambia Hockey Association via Stichting Kadish.</p>
+            <p>Robinson Crusoe-eiland renovatie én een zeecontainer vol hockeymateriaal naar Zambia. Sport kent geen grenzen.</p>
+            <div class="vtl-badge">&#127758; Internationaal</div>
           </div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">2023</div>
-          <div class="timeline-content">
-            <h4>Lustrumboek 125 jaar Hockeyclub Amsterdam</h4>
-            <p>Na bijna drie jaar werk wordt het lustrumboek gepresenteerd in het Bazel (Stadsarchief Amsterdam). Door velen beschreven als "een nieuw standaard" en "een historisch kunstwerk".</p>
+
+        <div class="vtl-item vtl-right">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card">
+            <div class="vtl-year">2023</div>
+            <h4>Lustrumboek 125 Jaar HC Amsterdam</h4>
+            <p>Na drie jaar werk gepresenteerd in het Stadsarchief. "Een nieuw standaard" en "een historisch kunstwerk".</p>
+            <div class="vtl-badge">&#128214; Meesterwerk</div>
           </div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">2024</div>
-          <div class="timeline-content">
-            <h4>Rabobank MRA & KNHB Expertisecentrum</h4>
-            <p>Lancering van het Maatschappelijke Relevantie Analyse-programma met Rabobank ClubSupport. Begeleiding van clubs via het KNHB Expertisecentrum met visie- en strategieprogramma's.</p>
+
+        <div class="vtl-item vtl-left">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card">
+            <div class="vtl-year">2024</div>
+            <h4>KNHB Expertisecentrum & Rabobank MRA</h4>
+            <p>Maatschappelijke Relevantie Analyse met Rabobank ClubSupport. Visie- en strategieprogramma's via KNHB.</p>
+            <div class="vtl-badge">&#128640; Nieuwe programma's</div>
           </div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-year">2026</div>
-          <div class="timeline-content">
-            <h4>Innovatie & AI</h4>
-            <p>Verdere innovatie met AI-gedreven verslaglegging en adviestools. Bijna 30 jaar LiBeR — de sportwereld blijft in beweging, LiBeR beweegt mee.</p>
+
+        <div class="vtl-item vtl-right">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card">
+            <div class="vtl-year">2025</div>
+            <h4>Nationaal Sportakkoord</h4>
+            <p>Vijf jaar Nationaal Sportakkoord — tientallen clubs en gemeenten in beweging gebracht door heel Nederland.</p>
+            <div class="vtl-badge">&#127466;&#127473; Sport verenigt</div>
+          </div>
+        </div>
+
+        <div class="vtl-item vtl-left">
+          <div class="vtl-dot"><span>&#9679;</span></div>
+          <div class="vtl-card vtl-card-highlight">
+            <div class="vtl-year">2026</div>
+            <h4>Bijna 30 Jaar LiBeR</h4>
+            <p>AI-innovatie, nieuwe samenwerkingen en dezelfde passie als op dag één. De sportwereld blijft in beweging — LiBeR beweegt mee.</p>
+            <div class="vtl-badge">&#10024; Het verhaal gaat door</div>
           </div>
         </div>
       </div>
@@ -591,14 +655,45 @@
       });
     }, { threshold: 0.1 });
 
-    document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right, .service-card, .timeline-item, .partner-card, .publication-card, .ny-card').forEach(el => {
+    document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right, .service-card, .partner-card, .publication-card, .ny-card').forEach(el => {
       observer.observe(el);
     });
 
-    // Navbar background on scroll
+    // Animated vertical timeline
+    const vtlObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('vtl-visible');
+        }
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -50px 0px' });
+
+    document.querySelectorAll('.vtl-item').forEach(el => {
+      vtlObserver.observe(el);
+    });
+
+    // Scroll-based progress line for timeline
+    function updateTimelineProgress() {
+      const vtl = document.getElementById('vtl');
+      const progress = document.getElementById('vtl-progress');
+      if (!vtl || !progress) return;
+
+      const rect = vtl.getBoundingClientRect();
+      const windowH = window.innerHeight;
+      const totalH = vtl.offsetHeight;
+
+      // How far through the timeline section we've scrolled
+      const scrolled = windowH - rect.top;
+      const pct = Math.min(100, Math.max(0, (scrolled / (totalH + windowH * 0.3)) * 100));
+      progress.style.height = pct + '%';
+    }
+
     window.addEventListener('scroll', () => {
       document.querySelector('.nav').classList.toggle('nav-scrolled', window.scrollY > 50);
+      updateTimelineProgress();
     });
+
+    updateTimelineProgress();
 
     // Nieuwjaarskaarten greeting texts
     const greetings = {
