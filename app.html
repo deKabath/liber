@@ -684,14 +684,18 @@ async function startProcess() {
     if (!createRes.reportId) throw new Error('Geen reportId ontvangen');
     STATE.reportId = createRes.reportId;
 
-    // Upload audio
-    await uploadAudio(STATE.reportId, STATE.audioFile);
-
+    // Schakel alvast door naar transcriptie pagina en start polling
+    // zodat de gebruiker voortgang ziet terwijl de upload loopt
     markStepDone('upload');
     enableStep('transcribe');
     goStep('transcribe');
 
-    // Start polling
+    // Upload audio (kan lang duren bij finalize stap)
+    uploadAudio(STATE.reportId, STATE.audioFile).catch(err => {
+      toast('Upload fout: ' + err.message, 'error');
+    });
+
+    // Start polling onafhankelijk van upload
     pollTranscription();
 
   } catch (err) {
@@ -742,7 +746,8 @@ async function uploadAudio(reportId, file) {
             const res = await apiPost('uploadAudioChunk', { reportId, fileName, mimeType, chunkIndex: i, totalChunks, chunkBase64: chunk });
             if (res.error) throw new Error(res.error);
           }
-          label.textContent = 'Samenvoegen...';
+          label.textContent = 'Audio samenvoegen en transcriptie starten...';
+          detail.textContent = 'Even geduld, dit kan enkele minuten duren...';
           pct.textContent = '95%';
           fill.style.width = '95%';
           const finalRes = await apiPost('finalizeAudioUpload', { reportId });
@@ -750,6 +755,7 @@ async function uploadAudio(reportId, file) {
           fill.style.width = '100%';
           pct.textContent = '100%';
           label.textContent = 'Upload voltooid – transcriptie gestart';
+          detail.textContent = '';
           resolve(finalRes);
         }
       } catch (err) {
