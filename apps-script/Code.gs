@@ -1453,6 +1453,10 @@ function doGet(e) {
         result = checkTranscriptionComplete_(params.reportId);
         break;
 
+      case 'listJotformSubmissions':
+        result = listJotformSubmissions_();
+        break;
+
       case 'diagnoseDrive':
         result = diagnoseDriveFolders_();
         break;
@@ -1550,11 +1554,8 @@ function doPost(e) {
 
     switch (action) {
       case 'webhook':
-        // Originele Jotform webhook
-        checkForNewAudioFiles();
-        const pendingAnalysis = findNextPendingAnalysisJob_();
-        if (pendingAnalysis) scheduleAnalysisResume_(1);
-        result = { status: 'success', message: 'Check gestart' };
+        // Jotform webhook – ontvang formulierinzending met audiobestand
+        result = processJotformWebhook_(body, e);
         break;
 
       case 'createReport':
@@ -1597,6 +1598,11 @@ function doPost(e) {
 
       case 'deleteReport':
         result = deleteReport_(body.reportId);
+        break;
+
+      case 'submitTranscription':
+        // Directe transcriptie-tekst inzending (bijv. vanuit frontend)
+        result = submitTranscriptionText_(body);
         break;
 
       case 'linkTranscript':
@@ -2922,4 +2928,332 @@ function ensurePlaceholderHeaders_(sheet) {
 function ensureQaHeaders_(sheet) {
   const headers = ["Timestamp", "Verslag", "Model", "MissingFields", "UncertainFields", "CoverageCheck", "UnassignedNotes", "DraftDocUrl"];
   if (sheet.getLastColumn() === 0) { sheet.getRange(1, 1, 1, headers.length).setValues([headers]); sheet.setFrozenRows(1); }
+}
+
+/****************************************************
+ * ═══════════════════════════════════════════════════
+ * FASE 7: JOTFORM WEBHOOK INTEGRATIE
+ * Ontvangt formulierinzendingen met audiobestanden,
+ * downloadt de audio, en start de transcriptie pipeline.
+ * ═══════════════════════════════════════════════════
+ ****************************************************/
+
+/**
+ * Verwerkt een inkomende JotForm webhook.
+ *
+ * JotForm stuurt formulierdata als JSON of form-urlencoded.
+ * Bestandsuploads worden als URLs meegestuurd (gehost op JotForm servers).
+ *
+ * Ondersteunde velden (flexibel – zoekt automatisch):
+ * - Audio: het eerste veld dat een URL naar een audiobestand bevat
+ * - Naam/vereniging: veld met "naam", "vereniging", "organisatie" in de naam
+ * - Datum: veld met "datum" of "date" in de naam
+ * - Contact: veld met "contact" in de naam
+ *
+ * @param {Object} body - Geparsede JSON body
+ * @param {Object} e - Het originele event object van doPost
+ * @returns {Object} Resultaat met reportId en status
+ */
+function processJotformWebhook_(body, e) {
+  console.log("=== JOTFORM WEBHOOK ONTVANGEN ===");
+
+  // JotForm kan data sturen als:
+  // 1. JSON body (via onze parse in doPost)
+  // 2. form-urlencoded (via e.parameter)
+  // Combineer beide bronnen
+  let formData = {};
+
+  // Probeer rawRequest te parsen (JotForm stuurt dit vaak als genest JSON)
+  if (body.rawRequest) {
+    try {
+      const raw = typeof body.rawRequest === 'string' ? JSON.parse(body.rawRequest) : body.rawRequest;
+      formData = { ...formData, ...raw };
+    } catch (err) {
+      console.log("rawRequest is geen JSON, gebruik als string");
+    }
+  }
+
+  // Voeg top-level velden toe
+  for (const [key, value] of Object.entries(body)) {
+    if (key !== 'rawRequest' && key !== 'action') {
+      formData[key] = value;
+    }
+  }
+
+  // Voeg URL parameters toe (form-urlencoded fallback)
+  if (e && e.parameter) {
+    for (const [key, value] of Object.entries(e.parameter)) {
+      if (!formData[key]) formData[key] = value;
+    }
+  }
+
+  console.log("Formuliervelden ontvangen:", Object.keys(formData).join(', '));
+
+  // Zoek het audiobestand (URL naar bestand op JotForm servers)
+  const audioUrl = findAudioUrlInFormData_(formData);
+  if (!audioUrl) {
+    console.log("Geen audio-URL gevonden in formulierdata");
+    // Fallback: start wel een check voor bestaande audio in Drive
+    checkForNewAudioFiles();
+    const pendingAnalysis = findNextPendingAnalysisJob_();
+    if (pendingAnalysis) scheduleAnalysisResume_(1);
+    return { status: 'no_audio', message: 'Geen audiobestand gevonden in de inzending. Standaard check gestart.' };
+  }
+
+  // Extraheer metadata uit formuliervelden
+  const meetingName = findFieldValue_(formData, ['naam', 'vereniging', 'organisatie', 'name', 'club']) || 'JotForm Inzending ' + new Date().toLocaleDateString('nl-NL');
+  const datum = findFieldValue_(formData, ['datum', 'date']) || new Date().toISOString().split('T')[0];
+  const contact = findFieldValue_(formData, ['contact', 'contactpersoon']) || '';
+  const submissionId = formData.submissionID || formData.submission_id || Utilities.getUuid().substring(0, 8);
+  const formId = formData.formID || formData.form_id || '';
+
+  console.log(`Verwerken: "${meetingName}" (submission: ${submissionId})`);
+  console.log(`Audio URL: ${audioUrl.substring(0, 80)}...`);
+
+  // Maak een nieuw rapport aan
+  const reportId = Utilities.getUuid();
+  const reportKey = "report_" + reportId;
+
+  const headerFields = {
+    '<<naam vereniging>>': meetingName,
+    '<<datum>>': datum,
+    '<<contactpersoon>>': contact,
+    '<<onderwerp>>': 'verslag intake',
+    '<<opgesteld_door>>': 'Lutger Brenninkmeijer',
+    '<<opdrachtgever>>': 'Rabobank Kring Metropool Regio Amsterdam'
+  };
+
+  PROPS.setProperty(reportKey + "_meetingName", meetingName);
+  PROPS.setProperty(reportKey + "_createdAt", new Date().toISOString());
+  PROPS.setProperty(reportKey + "_template", "rabobank_mra");
+  PROPS.setProperty(reportKey + "_status", "jotform_received");
+  PROPS.setProperty(reportKey + "_headerFields", JSON.stringify(headerFields));
+  PROPS.setProperty(reportKey + "_source", "jotform");
+  PROPS.setProperty(reportKey + "_jotformSubmissionId", submissionId);
+  PROPS.setProperty(reportKey + "_jotformFormId", formId);
+
+  // Download het audiobestand van JotForm naar Google Drive
+  try {
+    const audioFile = downloadAudioFromUrl_(audioUrl, meetingName);
+    const meetingFolderId = audioFile.folder.getId();
+
+    PROPS.setProperty(reportKey + "_meetingFolderId", meetingFolderId);
+    PROPS.setProperty(reportKey + "_status", "transcribing");
+
+    // Start transcriptie pipeline
+    prepareMeetingJob_(audioFile.folder, meetingName, audioFile.file);
+    scheduleResume_(1);
+
+    console.log("✓ JotForm audio ontvangen en transcriptie gestart:", meetingName);
+
+    return {
+      status: 'transcribing',
+      reportId: reportId,
+      meetingFolderId: meetingFolderId,
+      submissionId: submissionId,
+      message: `Audio "${meetingName}" ontvangen via JotForm. Transcriptie gestart.`
+    };
+
+  } catch (err) {
+    console.log("!!! Fout bij downloaden/verwerken JotForm audio:", err);
+    PROPS.setProperty(reportKey + "_status", "error");
+    PROPS.setProperty(reportKey + "_error", String(err));
+
+    return {
+      status: 'error',
+      reportId: reportId,
+      error: String(err),
+      message: 'Fout bij verwerken van audiobestand: ' + String(err)
+    };
+  }
+}
+
+/**
+ * Zoekt een audio-URL in de formulierdata.
+ * JotForm file uploads worden als URLs meegestuurd.
+ * Ondersteunt zowel directe URL-velden als geneste objecten.
+ */
+function findAudioUrlInFormData_(formData) {
+  const audioExtensions = ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac', '.wma', '.aiff', '.mp4', '.webm'];
+
+  for (const [key, value] of Object.entries(formData)) {
+    if (!value) continue;
+
+    // Directe URL string
+    if (typeof value === 'string') {
+      const url = value.trim();
+      if (url.startsWith('http') && audioExtensions.some(ext => url.toLowerCase().includes(ext))) {
+        return url;
+      }
+      // JotForm upload URLs bevatten vaak /uploads/ in het pad
+      if (url.startsWith('http') && url.includes('/uploads/')) {
+        return url;
+      }
+    }
+
+    // Array van URLs (JotForm stuurt meerdere uploads als array)
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === 'string' && item.startsWith('http')) {
+          if (audioExtensions.some(ext => item.toLowerCase().includes(ext)) || item.includes('/uploads/')) {
+            return item;
+          }
+        }
+      }
+    }
+
+    // Genest object (JotForm stuurt soms {0: "url1", 1: "url2"})
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      for (const subVal of Object.values(value)) {
+        if (typeof subVal === 'string' && subVal.startsWith('http')) {
+          if (audioExtensions.some(ext => subVal.toLowerCase().includes(ext)) || subVal.includes('/uploads/')) {
+            return subVal;
+          }
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Zoekt een waarde in formulierdata op basis van mogelijke veldnamen.
+ * JotForm veldnamen bevatten vaak het vraagnummer (bijv. "q3_naamVereniging").
+ */
+function findFieldValue_(formData, keywords) {
+  for (const [key, value] of Object.entries(formData)) {
+    if (!value || typeof value !== 'string') continue;
+    const keyLower = key.toLowerCase();
+    if (keywords.some(kw => keyLower.includes(kw.toLowerCase()))) {
+      return value.trim();
+    }
+  }
+
+  // Tweede pass: zoek in geneste objecten (JotForm "pretty" velden)
+  for (const [key, value] of Object.entries(formData)) {
+    if (!value || typeof value !== 'object') continue;
+    for (const [subKey, subVal] of Object.entries(value)) {
+      if (typeof subVal !== 'string') continue;
+      const subKeyLower = subKey.toLowerCase();
+      if (keywords.some(kw => subKeyLower.includes(kw.toLowerCase()))) {
+        return subVal.trim();
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Downloadt een audiobestand van een URL naar Google Drive.
+ * Maakt een submap in SOURCE_FOLDER aan.
+ *
+ * @param {string} audioUrl - URL naar het audiobestand
+ * @param {string} meetingName - Naam voor de submap
+ * @returns {Object} {file: DriveFile, folder: DriveFolder}
+ */
+function downloadAudioFromUrl_(audioUrl, meetingName) {
+  console.log("Downloaden audio van:", audioUrl.substring(0, 100));
+
+  const response = UrlFetchApp.fetch(audioUrl, { muteHttpExceptions: true, followRedirects: true });
+  const code = response.getResponseCode();
+
+  if (code < 200 || code >= 300) {
+    throw new Error(`Download mislukt (HTTP ${code}): ${audioUrl.substring(0, 100)}`);
+  }
+
+  const blob = response.getBlob();
+  const contentType = blob.getContentType() || 'audio/mpeg';
+
+  // Bepaal bestandsnaam uit URL of content-disposition
+  let fileName = audioUrl.split('/').pop().split('?')[0] || 'audio.mp3';
+  // Zorg dat het een herkenbare extensie heeft
+  const audioExtensions = ['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'];
+  if (!audioExtensions.some(ext => fileName.toLowerCase().endsWith(ext))) {
+    fileName = meetingName.replace(/[\\/:*?"<>|]/g, '-') + '.mp3';
+  }
+  blob.setName(fileName);
+
+  // Maak submap in SOURCE_FOLDER
+  const sourceFolder = DriveApp.getFolderById(SOURCE_FOLDER_ID);
+  const meetingFolder = sourceFolder.createFolder(meetingName);
+  const audioFile = meetingFolder.createFile(blob);
+
+  console.log(`✓ Audio gedownload: ${fileName} (${blob.getBytes().length} bytes) → ${meetingFolder.getName()}`);
+
+  return { file: audioFile, folder: meetingFolder };
+}
+
+/**
+ * Directe transcriptie-tekst inzending (voor handmatig plakken via frontend).
+ * Slaat de tekst op als .txt bestand en koppelt aan een nieuw rapport.
+ */
+function submitTranscriptionText_(body) {
+  const meetingName = body.meetingName || 'Handmatige Transcriptie';
+  const transcriptionText = body.transcriptionText || body.text || '';
+  const headerFields = body.headerFields || {};
+
+  if (!transcriptionText || transcriptionText.trim().length < 50) {
+    return { error: 'Transcriptie tekst is te kort (minimaal 50 tekens).' };
+  }
+
+  const reportId = Utilities.getUuid();
+  const reportKey = "report_" + reportId;
+
+  // Sla transcriptie op als .txt bestand
+  const transcriptFolder = DriveApp.getFolderById(TRANSCRIPT_FOLDER_ID);
+  const txtFile = createTranscriptTxt(meetingName + " - Transcriptie", transcriptionText, transcriptFolder);
+
+  // Maak rapport aan
+  PROPS.setProperty(reportKey + "_meetingName", meetingName);
+  PROPS.setProperty(reportKey + "_meetingFolderId", reportId);
+  PROPS.setProperty(reportKey + "_createdAt", new Date().toISOString());
+  PROPS.setProperty(reportKey + "_template", "rabobank_mra");
+  PROPS.setProperty(reportKey + "_status", "transcribed");
+  PROPS.setProperty(reportKey + "_transcriptTxtFileId", txtFile.getId());
+  PROPS.setProperty(reportKey + "_source", "manual");
+
+  if (Object.keys(headerFields).length > 0) {
+    PROPS.setProperty(reportKey + "_headerFields", JSON.stringify(headerFields));
+  }
+
+  console.log(`✓ Handmatige transcriptie opgeslagen: ${meetingName} (${transcriptionText.length} tekens)`);
+
+  return {
+    status: 'transcribed',
+    reportId: reportId,
+    transcriptFileId: txtFile.getId(),
+    message: `Transcriptie "${meetingName}" opgeslagen. Klaar voor sectie-generatie.`
+  };
+}
+
+/**
+ * Geeft een lijst van alle JotForm-inzendingen terug.
+ */
+function listJotformSubmissions_() {
+  const all = PROPS.getProperties();
+  const submissions = [];
+
+  for (const key of Object.keys(all)) {
+    if (key.endsWith('_source') && (all[key] === 'jotform' || all[key] === 'manual')) {
+      const reportId = key.replace('report_', '').replace('_source', '');
+      const reportKey = 'report_' + reportId;
+
+      submissions.push({
+        reportId: reportId,
+        meetingName: PROPS.getProperty(reportKey + '_meetingName') || 'Onbekend',
+        status: PROPS.getProperty(reportKey + '_status') || 'unknown',
+        source: all[key],
+        createdAt: PROPS.getProperty(reportKey + '_createdAt') || '',
+        submissionId: PROPS.getProperty(reportKey + '_jotformSubmissionId') || '',
+        formId: PROPS.getProperty(reportKey + '_jotformFormId') || '',
+        hasTranscript: !!PROPS.getProperty(reportKey + '_transcriptTxtFileId'),
+        error: PROPS.getProperty(reportKey + '_error') || ''
+      });
+    }
+  }
+
+  submissions.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+  return { submissions };
 }

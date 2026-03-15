@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiBeR Verslaggenerator</title>
+  <link rel="stylesheet" href="css/style.css?v=12.7">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+</head>
+<body>
+  <!-- TOP NAV -->
+  <nav class="topnav">
+    <div class="topnav-left">
+      <span class="logo">Li<span class="logo-accent">Be</span>R</span>
+      <span class="logo-sub">Verslaggenerator</span>
+    </div>
+    <div class="topnav-center">
+      <a href="#" class="nav-link active" data-page="dashboard">Dashboard</a>
+      <a href="#" class="nav-link" data-page="create">Nieuw Verslag</a>
+      <a href="#" class="nav-link" data-page="jotform">JotForm Intake</a>
+    </div>
+    <div class="topnav-right">
+      <span class="user-name">Lutger Brenninkmeijer</span>
+    </div>
+  </nav>
+
+  <!-- PAGE: DASHBOARD -->
+  <main id="page-dashboard" class="page active">
+    <div class="dashboard-header">
+      <h1>Dashboard</h1>
+      <button class="btn btn-primary" onclick="navigateTo('create')">
+        <span class="material-symbols-outlined">add</span> Nieuw Verslag
+      </button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-number" id="stat-total">0</div>
+        <div class="stat-label">Totaal Verslagen</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-progress">0</div>
+        <div class="stat-label">In Bewerking</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-done">0</div>
+        <div class="stat-label">Voltooid</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-transcribing">0</div>
+        <div class="stat-label">Transcripties Actief</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Recente Verslagen</h2>
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Vereniging</th>
+            <th>Status</th>
+            <th>Template</th>
+            <th>Aangemaakt</th>
+            <th>Acties</th>
+          </tr>
+        </thead>
+        <tbody id="reports-tbody">
+          <tr class="empty-row">
+            <td colspan="5">Geen verslagen gevonden. <a href="#" onclick="navigateTo('create')">Maak een nieuw verslag aan.</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- PAGE: CREATE NEW REPORT -->
+  <main id="page-create" class="page">
+    <div class="create-container">
+      <h1>Nieuw Verslag Aanmaken</h1>
+      <p class="subtitle">Volg de stappen om een nieuw MRA verslag te genereren vanuit een audio-opname.</p>
+
+      <!-- STAP 1: Template -->
+      <div class="card step-card">
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <h3>Template selecteren</h3>
+        </div>
+        <div class="step-body">
+          <select id="template-select" class="form-select">
+            <option value="rabobank_mra" selected>Rabobank MRA – Maatschappelijke Relevantie Analyse</option>
+          </select>
+          <p class="help-text">Intake verslag template met vaste structuur: Inleiding, Nulmeting, Positie, Ambitie, Advies, Ondersteuning, Expert(s), Bijlage.</p>
+        </div>
+      </div>
+
+      <!-- STAP 2: Audio Upload -->
+      <div class="card step-card">
+        <div class="step-header">
+          <span class="step-number">2</span>
+          <h3>Audio transcriptie uploaden</h3>
+        </div>
+        <div class="step-body">
+          <div class="upload-zone" id="audio-drop-zone">
+            <span class="material-symbols-outlined upload-icon">mic</span>
+            <p>Sleep je audiobestand hierheen of klik om te selecteren</p>
+            <p class="help-text">Ondersteunde formaten: MP3, WAV, M4A, AAC, OGG, FLAC – Max 500MB</p>
+            <input type="file" id="audio-input" accept="audio/*" hidden>
+          </div>
+          <div id="audio-preview" class="file-preview" hidden>
+            <span class="material-symbols-outlined">audio_file</span>
+            <span id="audio-filename"></span>
+            <button class="btn btn-ghost btn-sm" onclick="removeAudio()">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <!-- Upload voortgang -->
+          <div id="upload-progress" class="upload-progress" hidden>
+            <div class="upload-progress-header">
+              <span class="material-symbols-outlined spinning">cloud_upload</span>
+              <span id="upload-progress-label">Audio uploaden...</span>
+            </div>
+            <div class="upload-progress-bar">
+              <div class="upload-progress-fill" id="upload-progress-fill"></div>
+            </div>
+            <div class="upload-progress-detail" id="upload-progress-detail"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STAP 3: Afbeeldingen -->
+      <div class="card step-card">
+        <div class="step-header">
+          <span class="step-number">3</span>
+          <h3>Afbeeldingen & Bijlagen <span class="optional-badge">optioneel</span></h3>
+        </div>
+        <div class="step-body">
+          <div class="upload-zone upload-zone-sm" id="images-drop-zone">
+            <span class="material-symbols-outlined upload-icon">photo_library</span>
+            <p>Upload afbeeldingen voor het verslag</p>
+            <input type="file" id="images-input" accept="image/*" multiple hidden>
+          </div>
+          <div id="images-grid" class="images-grid"></div>
+        </div>
+      </div>
+
+      <!-- STAP 4: Basisgegevens -->
+      <div class="card step-card">
+        <div class="step-header">
+          <span class="step-number">4</span>
+          <h3>Basisgegevens</h3>
+        </div>
+        <div class="step-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="field-vereniging">Naam Vereniging *</label>
+              <input type="text" id="field-vereniging" class="form-input" placeholder="bijv. KV de Geuzen">
+            </div>
+            <div class="form-group">
+              <label for="field-datum">Datum Intake *</label>
+              <input type="date" id="field-datum" class="form-input">
+            </div>
+            <div class="form-group">
+              <label for="field-contact">Contactpersoon</label>
+              <input type="text" id="field-contact" class="form-input" placeholder="bijv. Ron Leegwater, Martine Hos">
+            </div>
+            <div class="form-group">
+              <label for="field-onderwerp">Onderwerp</label>
+              <input type="text" id="field-onderwerp" class="form-input" value="verslag intake">
+            </div>
+            <div class="form-group full-width">
+              <label for="field-opgesteld">Opgesteld door</label>
+              <input type="text" id="field-opgesteld" class="form-input" value="Lutger Brenninkmeijer">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="create-actions">
+        <button class="btn btn-primary btn-lg" id="btn-create-report" onclick="createReport()">
+          <span class="material-symbols-outlined">rocket_launch</span> Verslag Aanmaken
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- PAGE: JOTFORM INTAKE -->
+  <main id="page-jotform" class="page">
+    <div class="create-container">
+      <h1>JotForm Intake</h1>
+      <p class="subtitle">Ontvangen audio-opnames via JotForm worden hier automatisch getranscribeerd en verwerkt tot verslagen.</p>
+
+      <!-- OPTIE 1: Handmatige transcriptie inzending -->
+      <div class="card step-card">
+        <div class="step-header">
+          <span class="step-number">1</span>
+          <h3>Handmatige transcriptie invoeren <span class="optional-badge">optioneel</span></h3>
+        </div>
+        <div class="step-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="jf-naam">Naam Vereniging *</label>
+              <input type="text" id="jf-naam" class="form-input" placeholder="bijv. KV de Geuzen">
+            </div>
+            <div class="form-group">
+              <label for="jf-datum">Datum</label>
+              <input type="date" id="jf-datum" class="form-input">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 12px;">
+            <label for="jf-transcriptie">Transcriptie tekst</label>
+            <textarea id="jf-transcriptie" class="form-input form-textarea" rows="8" placeholder="Plak hier de transcriptie tekst..."></textarea>
+          </div>
+          <div class="create-actions" style="margin-top: 16px;">
+            <button class="btn btn-primary" id="btn-submit-transcription" onclick="submitTranscription()">
+              <span class="material-symbols-outlined">send</span> Transcriptie Indienen
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OVERZICHT: JotForm inzendingen -->
+      <div class="card">
+        <div class="dashboard-header" style="margin-bottom: 0;">
+          <h2>Ontvangen Inzendingen</h2>
+          <button class="btn btn-ghost" onclick="loadJotformSubmissions()">
+            <span class="material-symbols-outlined">refresh</span> Verversen
+          </button>
+        </div>
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Vereniging</th>
+              <th>Bron</th>
+              <th>Status</th>
+              <th>Ontvangen</th>
+              <th>Acties</th>
+            </tr>
+          </thead>
+          <tbody id="jotform-tbody">
+            <tr class="empty-row">
+              <td colspan="5">Laden...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- WEBHOOK INFO -->
+      <div class="card step-card">
+        <div class="step-header">
+          <span class="step-number"><span class="material-symbols-outlined">webhook</span></span>
+          <h3>JotForm Webhook Configuratie</h3>
+        </div>
+        <div class="step-body">
+          <p>Om JotForm automatisch audiobestanden te laten versturen naar LiBeR:</p>
+          <ol class="webhook-steps">
+            <li>Open je JotForm formulier in de Form Builder</li>
+            <li>Ga naar <strong>Instellingen</strong> → <strong>Integraties</strong> → <strong>Webhooks</strong></li>
+            <li>Voeg een nieuwe webhook toe met de URL:<br>
+              <code class="webhook-url" id="webhook-url-display">Laden...</code>
+              <button class="btn btn-ghost btn-sm" onclick="copyWebhookUrl()" title="Kopieer URL">
+                <span class="material-symbols-outlined" style="font-size:16px">content_copy</span>
+              </button>
+            </li>
+            <li>Zorg dat je formulier een <strong>Bestandsupload</strong> veld bevat voor de audio-opname</li>
+            <li>Bij elke inzending wordt de audio automatisch gedownload, getranscribeerd en verwerkt</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- PAGE: EDITOR -->
+  <main id="page-editor" class="page">
+    <div class="editor-layout">
+      <!-- Sidebar: Secties -->
+      <aside class="editor-sidebar">
+        <div class="sidebar-header">
+          <h3>Secties</h3>
+          <div class="progress-ring" id="section-progress">0/11</div>
+        </div>
+        <ul class="section-list" id="section-list"></ul>
+        <div class="sidebar-footer">
+          <button class="btn btn-primary btn-block" onclick="generateAllSections()">
+            <span class="material-symbols-outlined">auto_awesome</span> Alles Genereren
+          </button>
+          <button class="btn btn-secondary btn-block" onclick="assembleAndPreview()">
+            <span class="material-symbols-outlined">preview</span> Preview Verslag
+          </button>
+        </div>
+      </aside>
+
+      <!-- Center: Document Editor -->
+      <div class="editor-main">
+        <!-- Transcriptie status balk -->
+        <!-- v12.4: Uitgebreide pipeline voortgangsbalk -->
+        <div class="pipeline-tracker" id="pipeline-tracker" hidden>
+          <div class="pipeline-header">
+            <div class="pipeline-title">
+              <span class="material-symbols-outlined spinning">settings</span>
+              <span id="pipeline-step-label">Pipeline actief...</span>
+            </div>
+            <div class="pipeline-eta" id="pipeline-eta"></div>
+          </div>
+          <div class="pipeline-progress-bar">
+            <div class="pipeline-progress-fill" id="pipeline-progress-fill" style="width: 0%"></div>
+          </div>
+          <div class="pipeline-steps" id="pipeline-steps"></div>
+          <div class="pipeline-detail" id="pipeline-detail">
+            <span class="pipeline-function" id="pipeline-function"></span>
+            <span class="pipeline-elapsed" id="pipeline-elapsed"></span>
+          </div>
+        </div>
+
+        <div class="editor-toolbar">
+          <div class="toolbar-left">
+            <button class="btn btn-ghost" onclick="navigateTo('dashboard')">
+              <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <h2 id="editor-title">Rabobank MRA – verslag intake</h2>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-ghost" onclick="saveAllSections()">
+              <span class="material-symbols-outlined">save</span> Opslaan
+            </button>
+            <button class="btn btn-secondary" onclick="assembleReport()">
+              <span class="material-symbols-outlined">description</span> Exporteer Google Doc
+            </button>
+            <button class="btn btn-ghost btn-delete" onclick="deleteCurrentReport()" title="Verslag verwijderen">
+              <span class="material-symbols-outlined">delete</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="document-canvas" id="document-canvas">
+          <!-- Dynamisch gevuld door JS -->
+          <div class="document-page" id="doc-page">
+            <div class="page-header">
+              <span class="page-logo">Li<span class="logo-accent">Be</span>R</span>
+              <div class="page-divider"></div>
+            </div>
+            <div id="section-content-area">
+              <p class="placeholder-text">Selecteer een sectie in de zijbalk om te beginnen met bewerken, of klik op "Alles Genereren".</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: Afbeeldingen -->
+      <aside class="editor-images-panel">
+        <h3>Afbeeldingen</h3>
+        <div class="upload-zone upload-zone-sm" id="editor-images-drop">
+          <span class="material-symbols-outlined">add_photo_alternate</span>
+          <p>Upload</p>
+          <input type="file" id="editor-images-input" accept="image/*" multiple hidden>
+        </div>
+        <div id="editor-images-list" class="editor-images-list"></div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- PAGE: PREVIEW -->
+  <main id="page-preview" class="page">
+    <div class="preview-toolbar">
+      <button class="btn btn-ghost" onclick="navigateTo('editor')">
+        <span class="material-symbols-outlined">arrow_back</span> Terug naar editor
+      </button>
+      <div class="preview-actions">
+        <button class="btn btn-secondary" onclick="assembleReport()">
+          <span class="material-symbols-outlined">description</span> Download Google Doc
+        </button>
+      </div>
+    </div>
+    <div class="preview-container" id="preview-container">
+      <!-- Dynamisch gevuld door JS -->
+    </div>
+  </main>
+
+  <!-- MODAL: Transcriptie voortgang -->
+  <div class="modal-overlay" id="modal-transcription" hidden>
+    <div class="modal">
+      <h3><span class="material-symbols-outlined">mic</span> Transcriptie verwerken</h3>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="transcription-progress" style="width:0%"></div>
+      </div>
+      <p id="transcription-status">Audio wordt geüpload...</p>
+      <p class="help-text">Dit kan enkele minuten duren afhankelijk van de lengte van de opname.</p>
+    </div>
+  </div>
+
+  <!-- MODAL: Generatie voortgang -->
+  <div class="modal-overlay" id="modal-generation" hidden>
+    <div class="modal generation-modal">
+      <div class="gen-header">
+        <span class="material-symbols-outlined gen-icon spinning">auto_awesome</span>
+        <div>
+          <h3 id="gen-title">Secties genereren</h3>
+          <p class="gen-subtitle" id="gen-subtitle">Bezig met verwerken...</p>
+        </div>
+      </div>
+
+      <div class="gen-progress-wrap">
+        <div class="progress-bar-container gen-bar">
+          <div class="progress-bar" id="gen-progress-bar" style="width:0%"></div>
+        </div>
+        <span class="gen-percent" id="gen-percent">0%</span>
+      </div>
+
+      <div class="gen-stats">
+        <div class="gen-stat">
+          <span class="material-symbols-outlined">timer</span>
+          <span id="gen-elapsed">0:00</span>
+        </div>
+        <div class="gen-stat">
+          <span class="material-symbols-outlined">hourglass_top</span>
+          <span id="gen-eta">Berekenen...</span>
+        </div>
+        <div class="gen-stat">
+          <span class="material-symbols-outlined">check_circle</span>
+          <span id="gen-counter">0 / 0</span>
+        </div>
+      </div>
+
+      <div class="gen-steps" id="gen-steps"></div>
+
+      <p class="gen-tip" id="gen-tip">AI analyseert de transcriptie en schrijft de inhoud...</p>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/api.js?v=12.7"></script>
+  <script src="js/app.js?v=12.7"></script>
+  <script src="js/editor.js?v=12.7"></script>
+  <script src="js/preview.js?v=12.7"></script>
+</body>
+</html>
