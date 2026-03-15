@@ -92,6 +92,35 @@ a:hover { color: var(--orange-dark); }
 .partner-card:nth-child(5) { transition-delay: 0.2s; }
 .partner-card:nth-child(6) { transition-delay: 0.25s; }
 
+.publication-card,
+.ny-card {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.publication-card.visible,
+.ny-card.visible {
+  opacity: 1;
+  transform: translate(0);
+}
+
+.ny-card:nth-child(1) { transition-delay: 0s; }
+.ny-card:nth-child(2) { transition-delay: 0.03s; }
+.ny-card:nth-child(3) { transition-delay: 0.06s; }
+.ny-card:nth-child(4) { transition-delay: 0.09s; }
+.ny-card:nth-child(5) { transition-delay: 0.12s; }
+.ny-card:nth-child(6) { transition-delay: 0.15s; }
+.ny-card:nth-child(7) { transition-delay: 0.18s; }
+.ny-card:nth-child(8) { transition-delay: 0.21s; }
+.ny-card:nth-child(9) { transition-delay: 0.24s; }
+.ny-card:nth-child(10) { transition-delay: 0.27s; }
+
+.publication-card:nth-child(1) { transition-delay: 0s; }
+.publication-card:nth-child(2) { transition-delay: 0.08s; }
+.publication-card:nth-child(3) { transition-delay: 0.16s; }
+.publication-card:nth-child(4) { transition-delay: 0.24s; }
+
 /* ---- NAVIGATION ---- */
 .nav {
   position: fixed;
@@ -697,6 +726,17 @@ a:hover { color: var(--orange-dark); }
   transform: translateY(-4px);
 }
 
+.partner-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  transition: transform 0.3s;
+}
+
+.partner-card:hover .partner-logo {
+  transform: scale(1.2);
+}
+
 .partner-card .material-symbols-outlined {
   font-size: 36px;
   color: var(--orange);
@@ -737,6 +777,30 @@ a:hover { color: var(--orange-dark); }
   border-color: var(--orange);
   color: var(--orange);
   background: var(--orange-light);
+}
+
+.club-tag-gov {
+  border-color: #d4e6f1;
+  color: #1a5276;
+  background: #eaf2f8;
+}
+
+.club-tag-gov:hover {
+  border-color: #1a5276;
+  color: #1a5276;
+  background: #d4e6f1;
+}
+
+.club-tag-bond {
+  border-color: #d5f5e3;
+  color: var(--green-field);
+  background: #eafaf1;
+}
+
+.club-tag-bond:hover {
+  border-color: var(--green-field);
+  color: var(--green-field);
+  background: #d5f5e3;
 }
 
 .partners-subtitle {
@@ -810,9 +874,32 @@ a:hover { color: var(--orange-dark); }
   align-items: center;
   justify-content: center;
   transition: all 0.3s;
-  cursor: default;
+  cursor: pointer;
   box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
 }
+
+.ny-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.ny-card:hover::before { opacity: 1; }
+
+.ny-card:active {
+  transform: translateY(-2px) scale(0.97);
+}
+
+/* Alternating card colors for playful look */
+.ny-card:nth-child(4n+1) { background: linear-gradient(135deg, #E87722, #d46a1c); }
+.ny-card:nth-child(4n+2) { background: linear-gradient(135deg, #2D5A27, #1e4a1a); }
+.ny-card:nth-child(4n+3) { background: linear-gradient(135deg, #1a5276, #154360); }
+.ny-card:nth-child(4n)   { background: linear-gradient(135deg, #7d3c98, #6c3483); }
 
 .ny-card:hover {
   transform: translateY(-6px) rotate(-2deg);
@@ -832,6 +919,233 @@ a:hover { color: var(--orange-dark); }
   font-size: 14px;
   margin-top: 24px;
   font-style: italic;
+}
+
+/* ---- GREETING MODAL ---- */
+.greeting-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: modalFadeIn 0.3s ease;
+}
+
+.greeting-modal.active { display: flex; }
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateY(40px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.greeting-card {
+  background: linear-gradient(145deg, #fff8f2, #ffffff, #fff3eb);
+  border-radius: var(--radius-xl);
+  padding: 48px 40px;
+  max-width: 520px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 24px 80px rgba(232,119,34,0.25), 0 0 0 1px rgba(232,119,34,0.1);
+  animation: cardSlideIn 0.4s ease;
+  text-align: center;
+  overflow: hidden;
+}
+
+.greeting-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--orange), #f5a623, var(--orange-dark));
+}
+
+.greeting-card::after {
+  content: '';
+  position: absolute;
+  bottom: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(232,119,34,0.08), transparent 70%);
+  border-radius: 50%;
+}
+
+.greeting-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  background: var(--gray-100);
+  border: none;
+  border-radius: 50%;
+  font-size: 20px;
+  color: var(--gray-600);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 1;
+}
+
+.greeting-close:hover {
+  background: var(--orange);
+  color: white;
+}
+
+.greeting-year-badge {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--orange);
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.greeting-year-badge::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: var(--orange);
+  margin: 12px auto 0;
+  border-radius: 2px;
+}
+
+.greeting-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--gray-700);
+  margin-bottom: 28px;
+}
+
+.greeting-text p {
+  margin-bottom: 12px;
+}
+
+.greeting-text p:last-child { margin-bottom: 0; }
+
+.greeting-text .greeting-title {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 16px;
+}
+
+.greeting-footer {
+  padding-top: 20px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.greeting-logo {
+  height: 40px;
+  width: auto;
+}
+
+/* ---- DECORATIVE ELEMENTS ---- */
+.section-decorated {
+  position: relative;
+}
+
+.section-decorated::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -100px;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(232,119,34,0.06), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.section-decorated::after {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  left: -100px;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(232,119,34,0.04), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Floating decorative dots */
+.deco-dots {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  background-image: radial-gradient(var(--orange) 2px, transparent 2px);
+  background-size: 16px 16px;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+/* Playful diagonal stripe accent */
+.stripe-accent {
+  position: absolute;
+  width: 200px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--orange), transparent);
+  border-radius: 2px;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+/* ---- ENHANCED TIMELINE ---- */
+.timeline-item .timeline-content {
+  position: relative;
+}
+
+.timeline-item:nth-child(even) .timeline-content {
+  border-left: 3px solid var(--orange);
+}
+
+.timeline-item:nth-child(odd) .timeline-content {
+  border-left: 3px solid var(--orange-light);
+}
+
+/* ---- ENHANCED SERVICE CARDS with gradient icons ---- */
+.service-card {
+  background: linear-gradient(180deg, var(--white) 0%, var(--gray-50) 100%);
+}
+
+/* ---- PLAYFUL SECTION DIVIDERS ---- */
+.zigzag-divider {
+  width: 100%;
+  height: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.zigzag-divider::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -5%;
+  width: 110%;
+  height: 20px;
+  background: linear-gradient(135deg, var(--orange) 25%, transparent 25%) -14px 0,
+              linear-gradient(225deg, var(--orange) 25%, transparent 25%) -14px 0,
+              linear-gradient(315deg, var(--orange) 25%, transparent 25%),
+              linear-gradient(45deg, var(--orange) 25%, transparent 25%);
+  background-size: 28px 20px;
+  opacity: 0.1;
 }
 
 /* ---- CONTACT ---- */
@@ -1095,4 +1409,14 @@ a:hover { color: var(--orange-dark); }
   .timeline-item::before { left: -25px; }
 
   .wave-divider svg { height: 40px; }
+
+  .greeting-card {
+    padding: 32px 24px;
+    margin: 16px;
+  }
+
+  .greeting-year-badge { font-size: 32px; }
+  .greeting-text { font-size: 15px; }
+  .greeting-text .greeting-title { font-size: 18px; }
+  .deco-dots { display: none; }
 }

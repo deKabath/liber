@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LiBeR – Tijdlijn 1997-2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --orange: #E87722;
+      --orange-light: #FFF3EB;
+      --orange-dark: #C4611A;
+      --green-field: #2D5A27;
+      --white: #FFFFFF;
+      --gray-900: #212121;
+      --gray-700: #616161;
+      --gray-500: #9E9E9E;
+      --gray-300: #E0E0E0;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: 'Libre Caslon Text', Georgia, serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--gray-900);
+      color: var(--white);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* ---- INTRO SCREEN ---- */
+    .intro {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--gray-900);
+      transition: opacity 1s ease, visibility 1s;
+    }
+
+    .intro.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .intro-logo {
+      height: 80px;
+      margin-bottom: 40px;
+      animation: fadeInUp 1s ease 0.3s both;
+    }
+
+    .intro-title {
+      font-family: var(--font-serif);
+      font-size: 48px;
+      color: var(--white);
+      margin-bottom: 16px;
+      animation: fadeInUp 1s ease 0.6s both;
+    }
+
+    .intro-title .accent { color: var(--orange); }
+
+    .intro-sub {
+      font-size: 18px;
+      color: var(--gray-500);
+      margin-bottom: 48px;
+      animation: fadeInUp 1s ease 0.9s both;
+    }
+
+    .intro-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 40px;
+      background: var(--orange);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      animation: fadeInUp 1s ease 1.2s both, pulse 2s ease 2.5s infinite;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .intro-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 30px rgba(232,119,34,0.4);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(232,119,34,0.4); }
+      50% { box-shadow: 0 0 0 15px rgba(232,119,34,0); }
+    }
+
+    /* ---- TIMELINE CONTAINER ---- */
+    .timeline-container {
+      position: fixed;
+      inset: 0;
+      display: none;
+    }
+
+    .timeline-container.active { display: block; }
+
+    /* Progress bar */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--orange), #f5a623);
+      z-index: 50;
+      transition: width 0.6s ease;
+      width: 0%;
+    }
+
+    /* Year indicator */
+    .year-indicator {
+      position: fixed;
+      top: 24px;
+      right: 32px;
+      z-index: 50;
+      font-family: var(--font-serif);
+      font-size: 96px;
+      font-weight: 700;
+      color: rgba(232,119,34,0.15);
+      line-height: 1;
+      transition: all 0.6s ease;
+    }
+
+    /* Navigation */
+    .timeline-nav {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .nav-btn {
+      width: 48px;
+      height: 48px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      color: var(--white);
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      backdrop-filter: blur(8px);
+    }
+
+    .nav-btn:hover {
+      background: var(--orange);
+      border-color: var(--orange);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    .nav-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .nav-dot.active {
+      background: var(--orange);
+      width: 24px;
+      border-radius: 4px;
+    }
+
+    .nav-dot:hover { background: rgba(255,255,255,0.6); }
+
+    /* Back to landing link */
+    .back-link {
+      position: fixed;
+      top: 24px;
+      left: 32px;
+      z-index: 50;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--orange); }
+
+    /* ---- SLIDE ---- */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      transform: translateX(60px);
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+
+    .slide.exit-left {
+      opacity: 0;
+      transform: translateX(-60px);
+    }
+
+    .slide-inner {
+      max-width: 900px;
+      width: 100%;
+      padding: 80px 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+
+    .slide-text { position: relative; }
+
+    .slide-year {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--orange);
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: none;
+    }
+
+    .slide.active .slide-year {
+      animation: fadeInUp 0.6s ease 0.2s both;
+    }
+
+    .slide-title {
+      font-family: var(--font-serif);
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 20px;
+      opacity: 0;
+    }
+
+    .slide.active .slide-title {
+      animation: fadeInUp 0.6s ease 0.4s both;
+    }
+
+    .slide-desc {
+      font-size: 17px;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.7);
+      opacity: 0;
+    }
+
+    .slide.active .slide-desc {
+      animation: fadeInUp 0.6s ease 0.6s both;
+    }
+
+    /* Typing cursor */
+    .typing-cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1.1em;
+      background: var(--orange);
+      margin-left: 2px;
+      vertical-align: text-bottom;
+      animation: blink 0.7s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* Visual side */
+    .slide-visual {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+    }
+
+    .slide.active .slide-visual {
+      animation: fadeInUp 0.8s ease 0.3s both;
+    }
+
+    .slide-image {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      transition: transform 0.5s;
+    }
+
+    .slide-image:hover { transform: scale(1.03); }
+
+    /* Decorative circle behind image */
+    .slide-visual::before {
+      content: '';
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,119,34,0.15), transparent 70%);
+      z-index: -1;
+    }
+
+    /* Stats highlight */
+    .slide-stat {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(232,119,34,0.15);
+      border: 1px solid rgba(232,119,34,0.3);
+      border-radius: 8px;
+      padding: 8px 16px;
+      margin-top: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--orange);
+      opacity: 0;
+    }
+
+    .slide.active .slide-stat {
+      animation: fadeInUp 0.6s ease 0.8s both;
+    }
+
+    /* Icon decoration for slides without images */
+    .slide-icon-wrap {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(232,119,34,0.2), rgba(232,119,34,0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 80px;
+    }
+
+    /* Full-width slide variant */
+    .slide-inner.full-width {
+      grid-template-columns: 1fr;
+      text-align: center;
+      max-width: 700px;
+    }
+
+    .slide-inner.full-width .slide-title {
+      font-size: 42px;
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 768px) {
+      .slide-inner {
+        grid-template-columns: 1fr;
+        padding: 100px 24px 140px;
+        gap: 32px;
+      }
+
+      .slide-title { font-size: 28px; }
+      .slide-desc { font-size: 15px; }
+      .year-indicator { font-size: 64px; right: 16px; top: 16px; }
+      .intro-title { font-size: 32px; }
+      .intro-sub { font-size: 15px; }
+      .timeline-nav { bottom: 16px; }
+      .nav-btn { width: 40px; height: 40px; font-size: 20px; }
+      .back-link { top: 16px; left: 16px; }
+
+      .slide-visual { order: -1; }
+      .slide-image { max-width: 280px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- INTRO -->
+  <div class="intro" id="intro">
+    <img src="img/LiBeR.logo2008.diap - kopie.jpg" alt="LiBeR" class="intro-logo">
+    <h1 class="intro-title">De Reis van <span class="accent">LiBeR</span></h1>
+    <p class="intro-sub">1997 – 2026 &middot; Bijna 30 jaar sport, passie en verbinding</p>
+    <button class="intro-btn" onclick="startTimeline()">
+      &#9654; Start de tijdlijn
+    </button>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="timeline-container" id="timeline">
+    <div class="progress-bar" id="progress-bar"></div>
+    <div class="year-indicator" id="year-indicator">1997</div>
+    <a href="landing.html" class="back-link">&larr; Terug naar LiBeR</a>
+
+    <!-- SLIDES -->
+    <div class="slide active" data-year="1997">
+      <div class="slide-inner">
+        <div class="slide-text">
+          <div class="slide-year">1 MEI 1997</div>
+          <h2 class="slide-title">Oprichting LiBeR</h2>
+          <p class="slide-desc" data-type="true">Op Dag van de Arbeid start Lutger R. Brenninkmeijer LiBeR Advies Begeleiding Concepten in Amsterdam. Een bureau geboren uit passie voor sport en de overtuiging dat sportverenigingen het kloppend hart van de samenleving zijn.</p>
+          <div class="slide-stat">&#127942; Het begin van een missie</div>
+        </div>
+        <div class="slide-visual">
+          <div class="slide-icon-wrap">&#9917;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-year="1998">
+      <div class="slide-inner">
+        <div class="slide-text">
+          <div class="slide-year">1998</div>
+          <h2 class="slide-title">Revitalisering Hockeyclub Amsterdam</h2>
+          <p class="slide-desc" data-type="true">Start van de revitalisering van AH&BC — de oudste en grootste hockeyclub van Nederland. Vernieuwde visie, nieuw technisch beleid en modernisering van de accommodatie. Het begin van een transformatie die jaren zou duren.</p>
+          <div class="slide-stat">&#127919; AH&BC Amsterdam</div>
+        </div>
+        <div class="slide-visual">
+          <img src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=500&h=400&fit=crop" alt="Hockey" class="slide-image">
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-year="1999">
+      <div class="slide-inner">
+        <div class="slide-text">
+          <div class="slide-year">1999</div>
+          <h2 class="slide-title">Het Sidneyveld</h2>
+          <p class="slide-desc" data-type="true">Realisatie van het Sidneyveld bij Hockeyclub Amsterdam — het voorbereidingsveld voor de nationale teams richting de Olympische Spelen in Sydney 2000. Het herenteam won daar goud. Een historisch moment voor het Nederlandse hockey.</p>
+          <div class="slide-stat">&#129351; Olympisch goud Sydney 2000</div>
+        </div>
+        <div class="slide-visual">
+          <img src="https://images.unsplash.com/photo-1560090995-01632a28895b?w=500&h=400&fit=crop" alt="Sportveld" class="slide-image">
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-year="2003">
+      <div class="slide-inner">
+        <div class="slide-text">
+          <div class="slide-year">2003</div>
+          <h2 class="slide-title">Lid van Verdienste</h2>
+          <p class="slide-desc" data-type="true">Bij de opening van het nieuwe clubhuis van Hockeyclub Amsterdam wordt Lutger Brenninkmeijer benoemd tot Lid van Verdienste. Een erkenning voor zijn jarenlange bijdrage aan de revitalisering en groei van de club.</p>
+          <div class="slide-stat">&#127941; Erkenning &amp; waardering</div>
+        </div>
+        <div class="slide-visual">
+          <div class="slide-icon-wrap">&#127942;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-year="2005">
+      <div class="slide-inner full-width">
+        <div class="slide-text">
+          <div class="slide-year">2005</div>
+          <h2 class="slide-title">Eerste Nieuwjaarskaart</h2>
+          <p class="slide-desc" data-type="true">Het begin van een prachtige traditie: de eerste LiBeR nieuwjaarskaart. Elk jaar een uniek ontwerp dat de passie, creativiteit en het netwerk van LiBeR weerspiegelt. Tot op de dag van vandaag — 20 kaarten in 21 jaar.</p>
+          <div class="slide-stat">&#9993; 20 unieke kaarten</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-year="2007">
+      <div class="slide-inner">
+        <div class="slide-text">
+          <div class="slide-year">2007</div>
+          <h2 class="slide-title">10 Jaar LiBeR</h2>
+          <p class="slide-desc" data-type="true">Een decennium van groei, verbinding en impact in de sportwereld. Van Hockeyclub Amsterdam tot clubs door het hele land. LiBeR heeft zich bewezen als betrouwbare partner in de Nederlandse sport.</p>
+          <div class="slide-stat">&#127874; Eerste lustrum x2</div>
+        </div>
+        <div class="slide-visual">
+          <div class="slide-icon-wrap">&#127881;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-year="2010">
+      <div class="slide-inner">
+        <div class="slide-text">
+          <div class="slide-year">2010</div>
+          <h2 class="slide-title">20 Jaar SportWays</h2>
+          <p class="slide-desc" data-type="true">Viering van 20 jaar SportWays Hockeykampen — medeopgericht door Lutger. Uitgegroeid tot de grootste hockeykamporganisatie van Europa met kampen in Nederland, België, Spanje en Ierland. Duizenden kinderen geïnspireerd.</p>
+          <div class="slide-stat">&#127757; Grootste hockeykampen van Europa</div>
+        </div>
+        <div class="slide-visual">
+          <img src="https://images.unsplash.com/photo-1517649763962-0c623066013b?w=500&h=400&fit=crop" alt="SportWays kampen" class="slide-image">
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-year="2011">
+      <div class="slide-inner">
+        <div class="slide-text">
+          <div class="slide-year">2011</div>
+          <h2 class="slide-title">Fletiomare: van 80 naar 2.200+ leden</h2>
+          <p class="slide-desc" data-type="true">Jarenlange begeleiding van MHC Fletiomare in Leidsche Rijn. De club groeit van 80 naar meer dan 2.200 leden en wordt een van de snelst groeiende clubs van Nederland. Het Lutger Brenninkmeijerveld wordt onthuld — een bijzondere eer.</p>
+          <div class="slide-stat">&#128200; 2.750% groei in ledenaantal</div>
+        </div>
+        <div class="slide-visual">
+          <img src="https://images.unsplash.com/photo-1590674899484-d5640e854abe?w=500&h=400&fit=crop" alt="Sportveld luchtfoto" class="slide-image">
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-year="2019">
+      <div class="slide-inner">
+        <div class="slide-text">
+          <div class="slide-year">2019</div>
+          <h2 class="slide-title">SailWise & Zambia</h2>
+          <p class="slide-desc" data-type="true">Begeleiding van SailWise bij de renovatie van het Robinson Crusoe-eiland in de Loosdrechtse Plassen. Daarnaast een hockeyproject in Zambia: een zeecontainer vol materiaal voor de Zambia Hockey Association via Stichting Kadish. Sport kent geen grenzen.</p>
+          <div class="slide-stat">&#127758; Impact over grenzen heen</div>
+        </div>
+        <div class="slide-visual">
+          <img src="https://images.unsplash.com/photo-1508193638397-1c4234db14d8?w=500&h=400&fit=crop" alt="Water en natuur" class="slide-image">
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-year="2023">
+      <div class="slide-inner">
+        <div class="slide-text">
+          <div class="slide-year">2023</div>
+          <h2 class="slide-title">Lustrumboek 125 Jaar HC Amsterdam</h2>
+          <p class="slide-desc" data-type="true">Na bijna drie jaar werk wordt het lustrumboek van 125 jaar Hockeyclub Amsterdam gepresenteerd in het Bazel (Stadsarchief Amsterdam). Door velen beschreven als "een nieuw standaard" en "een historisch kunstwerk".</p>
+          <div class="slide-stat">&#128214; Een historisch kunstwerk</div>
+        </div>
+        <div class="slide-visual">
+          <div class="slide-icon-wrap">&#128218;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-year="2024">
+      <div class="slide-inner">
+        <div class="slide-text">
+          <div class="slide-year">2024</div>
+          <h2 class="slide-title">Rabobank MRA & KNHB Expertisecentrum</h2>
+          <p class="slide-desc" data-type="true">Lancering van het Maatschappelijke Relevantie Analyse-programma met Rabobank ClubSupport. Begeleiding van clubs via het KNHB Expertisecentrum met visie- en strategieprogramma's. Opleidingen voor Technisch Coördinatoren en Managers.</p>
+          <div class="slide-stat">&#128640; Nieuwe programma's live</div>
+        </div>
+        <div class="slide-visual">
+          <img src="https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=500&h=400&fit=crop" alt="Sport en samenwerking" class="slide-image">
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" data-year="2026">
+      <div class="slide-inner full-width">
+        <div class="slide-text">
+          <div class="slide-year">2026</div>
+          <h2 class="slide-title">Bijna 30 Jaar LiBeR</h2>
+          <p class="slide-desc" data-type="true">De sportwereld blijft in beweging — LiBeR beweegt mee. Met AI-innovatie, nieuwe samenwerkingen en dezelfde passie als op dag één. Drie decennia van advies, begeleiding en concepten. Het verhaal gaat door.</p>
+          <div class="slide-stat">&#10024; Het verhaal gaat door...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="timeline-nav">
+      <button class="nav-btn" id="btn-prev" onclick="prevSlide()" disabled>&#8592;</button>
+      <div class="nav-dots" id="nav-dots"></div>
+      <button class="nav-btn" id="btn-next" onclick="nextSlide()">&#8594;</button>
+    </div>
+  </div>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.getElementById('nav-dots');
+    const progress = document.getElementById('progress-bar');
+    const yearEl = document.getElementById('year-indicator');
+    const prevBtn = document.getElementById('btn-prev');
+    const nextBtn = document.getElementById('btn-next');
+    let current = 0;
+    let typing = false;
+
+    // Create dots
+    slides.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+      dot.onclick = () => goToSlide(i);
+      dots.appendChild(dot);
+    });
+
+    function startTimeline() {
+      document.getElementById('intro').classList.add('hidden');
+      document.getElementById('timeline').classList.add('active');
+      typeText(slides[0]);
+    }
+
+    function updateUI() {
+      // Update progress
+      progress.style.width = ((current / (slides.length - 1)) * 100) + '%';
+
+      // Update year
+      yearEl.textContent = slides[current].dataset.year;
+
+      // Update dots
+      document.querySelectorAll('.nav-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+
+      // Update buttons
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === slides.length - 1;
+    }
+
+    function goToSlide(index) {
+      if (index === current || typing) return;
+
+      const direction = index > current ? 1 : -1;
+      const oldSlide = slides[current];
+      const newSlide = slides[index];
+
+      // Remove active from old
+      oldSlide.classList.remove('active');
+      oldSlide.classList.add(direction > 0 ? 'exit-left' : '');
+
+      setTimeout(() => {
+        oldSlide.classList.remove('exit-left');
+        oldSlide.style.transform = '';
+      }, 800);
+
+      current = index;
+      newSlide.classList.add('active');
+      updateUI();
+      typeText(newSlide);
+    }
+
+    function nextSlide() {
+      if (current < slides.length - 1) goToSlide(current + 1);
+    }
+
+    function prevSlide() {
+      if (current > 0) goToSlide(current - 1);
+    }
+
+    // Typing effect
+    function typeText(slide) {
+      const desc = slide.querySelector('.slide-desc[data-type]');
+      if (!desc || desc.dataset.typed === 'true') return;
+
+      const fullText = desc.textContent;
+      desc.textContent = '';
+      desc.dataset.typed = 'true';
+      typing = true;
+
+      let i = 0;
+      const cursor = document.createElement('span');
+      cursor.className = 'typing-cursor';
+      desc.appendChild(cursor);
+
+      function type() {
+        if (i < fullText.length) {
+          desc.insertBefore(document.createTextNode(fullText[i]), cursor);
+          i++;
+          // Variable speed for natural feel
+          const delay = fullText[i-1] === '.' ? 200 : fullText[i-1] === ',' ? 100 : 15 + Math.random() * 15;
+          setTimeout(type, delay);
+        } else {
+          // Remove cursor after a moment
+          setTimeout(() => {
+            cursor.remove();
+            typing = false;
+          }, 1500);
+        }
+      }
+      type();
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+    });
+
+    // Touch/swipe support
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+    document.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        diff > 0 ? nextSlide() : prevSlide();
+      }
+    });
+
+    updateUI();
+  </script>
+</body>
+</html>
