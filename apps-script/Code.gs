@@ -460,6 +460,18 @@ function resumePendingWork() {
 
     console.log("=== RESUME JOB ===", job.meetingName, "State:", job.state);
 
+    // Queued job: voer prepareMeetingJob_ uit in de achtergrond
+    if (job.state === "queued") {
+      console.log("→ Queued job gevonden, starten prepareMeetingJob_...");
+      const audioFileId = PROPS.getProperty(job.key + "_audioFileId");
+      if (!audioFileId) throw new Error("Geen audioFileId voor queued job: " + job.meetingName);
+      const audioFile = DriveApp.getFileById(audioFileId);
+      const meetingFolder = DriveApp.getFolderById(job.meetingFolderId);
+      prepareMeetingJob_(meetingFolder, job.meetingName, audioFile);
+      scheduleResume_(1);
+      return;
+    }
+
     const transcriptFolder = DriveApp.getFolderById(TRANSCRIPT_FOLDER_ID);
     const partsFolder = createOrGetPartsFolder_(transcriptFolder, job.meetingName);
 
@@ -1913,27 +1925,14 @@ function uploadAudioFromFrontend_(body) {
   PROPS.setProperty("report_" + reportId + "_meetingFolderId", meetingFolderId);
   PROPS.setProperty("report_" + reportId + "_status", "transcribing");
 
-  // ── STAP-TRACKING: Upload klaar, start pipeline ──
-  const uploadJobKey = "job_" + meetingFolderId;
-  PROPS.setProperty(uploadJobKey + "_uploadCompletedAt", new Date().toISOString());
-
-  // Start transcriptie pipeline
-  try {
-    prepareMeetingJob_(meetingFolder, meetingName, audioFile);
-    scheduleResume_(1); // Schedule resume voor transcriptie
-    console.log("✓ Transcriptie pipeline gestart voor:", meetingName);
-  } catch (err) {
-    console.log("!!! Fout bij starten transcriptie:", err);
-    PROPS.setProperty("report_" + reportId + "_status", "error");
-    PROPS.setProperty("report_" + reportId + "_error", String(err));
-    return { status: 'error', error: String(err) };
-  }
+  // Queue transcriptie als achtergrond-job (niet synchroon uitvoeren!)
+  queueTranscriptionJob_(meetingFolderId, meetingName, audioFile.getId());
 
   return {
-    status: 'transcribing',
+    status: 'queued',
     reportId: reportId,
     meetingFolderId: meetingFolderId,
-    message: 'Audio ontvangen, transcriptie gestart.'
+    message: 'Audio ontvangen, transcriptie wordt op de achtergrond gestart.'
   };
 }
 
@@ -2038,29 +2037,15 @@ function finalizeAudioUpload_(body) {
 
   // Koppel meetingFolderId aan reportId
   PROPS.setProperty("report_" + reportId + "_meetingFolderId", meetingFolderId);
-  PROPS.setProperty("report_" + reportId + "_status", "transcribing");
 
-  // ── STAP-TRACKING: Upload klaar, start pipeline ──
-  const uploadJobKey = "job_" + meetingFolderId;
-  PROPS.setProperty(uploadJobKey + "_uploadCompletedAt", new Date().toISOString());
-
-  // Start transcriptie pipeline
-  try {
-    prepareMeetingJob_(meetingFolder, meetingName, audioFile);
-    scheduleResume_(1);
-    console.log("✓ Transcriptie pipeline gestart voor:", meetingName);
-  } catch (err) {
-    console.log("!!! Fout bij starten transcriptie:", err);
-    PROPS.setProperty("report_" + reportId + "_status", "error");
-    PROPS.setProperty("report_" + reportId + "_error", String(err));
-    return { status: 'error', error: String(err) };
-  }
+  // Queue transcriptie als achtergrond-job (niet synchroon uitvoeren!)
+  queueTranscriptionJob_(meetingFolderId, meetingName, audioFile.getId());
 
   return {
-    status: 'transcribing',
+    status: 'queued',
     reportId: reportId,
     meetingFolderId: meetingFolderId,
-    message: 'Audio ontvangen, transcriptie gestart.'
+    message: 'Audio ontvangen, transcriptie wordt op de achtergrond gestart.'
   };
 }
 
@@ -2094,7 +2079,7 @@ function getFullReportStatus_(reportId) {
 
   // Bepaal de overkoepelende status
   let overallStatus = reportStatus;
-  if (jobState === "preparing" || jobState === "ready" || jobState === "transcribing") {
+  if (jobState === "queued" || jobState === "preparing" || jobState === "ready" || jobState === "transcribing") {
     overallStatus = "transcribing";
   } else if (jobState === "done" && secgenState !== "done") {
     overallStatus = "transcribed"; // klaar voor generatie
@@ -2215,7 +2200,8 @@ function buildPipelineSteps_(jobState, currentStep, totalFragments, currentIdx, 
   let activeStepId = currentStep;
   if (!activeStepId) {
     // Afleiden uit jobState
-    if (jobState === "preparing") activeStepId = "archiving";
+    if (jobState === "queued") activeStepId = "upload";
+    else if (jobState === "preparing") activeStepId = "archiving";
     else if (jobState === "ready") activeStepId = "queued";
     else if (jobState === "transcribing") activeStepId = "whisper";
   }
@@ -2352,6 +2338,7 @@ function getStepLabel_(currentStep, jobState) {
   if (currentStep && labels[currentStep]) return labels[currentStep];
   // Fallback op jobState
   const stateLabels = {
+    'queued':        'Audio in wachtrij voor verwerking...',
     'preparing':    'Audio wordt voorbereid...',
     'ready':        'Klaar om te transcriberen...',
     'transcribing': 'Bezig met transcriberen...',
@@ -2660,6 +2647,34 @@ function safeParseJson_(text) {
   catch (e) { return JSON.parse(String(text || "").trim().replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```$/i, "").trim()); }
 }
 
+/**
+ * Queued een transcriptie-job voor achtergrondverwerking.
+ * Dit voorkomt dat prepareMeetingJob_() synchroon draait in doPost
+ * (wat een 6-min timeout veroorzaakt bij zware CloudConvert operaties).
+ */
+function queueTranscriptionJob_(meetingFolderId, meetingName, audioFileId) {
+  const key = jobKey_(meetingFolderId);
+  PROPS.setProperty(key + "_state", "queued");
+  PROPS.setProperty(key + "_meetingName", meetingName);
+  PROPS.setProperty(key + "_meetingFolderId", meetingFolderId);
+  PROPS.setProperty(key + "_audioFileId", audioFileId);
+  PROPS.setProperty(key + "_createdAt", new Date().toISOString());
+  PROPS.setProperty(key + "_uploadCompletedAt", new Date().toISOString());
+
+  // Stel report status in
+  const allProps = PROPS.getProperties();
+  for (const k of Object.keys(allProps)) {
+    if (k.endsWith("_meetingFolderId") && allProps[k] === meetingFolderId && k.startsWith("report_")) {
+      const rId = k.replace("report_", "").replace("_meetingFolderId", "");
+      PROPS.setProperty("report_" + rId + "_status", "queued");
+    }
+  }
+
+  // Schedule achtergrond-trigger
+  scheduleResume_(1);
+  console.log("✓ Transcriptie-job queued voor achtergrondverwerking:", meetingName);
+}
+
 // Job store/load helpers
 function jobKey_(meetingFolderId) { return "job_" + meetingFolderId; }
 
@@ -2668,7 +2683,7 @@ function findNextPendingJob_() {
   const jobKeys = Object.keys(all).filter(k => k.endsWith("_state") && k.startsWith("job_")).map(k => k.replace(/_state$/, ""));
   for (const key of jobKeys) {
     const state = PROPS.getProperty(key + "_state");
-    if (state === "ready" || state === "transcribing" || state === "preparing") return loadJob_(key);
+    if (state === "queued" || state === "ready" || state === "transcribing" || state === "preparing") return loadJob_(key);
   }
   return null;
 }
@@ -3038,20 +3053,18 @@ function processJotformWebhook_(body, e) {
     const meetingFolderId = audioFile.folder.getId();
 
     PROPS.setProperty(reportKey + "_meetingFolderId", meetingFolderId);
-    PROPS.setProperty(reportKey + "_status", "transcribing");
 
-    // Start transcriptie pipeline
-    prepareMeetingJob_(audioFile.folder, meetingName, audioFile.file);
-    scheduleResume_(1);
+    // Queue transcriptie als achtergrond-job (niet synchroon!)
+    queueTranscriptionJob_(meetingFolderId, meetingName, audioFile.file.getId());
 
-    console.log("✓ JotForm audio ontvangen en transcriptie gestart:", meetingName);
+    console.log("✓ JotForm audio ontvangen, transcriptie queued:", meetingName);
 
     return {
-      status: 'transcribing',
+      status: 'queued',
       reportId: reportId,
       meetingFolderId: meetingFolderId,
       submissionId: submissionId,
-      message: `Audio "${meetingName}" ontvangen via JotForm. Transcriptie gestart.`
+      message: `Audio "${meetingName}" ontvangen via JotForm. Transcriptie wordt op de achtergrond gestart.`
     };
 
   } catch (err) {
