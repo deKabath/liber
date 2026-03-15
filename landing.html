@@ -3,25 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LiBeR – Advies, Begeleiding en Concepten voor sportorganisaties. Sinds 1997 partner van sportverenigingen, bonden en gemeenten in Nederland.">
+  <meta name="theme-color" content="#E87722">
   <title>LiBeR – Advies · Begeleiding · Concepten</title>
-  <link rel="stylesheet" href="css/landing.css?v=20260315b">
+  <link rel="stylesheet" href="css/landing.css?v=20260315c">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
 </head>
 <body>
 
+  <!-- SCROLL PROGRESS -->
+  <div class="scroll-progress" id="scroll-progress"></div>
+
   <!-- NAVIGATIE -->
-  <nav class="nav">
+  <nav class="nav" id="main-nav">
     <div class="nav-inner">
-      <a href="#" class="nav-logo"><img src="img/LiBeR.logo2008.diap - kopie.jpg" alt="LiBeR" class="nav-logo-img nav-logo-white"><img src="img/LiBeR.logo2008 - kopie.jpg" alt="LiBeR" class="nav-logo-img nav-logo-orange"></a>
-      <div class="nav-links">
+      <a href="#" class="nav-logo">
+        <img src="img/LiBeR.logo2008.diap - kopie.jpg" alt="LiBeR" class="nav-logo-img nav-logo-white">
+        <img src="img/LiBeR.logo2008 - kopie.jpg" alt="LiBeR" class="nav-logo-img nav-logo-orange">
+      </a>
+      <div class="nav-links" id="nav-links">
         <a href="#diensten">Diensten</a>
         <a href="#over">Over Ons</a>
         <a href="#track-record">Track Record</a>
         <a href="#contact">Contact</a>
       </div>
-      <button class="nav-toggle" aria-label="Menu" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+      <button class="nav-toggle" aria-label="Menu openen" aria-expanded="false" id="nav-toggle">
         <span class="material-symbols-outlined">menu</span>
       </button>
     </div>
@@ -41,19 +50,19 @@
     </div>
     <div class="hero-stat-bar">
       <div class="hero-stat">
-        <span class="hero-stat-number">28</span>
+        <span class="hero-stat-number" data-count="28">0</span>
         <span class="hero-stat-label">Jaar ervaring</span>
       </div>
       <div class="hero-stat">
-        <span class="hero-stat-number">500+</span>
+        <span class="hero-stat-number" data-count="500" data-suffix="+">0</span>
         <span class="hero-stat-label">Projecten</span>
       </div>
       <div class="hero-stat">
-        <span class="hero-stat-number">200+</span>
+        <span class="hero-stat-number" data-count="200" data-suffix="+">0</span>
         <span class="hero-stat-label">Verenigingen</span>
       </div>
       <div class="hero-stat">
-        <span class="hero-stat-number">50+</span>
+        <span class="hero-stat-number" data-count="50" data-suffix="+">0</span>
         <span class="hero-stat-label">Gemeenten</span>
       </div>
     </div>
@@ -157,7 +166,7 @@
         </div>
         <div class="about-visual fade-in-right">
           <div class="about-image">
-            <img src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=600&h=400&fit=crop" alt="Hockey op kunstgras" class="about-photo">
+            <img src="https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=600&h=400&fit=crop" alt="Hockey op kunstgras" class="about-photo" loading="lazy">
           </div>
           <div class="about-card">
             <div class="about-card-icon">
@@ -411,37 +420,37 @@
       <h3 class="partners-subtitle">Strategische partners</h3>
       <div class="partners-grid">
         <div class="partner-card">
-          <img src="https://www.knhb.nl/themes/custom/knhb/logo.svg" alt="KNHB" class="partner-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <img src="https://www.knhb.nl/themes/custom/knhb/logo.svg" alt="KNHB" class="partner-logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
           <span class="material-symbols-outlined" style="display:none">sports_hockey</span>
           <span>KNHB</span>
         </div>
         <div class="partner-card">
-          <img src="https://logo.clearbit.com/rabobank.nl" alt="Rabobank" class="partner-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <img src="https://logo.clearbit.com/rabobank.nl" alt="Rabobank" class="partner-logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
           <span class="material-symbols-outlined" style="display:none">account_balance</span>
           <span>Rabobank</span>
         </div>
         <div class="partner-card">
-          <img src="https://logo.clearbit.com/sportways.nl" alt="SportWays" class="partner-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <img src="https://logo.clearbit.com/sportways.nl" alt="SportWays" class="partner-logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
           <span class="material-symbols-outlined" style="display:none">camping</span>
           <span>SportWays</span>
         </div>
         <div class="partner-card">
-          <img src="https://logo.clearbit.com/sponsorbrein.nl" alt="Sponsorbrein" class="partner-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <img src="https://logo.clearbit.com/sponsorbrein.nl" alt="Sponsorbrein" class="partner-logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
           <span class="material-symbols-outlined" style="display:none">hub</span>
           <span>Sponsorbrein</span>
         </div>
         <div class="partner-card">
-          <img src="https://logo.clearbit.com/fih.ch" alt="FIH" class="partner-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <img src="https://logo.clearbit.com/fih.ch" alt="FIH" class="partner-logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
           <span class="material-symbols-outlined" style="display:none">public</span>
           <span>Int. Hockey Fed.</span>
         </div>
         <div class="partner-card">
-          <img src="https://logo.clearbit.com/nocnsf.nl" alt="NOC*NSF" class="partner-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <img src="https://logo.clearbit.com/nocnsf.nl" alt="NOC*NSF" class="partner-logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
           <span class="material-symbols-outlined" style="display:none">sports_score</span>
           <span>NOC*NSF</span>
         </div>
         <div class="partner-card">
-          <img src="https://logo.clearbit.com/sportknowhowxl.nl" alt="SportKnowhowXL" class="partner-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <img src="https://logo.clearbit.com/sportknowhowxl.nl" alt="SportKnowhowXL" class="partner-logo" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
           <span class="material-symbols-outlined" style="display:none">newspaper</span>
           <span>SportKnowhowXL</span>
         </div>
@@ -511,33 +520,33 @@
       <p class="section-sub">Elk jaar een unieke nieuwjaarskaart — al sinds 2005. Een traditie die de passie en creativiteit van LiBeR weerspiegelt.</p>
 
       <div class="cards-timeline">
-        <div class="ny-card" onclick="showGreeting(2026)"><span class="ny-year">2026</span></div>
-        <div class="ny-card" onclick="showGreeting(2025)"><span class="ny-year">2025</span></div>
-        <div class="ny-card" onclick="showGreeting(2024)"><span class="ny-year">2024</span></div>
-        <div class="ny-card" onclick="showGreeting(2023)"><span class="ny-year">2023</span></div>
-        <div class="ny-card" onclick="showGreeting(2022)"><span class="ny-year">2022</span></div>
-        <div class="ny-card" onclick="showGreeting(2021)"><span class="ny-year">2021</span></div>
-        <div class="ny-card" onclick="showGreeting(2020)"><span class="ny-year">2020</span></div>
-        <div class="ny-card" onclick="showGreeting(2019)"><span class="ny-year">2019</span></div>
-        <div class="ny-card" onclick="showGreeting(2018)"><span class="ny-year">2018</span></div>
-        <div class="ny-card" onclick="showGreeting(2017)"><span class="ny-year">2017</span></div>
-        <div class="ny-card" onclick="showGreeting(2016)"><span class="ny-year">2016</span></div>
-        <div class="ny-card" onclick="showGreeting(2015)"><span class="ny-year">2015</span></div>
-        <div class="ny-card" onclick="showGreeting(2014)"><span class="ny-year">2014</span></div>
-        <div class="ny-card" onclick="showGreeting(2013)"><span class="ny-year">2013</span></div>
-        <div class="ny-card" onclick="showGreeting(2012)"><span class="ny-year">2012</span></div>
-        <div class="ny-card" onclick="showGreeting(2010)"><span class="ny-year">2010</span></div>
-        <div class="ny-card" onclick="showGreeting(2009)"><span class="ny-year">2009</span></div>
-        <div class="ny-card" onclick="showGreeting(2008)"><span class="ny-year">2008</span></div>
-        <div class="ny-card" onclick="showGreeting(2007)"><span class="ny-year">2007</span></div>
-        <div class="ny-card" onclick="showGreeting(2005)"><span class="ny-year">2005</span></div>
+        <div class="ny-card" style="--i:0" onclick="showGreeting(2026)"><span class="ny-year">2026</span></div>
+        <div class="ny-card" style="--i:1" onclick="showGreeting(2025)"><span class="ny-year">2025</span></div>
+        <div class="ny-card" style="--i:2" onclick="showGreeting(2024)"><span class="ny-year">2024</span></div>
+        <div class="ny-card" style="--i:3" onclick="showGreeting(2023)"><span class="ny-year">2023</span></div>
+        <div class="ny-card" style="--i:4" onclick="showGreeting(2022)"><span class="ny-year">2022</span></div>
+        <div class="ny-card" style="--i:5" onclick="showGreeting(2021)"><span class="ny-year">2021</span></div>
+        <div class="ny-card" style="--i:6" onclick="showGreeting(2020)"><span class="ny-year">2020</span></div>
+        <div class="ny-card" style="--i:7" onclick="showGreeting(2019)"><span class="ny-year">2019</span></div>
+        <div class="ny-card" style="--i:8" onclick="showGreeting(2018)"><span class="ny-year">2018</span></div>
+        <div class="ny-card" style="--i:9" onclick="showGreeting(2017)"><span class="ny-year">2017</span></div>
+        <div class="ny-card" style="--i:10" onclick="showGreeting(2016)"><span class="ny-year">2016</span></div>
+        <div class="ny-card" style="--i:11" onclick="showGreeting(2015)"><span class="ny-year">2015</span></div>
+        <div class="ny-card" style="--i:12" onclick="showGreeting(2014)"><span class="ny-year">2014</span></div>
+        <div class="ny-card" style="--i:13" onclick="showGreeting(2013)"><span class="ny-year">2013</span></div>
+        <div class="ny-card" style="--i:14" onclick="showGreeting(2012)"><span class="ny-year">2012</span></div>
+        <div class="ny-card" style="--i:15" onclick="showGreeting(2010)"><span class="ny-year">2010</span></div>
+        <div class="ny-card" style="--i:16" onclick="showGreeting(2009)"><span class="ny-year">2009</span></div>
+        <div class="ny-card" style="--i:17" onclick="showGreeting(2008)"><span class="ny-year">2008</span></div>
+        <div class="ny-card" style="--i:18" onclick="showGreeting(2007)"><span class="ny-year">2007</span></div>
+        <div class="ny-card" style="--i:19" onclick="showGreeting(2005)"><span class="ny-year">2005</span></div>
       </div>
       <p class="cards-note">20 unieke kaarten in 21 jaar — klik op een kaart voor de nieuwjaarsgroet.</p>
 
       <!-- Greeting Modal -->
       <div class="greeting-modal" id="greeting-modal" onclick="if(event.target===this)closeGreeting()">
         <div class="greeting-card">
-          <button class="greeting-close" onclick="closeGreeting()">&times;</button>
+          <button class="greeting-close" onclick="closeGreeting()" aria-label="Sluiten">&times;</button>
           <div class="greeting-year-badge" id="greeting-year"></div>
           <div class="greeting-text" id="greeting-text"></div>
           <div class="greeting-footer">
@@ -645,38 +654,43 @@
     </div>
   </footer>
 
-  <!-- Scroll animations & Greeting modal -->
+  <!-- BACK TO TOP -->
+  <button class="back-to-top" id="back-to-top" aria-label="Terug naar boven">
+    <span class="material-symbols-outlined">arrow_upward</span>
+  </button>
+
+  <!-- Enhanced JavaScript -->
   <script>
+    // ---- Intersection Observer for scroll animations ----
+    const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -40px 0px' };
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
+          // Unobserve after revealing for performance
+          observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1 });
+    }, observerOptions);
 
     document.querySelectorAll('.fade-in, .fade-in-left, .fade-in-right, .service-card, .partner-card, .publication-card, .ny-card').forEach(el => {
       observer.observe(el);
     });
 
-    // Animated vertical timeline
+    // ---- Animated vertical timeline ----
     const vtlItems = document.querySelectorAll('.vtl-item');
-    if ('IntersectionObserver' in window) {
-      const vtlObserver = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('vtl-visible');
-          }
-        });
-      }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
+    const vtlObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('vtl-visible');
+          vtlObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
 
-      vtlItems.forEach(el => vtlObserver.observe(el));
-    } else {
-      // Fallback: show all items immediately
-      vtlItems.forEach(el => el.classList.add('vtl-visible'));
-    }
+    vtlItems.forEach(el => vtlObserver.observe(el));
 
-    // Scroll-based progress line for timeline
+    // ---- Scroll-based progress line for timeline ----
     function updateTimelineProgress() {
       const vtl = document.getElementById('vtl');
       const progress = document.getElementById('vtl-progress');
@@ -685,21 +699,127 @@
       const rect = vtl.getBoundingClientRect();
       const windowH = window.innerHeight;
       const totalH = vtl.offsetHeight;
-
-      // How far through the timeline section we've scrolled
       const scrolled = windowH - rect.top;
       const pct = Math.min(100, Math.max(0, (scrolled / (totalH + windowH * 0.3)) * 100));
       progress.style.height = pct + '%';
     }
 
+    // ---- Animated counter for hero stats ----
+    function animateCounters() {
+      const counters = document.querySelectorAll('.hero-stat-number[data-count]');
+      counters.forEach(counter => {
+        if (counter.dataset.animated) return;
+        counter.dataset.animated = 'true';
+
+        const target = parseInt(counter.dataset.count);
+        const suffix = counter.dataset.suffix || '';
+        const duration = 2000;
+        const start = performance.now();
+
+        function update(now) {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+          // Ease out cubic
+          const ease = 1 - Math.pow(1 - progress, 3);
+          const current = Math.round(target * ease);
+          counter.textContent = current + suffix;
+
+          if (progress < 1) {
+            requestAnimationFrame(update);
+          }
+        }
+        requestAnimationFrame(update);
+      });
+    }
+
+    // Trigger counters when hero stat bar is visible
+    const statBar = document.querySelector('.hero-stat-bar');
+    if (statBar) {
+      const counterObserver = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          animateCounters();
+          counterObserver.disconnect();
+        }
+      }, { threshold: 0.5 });
+      counterObserver.observe(statBar);
+    }
+
+    // ---- Scroll progress bar ----
+    const scrollProgress = document.getElementById('scroll-progress');
+
+    // ---- Back to top button ----
+    const backToTop = document.getElementById('back-to-top');
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ---- Scroll event handler (throttled with rAF) ----
+    let ticking = false;
     window.addEventListener('scroll', () => {
-      document.querySelector('.nav').classList.toggle('nav-scrolled', window.scrollY > 50);
-      updateTimelineProgress();
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          const docH = document.documentElement.scrollHeight - window.innerHeight;
+
+          // Nav state
+          document.getElementById('main-nav').classList.toggle('nav-scrolled', scrollY > 50);
+
+          // Scroll progress
+          if (scrollProgress) {
+            scrollProgress.style.width = (scrollY / docH * 100) + '%';
+          }
+
+          // Back to top visibility
+          backToTop.classList.toggle('visible', scrollY > 600);
+
+          // Timeline progress
+          updateTimelineProgress();
+
+          ticking = false;
+        });
+        ticking = true;
+      }
     });
 
     updateTimelineProgress();
 
-    // Nieuwjaarskaarten greeting texts
+    // ---- Mobile nav toggle (accessible) ----
+    const navToggle = document.getElementById('nav-toggle');
+    const navLinks = document.getElementById('nav-links');
+
+    navToggle.addEventListener('click', () => {
+      const isOpen = navLinks.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', isOpen);
+      navToggle.querySelector('.material-symbols-outlined').textContent = isOpen ? 'close' : 'menu';
+    });
+
+    // Close mobile nav when clicking a link
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+        navToggle.querySelector('.material-symbols-outlined').textContent = 'menu';
+      });
+    });
+
+    // ---- Active nav link highlighting ----
+    const sections = document.querySelectorAll('section[id]');
+    const navLinksAll = document.querySelectorAll('.nav-links a');
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          navLinksAll.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { threshold: 0.3, rootMargin: '-64px 0px -50% 0px' });
+
+    sections.forEach(section => sectionObserver.observe(section));
+
+    // ---- Nieuwjaarskaarten greeting texts ----
     const greetings = {
       2026: {
         title: 'Gelukkig Nieuwjaar 2026!',
