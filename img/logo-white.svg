@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 160" fill="none">
+  <!-- LiBeR text -->
+  <g fill="#FFFFFF">
+    <!-- L -->
+    <path d="M28 20 L58 20 L42 110 L38 110 L52 28 L36 28 Z" />
+    <polygon points="28,20 58,20 52,28 36,28" />
+    <path d="M20,15 L60,15 L55,25 L25,25 Z" transform="skewX(-8)"/>
+    <!-- Stylized LiBeR as text for clarity -->
+  </g>
+  <!-- Using text approach for accuracy -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;display=swap');
+    .logo-text { font-family: 'Nunito', sans-serif; font-weight: 900; }
+    .sub-text { font-family: 'Nunito', sans-serif; font-weight: 800; letter-spacing: 3px; }
+  </style>
+  <text x="180" y="95" text-anchor="middle" class="logo-text" fill="#FFFFFF" font-size="110" font-style="italic">
+    <tspan>L</tspan><tspan font-size="75">i</tspan><tspan font-size="110">B</tspan><tspan font-size="75">e</tspan><tspan font-size="110">R</tspan>
+  </text>
+  <!-- Underline bars -->
+  <rect x="45" y="105" width="120" height="6" rx="3" fill="#FFFFFF" transform="skewX(-5)"/>
+  <rect x="185" y="105" width="140" height="6" rx="3" fill="#FFFFFF" transform="skewX(-5)"/>
+  <!-- Subtitle -->
+  <text x="180" y="145" text-anchor="middle" class="sub-text" fill="#FFFFFF" font-size="18">
+    ADVIES • BEGELEIDING • CONCEPTEN
+  </text>
+</svg>

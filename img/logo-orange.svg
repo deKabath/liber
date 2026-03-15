@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 160" fill="none">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;display=swap');
+    .logo-text { font-family: 'Nunito', sans-serif; font-weight: 900; }
+    .sub-text { font-family: 'Nunito', sans-serif; font-weight: 800; letter-spacing: 3px; }
+  </style>
+  <text x="180" y="95" text-anchor="middle" class="logo-text" fill="#E87722" font-size="110" font-style="italic">
+    <tspan>L</tspan><tspan font-size="75">i</tspan><tspan font-size="110">B</tspan><tspan font-size="75">e</tspan><tspan font-size="110">R</tspan>
+  </text>
+  <!-- Underline bars -->
+  <rect x="45" y="105" width="120" height="6" rx="3" fill="#E87722" transform="skewX(-5)"/>
+  <rect x="185" y="105" width="140" height="6" rx="3" fill="#E87722" transform="skewX(-5)"/>
+  <!-- Subtitle -->
+  <text x="180" y="145" text-anchor="middle" class="sub-text" fill="#E87722" font-size="18">
+    ADVIES • BEGELEIDING • CONCEPTEN
+  </text>
+</svg>
