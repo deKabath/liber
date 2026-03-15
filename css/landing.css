@@ -616,16 +616,9 @@ a:hover { color: var(--orange-dark); }
 /* ---- ANIMATED VERTICAL TIMELINE ---- */
 .vtl {
   position: relative;
-  max-width: 1000px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 20px 0;
-  overflow: hidden;
-}
-
-.vtl::after {
-  content: '';
-  display: table;
-  clear: both;
 }
 
 /* Central track line */
@@ -635,64 +628,37 @@ a:hover { color: var(--orange-dark); }
   top: 0;
   bottom: 0;
   width: 4px;
-  background: var(--gray-200);
-  transform: translateX(-50%);
-  border-radius: 2px;
+  background: #eee;
+  margin-left: -2px;
+  z-index: 0;
 }
 
 /* Animated progress fill */
 .vtl-progress {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
-  height: 0%;
-  background: linear-gradient(180deg, var(--orange), #f5a623, var(--orange-dark));
-  border-radius: 2px;
-  transition: height 0.1s linear;
-  box-shadow: 0 0 12px rgba(232,119,34,0.4), 0 0 4px rgba(232,119,34,0.6);
+  height: 0;
+  background: #E87722;
+  transition: height 0.15s linear;
 }
 
-/* Glowing tip of progress line */
-.vtl-progress::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 12px;
-  height: 12px;
-  background: var(--orange);
-  border-radius: 50%;
-  box-shadow: 0 0 20px rgba(232,119,34,0.8), 0 0 40px rgba(232,119,34,0.4);
-  animation: glowPulse 1.5s ease infinite;
-}
-
-@keyframes glowPulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(232,119,34,0.8), 0 0 40px rgba(232,119,34,0.4); }
-  50% { box-shadow: 0 0 30px rgba(232,119,34,1), 0 0 60px rgba(232,119,34,0.6); }
-}
-
-/* Timeline items */
+/* Timeline items — simple block layout */
 .vtl-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 32px;
   position: relative;
-  width: 50%;
-  padding: 0 48px 48px;
   opacity: 0;
-  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  clear: both;
+  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
 .vtl-left {
-  float: left;
-  text-align: right;
-  transform: translateX(-40px);
+  flex-direction: row-reverse;
+  transform: translateX(-30px);
 }
 
 .vtl-right {
-  float: right;
-  text-align: left;
-  transform: translateX(40px);
+  flex-direction: row;
+  transform: translateX(30px);
 }
 
 .vtl-item.vtl-visible {
@@ -700,127 +666,80 @@ a:hover { color: var(--orange-dark); }
   transform: translateX(0) !important;
 }
 
-/* Center dot on the line */
+/* Dot */
 .vtl-dot {
   position: absolute;
+  left: 50%;
   top: 8px;
   width: 20px;
   height: 20px;
-  background: var(--white);
-  border: 4px solid var(--orange);
+  margin-left: -10px;
+  background: #fff;
+  border: 4px solid #E87722;
   border-radius: 50%;
   z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.4s ease;
   box-shadow: 0 0 0 4px rgba(232,119,34,0.15);
+  transition: all 0.4s ease;
 }
 
-.vtl-dot span {
-  font-size: 0;
-  color: var(--orange);
-}
-
-.vtl-left .vtl-dot {
-  right: -10px;
-}
-
-.vtl-right .vtl-dot {
-  left: -10px;
-}
+.vtl-dot span { display: none; }
 
 .vtl-item.vtl-visible .vtl-dot {
-  animation: dotAppear 0.5s ease both;
+  animation: dotPop 0.5s ease both;
 }
 
-@keyframes dotAppear {
+@keyframes dotPop {
   0% { transform: scale(0); }
   60% { transform: scale(1.4); }
   100% { transform: scale(1); }
 }
 
 .vtl-item:hover .vtl-dot {
-  background: var(--orange);
+  background: #E87722;
   transform: scale(1.3);
-  box-shadow: 0 0 0 6px rgba(232,119,34,0.25), 0 0 20px rgba(232,119,34,0.4);
+  box-shadow: 0 0 0 6px rgba(232,119,34,0.25), 0 0 20px rgba(232,119,34,0.3);
 }
 
 /* Card */
 .vtl-card {
-  background: var(--white);
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius-lg);
+  width: calc(50% - 40px);
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
   padding: 24px 28px;
   transition: all 0.3s ease;
   position: relative;
-  overflow: hidden;
 }
 
-/* Arrow pointer towards center line */
-.vtl-left .vtl-card::after {
-  content: '';
-  position: absolute;
-  top: 14px;
-  right: -8px;
-  width: 16px;
-  height: 16px;
-  background: var(--white);
-  border: 1px solid var(--gray-200);
-  border-left: none;
-  border-bottom: none;
-  transform: rotate(45deg);
-  transition: border-color 0.3s;
+.vtl-left .vtl-card {
+  margin-right: auto;
+  text-align: right;
 }
 
-.vtl-right .vtl-card::after {
-  content: '';
-  position: absolute;
-  top: 14px;
-  left: -8px;
-  width: 16px;
-  height: 16px;
-  background: var(--white);
-  border: 1px solid var(--gray-200);
-  border-right: none;
-  border-top: none;
-  transform: rotate(45deg);
-  transition: border-color 0.3s;
+.vtl-right .vtl-card {
+  margin-left: auto;
+  text-align: left;
 }
 
 .vtl-card:hover {
-  border-color: var(--orange);
-  box-shadow: var(--shadow-lg);
+  border-color: #E87722;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
   transform: translateY(-4px);
-}
-
-.vtl-card:hover::after {
-  border-color: var(--orange);
 }
 
 /* Highlight card (final item) */
 .vtl-card-highlight {
   background: linear-gradient(135deg, #fff8f2, #ffffff);
-  border-color: var(--orange);
+  border-color: #E87722;
   box-shadow: 0 4px 20px rgba(232,119,34,0.15);
 }
 
-.vtl-card-highlight::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--orange), #f5a623, var(--orange-dark));
-}
-
-/* Year badge */
+/* Year */
 .vtl-year {
-  font-family: var(--font-serif);
+  font-family: 'Libre Caslon Text', Georgia, serif;
   font-size: 28px;
   font-weight: 700;
-  color: var(--orange);
+  color: #E87722;
   margin-bottom: 8px;
   line-height: 1;
 }
@@ -828,14 +747,14 @@ a:hover { color: var(--orange-dark); }
 .vtl-card h4 {
   font-size: 17px;
   font-weight: 600;
-  color: var(--gray-900);
+  color: #212121;
   margin-bottom: 8px;
   line-height: 1.3;
 }
 
 .vtl-card p {
   font-size: 14px;
-  color: var(--gray-600);
+  color: #757575;
   line-height: 1.7;
   margin-bottom: 12px;
 }
@@ -844,8 +763,8 @@ a:hover { color: var(--orange-dark); }
   display: inline-block;
   font-size: 12px;
   font-weight: 600;
-  color: var(--orange);
-  background: var(--orange-light);
+  color: #E87722;
+  background: #FFF3EB;
   padding: 4px 12px;
   border-radius: 50px;
 }
@@ -1542,21 +1461,14 @@ a:hover { color: var(--orange-dark); }
   .footer-links { flex-wrap: wrap; justify-content: center; }
 
   /* Vertical timeline mobile: single column */
-  .vtl-track { left: 20px; transform: none; }
+  .vtl-track { left: 16px; margin-left: 0; }
   .vtl-item, .vtl-left, .vtl-right {
-    width: 100%;
-    float: none;
-    text-align: left;
-    padding-left: 52px;
-    padding-right: 16px;
-    transform: translateY(30px);
+    flex-direction: row !important;
+    transform: translateY(20px);
   }
   .vtl-item.vtl-visible { transform: translateY(0) !important; }
-  .vtl-left .vtl-dot, .vtl-right .vtl-dot { left: -42px; right: auto; }
-  .vtl-left .vtl-card::after, .vtl-right .vtl-card::after {
-    top: 14px; left: -8px; right: auto;
-    border: 1px solid var(--gray-200); border-right: none; border-top: none;
-  }
+  .vtl-dot { left: 16px !important; margin-left: -10px; }
+  .vtl-card { width: calc(100% - 50px); margin-left: auto !important; margin-right: 0 !important; text-align: left !important; }
   .vtl-year { font-size: 22px; }
 
   .wave-divider svg { height: 40px; }
