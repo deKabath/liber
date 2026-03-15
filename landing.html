@@ -660,17 +660,21 @@
     });
 
     // Animated vertical timeline
-    const vtlObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('vtl-visible');
-        }
-      });
-    }, { threshold: 0.2, rootMargin: '0px 0px -50px 0px' });
+    const vtlItems = document.querySelectorAll('.vtl-item');
+    if ('IntersectionObserver' in window) {
+      const vtlObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('vtl-visible');
+          }
+        });
+      }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
 
-    document.querySelectorAll('.vtl-item').forEach(el => {
-      vtlObserver.observe(el);
-    });
+      vtlItems.forEach(el => vtlObserver.observe(el));
+    } else {
+      // Fallback: show all items immediately
+      vtlItems.forEach(el => el.classList.add('vtl-visible'));
+    }
 
     // Scroll-based progress line for timeline
     function updateTimelineProgress() {
