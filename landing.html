@@ -6,7 +6,7 @@
   <meta name="description" content="LiBeR – Advies, Begeleiding en Concepten voor sportorganisaties. Sinds 1997 partner van sportverenigingen, bonden en gemeenten in Nederland.">
   <meta name="theme-color" content="#E87722">
   <title>LiBeR – Advies · Begeleiding · Concepten</title>
-  <link rel="stylesheet" href="css/landing.css?v=20260315c">
+  <link rel="stylesheet" href="css/landing.css?v=20260316a">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -39,12 +39,27 @@
   <!-- HERO -->
   <header class="hero">
     <div class="hero-overlay"></div>
+    <!-- Animated floating shapes -->
+    <div class="hero-shapes">
+      <div class="hero-shape hero-shape-1"></div>
+      <div class="hero-shape hero-shape-2"></div>
+      <div class="hero-shape hero-shape-3"></div>
+      <div class="hero-shape hero-shape-4"></div>
+      <div class="hero-shape hero-shape-5"></div>
+    </div>
     <div class="hero-content fade-in">
-      <p class="hero-tagline">Advies · Begeleiding · Concepten</p>
-      <h1>Wij maken sport<br><span class="accent">sterker</span></h1>
+      <p class="hero-tagline">
+        <span class="hero-tagline-line"></span>
+        Advies · Begeleiding · Concepten
+        <span class="hero-tagline-line"></span>
+      </p>
+      <h1 class="hero-title-animated">
+        <span class="hero-title-line"><span class="hero-title-word">Wij</span> <span class="hero-title-word">maken</span> <span class="hero-title-word">sport</span></span>
+        <span class="hero-title-line"><span class="hero-title-word accent-word">sterker</span></span>
+      </h1>
       <p class="hero-sub">Sinds 1997 partner van sportverenigingen, bonden en gemeenten in Nederland. Inspiratie- & Spiegelsessies, Procesbegeleiding en Ondersteuningstrajecten van strategie naar operatie.</p>
       <div class="hero-actions">
-        <a href="#contact" class="btn btn-primary btn-lg">Neem contact op</a>
+        <a href="#contact" class="btn btn-primary btn-lg btn-glow">Neem contact op</a>
         <a href="#diensten" class="btn btn-outline-white btn-lg">Onze diensten</a>
       </div>
     </div>
@@ -66,10 +81,26 @@
         <span class="hero-stat-label">Gemeenten</span>
       </div>
     </div>
-    <!-- Wave divider -->
-    <div class="wave-divider">
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-        <path d="M0,60 C360,120 720,0 1080,60 C1260,90 1380,80 1440,60 L1440,120 L0,120 Z" fill="#ffffff"/>
+    <!-- Scroll indicator -->
+    <div class="hero-scroll-hint" id="hero-scroll-hint">
+      <span class="material-symbols-outlined hero-scroll-icon">expand_more</span>
+    </div>
+    <!-- Diagonal transition to diensten -->
+    <div class="hero-transition">
+      <svg viewBox="0 0 1440 200" preserveAspectRatio="none" class="hero-transition-svg">
+        <defs>
+          <linearGradient id="transGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#E87722;stop-opacity:0.15"/>
+            <stop offset="50%" style="stop-color:#E87722;stop-opacity:0.08"/>
+            <stop offset="100%" style="stop-color:#E87722;stop-opacity:0.15"/>
+          </linearGradient>
+        </defs>
+        <!-- Layer 1: soft orange glow -->
+        <path d="M0,120 C200,160 400,40 600,100 C800,160 1000,60 1200,100 C1350,130 1420,110 1440,100 L1440,200 L0,200 Z" fill="url(#transGrad)"/>
+        <!-- Layer 2: white wave -->
+        <path d="M0,140 C240,180 480,100 720,140 C960,180 1200,100 1440,140 L1440,200 L0,200 Z" fill="rgba(255,255,255,0.5)"/>
+        <!-- Layer 3: final white -->
+        <path d="M0,160 C360,200 720,140 1080,170 C1260,185 1380,175 1440,165 L1440,200 L0,200 Z" fill="#ffffff"/>
       </svg>
     </div>
   </header>
