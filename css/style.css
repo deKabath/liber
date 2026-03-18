@@ -178,6 +178,36 @@ body {
 .status-progress { background: var(--orange-light); color: var(--orange); }
 .status-error { background: var(--red-light); color: var(--red); }
 
+/* ---- DASHBOARD PROGRESS BAR ---- */
+.dashboard-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+}
+.dashboard-progress-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--gray-200);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.dashboard-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--orange);
+  transition: width 0.3s ease;
+}
+.dashboard-progress-fill.progress-complete {
+  background: var(--green);
+}
+.dashboard-progress-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-600);
+  white-space: nowrap;
+}
+
 /* ---- SOURCE BADGES ---- */
 .source-badge {
   display: inline-flex;

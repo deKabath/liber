@@ -88,7 +88,7 @@ function renderDashboard() {
   // Table
   const tbody = document.getElementById('reports-tbody');
   if (reports.length === 0) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Geen verslagen gevonden. <a href="#" onclick="navigateTo(\'create\')">Maak een nieuw verslag aan.</a></td></tr>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Geen verslagen gevonden. <a href="#" onclick="navigateTo(\'create\')">Maak een nieuw verslag aan.</a></td></tr>';
     return;
   }
 
@@ -104,9 +104,25 @@ function renderDashboard() {
     const status = statusMap[r.status] || `<span class="status-badge">${r.status}</span>`;
     const date = r.createdAt ? new Date(r.createdAt).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
 
+    // Bereken sectie-voortgang
+    const generatableSections = MRA_SECTIONS.filter(s => s.generatable);
+    const totalSections = generatableSections.length;
+    const sections = r.sections || {};
+    const completedSections = generatableSections.filter(s => sections[s.id] && sections[s.id].content).length;
+    const progressPct = totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0;
+    const progressClass = progressPct === 100 ? 'progress-complete' : progressPct > 0 ? 'progress-partial' : '';
+
     return `<tr>
       <td><strong>${escapeHtml(r.meetingName)}</strong></td>
       <td>${status}</td>
+      <td>
+        <div class="dashboard-progress">
+          <div class="dashboard-progress-bar">
+            <div class="dashboard-progress-fill ${progressClass}" style="width:${progressPct}%"></div>
+          </div>
+          <span class="dashboard-progress-label">${completedSections}/${totalSections}</span>
+        </div>
+      </td>
       <td>Rabobank MRA</td>
       <td>${date}</td>
       <td>
