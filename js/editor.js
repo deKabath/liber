@@ -280,12 +280,43 @@ function updateGenerateButtonsState(enabled, reason) {
     genAllBtn.disabled = !enabled;
     if (!enabled && reason) {
       genAllBtn.title = reason;
-      genAllBtn.innerHTML = `<span class="material-symbols-outlined">hourglass_empty</span> Wacht op transcriptie`;
+      // Parse percentage uit reason als beschikbaar
+      const pctMatch = reason.match(/(\d+)%/);
+      const pct = pctMatch ? parseInt(pctMatch[1]) : null;
+
+      // Bepaal icoon en label op basis van status
+      let icon = 'hourglass_empty';
+      let label = 'Wacht op transcriptie';
+      let showProgress = false;
+
+      if (reason.includes('Transcriptie bezig')) {
+        icon = 'mic';
+        label = `Transcriberen${pct !== null ? ` ${pct}%` : '...'}`;
+        showProgress = pct !== null;
+      } else if (reason.includes('Analyse bezig')) {
+        icon = 'psychology';
+        label = `Analyseren${pct !== null ? ` ${pct}%` : '...'}`;
+        showProgress = pct !== null;
+      } else if (reason.includes('Upload')) {
+        icon = 'cloud_upload';
+        label = 'Uploaden...';
+      } else if (reason.includes('Fout')) {
+        icon = 'error';
+        label = 'Fout opgetreden';
+      }
+
+      genAllBtn.innerHTML = `
+        <span class="material-symbols-outlined spinning">${icon}</span> ${label}
+        ${showProgress ? `<div class="sidebar-progress-bar"><div class="sidebar-progress-fill" style="width:${pct}%"></div></div>` : ''}
+      `;
     } else {
       genAllBtn.title = '';
       genAllBtn.innerHTML = `<span class="material-symbols-outlined">auto_awesome</span> Alles Genereren`;
     }
   }
+
+  // Sidebar transcript status widget
+  updateSidebarTranscriptWidget(enabled, reason);
 
   // Individuele "Genereer" knoppen in sectie-headers
   document.querySelectorAll('.section-block-actions .btn-primary').forEach(btn => {
@@ -296,6 +327,63 @@ function updateGenerateButtonsState(enabled, reason) {
       btn.title = 'Genereer vanuit transcriptie';
     }
   });
+}
+
+/**
+ * Toon een compact transcript-status widget boven de knoppen in de sidebar
+ */
+function updateSidebarTranscriptWidget(enabled, reason) {
+  let widget = document.getElementById('sidebar-transcript-status');
+  const footer = document.querySelector('.sidebar-footer');
+  if (!footer) return;
+
+  if (enabled || !reason) {
+    // Verwijder widget als transcriptie klaar is
+    if (widget) widget.remove();
+    return;
+  }
+
+  // Maak widget als die nog niet bestaat
+  if (!widget) {
+    widget = document.createElement('div');
+    widget.id = 'sidebar-transcript-status';
+    widget.className = 'sidebar-transcript-widget';
+    footer.insertBefore(widget, footer.firstChild);
+  }
+
+  const pctMatch = reason.match(/(\d+)%/);
+  const pct = pctMatch ? parseInt(pctMatch[1]) : 0;
+
+  // Bepaal stap-info
+  let stepIcon = 'hourglass_empty';
+  let stepLabel = reason;
+  let stepClass = 'waiting';
+
+  if (reason.includes('Transcriptie bezig')) {
+    stepIcon = 'mic';
+    stepLabel = reason;
+    stepClass = 'transcribing';
+  } else if (reason.includes('Analyse bezig')) {
+    stepIcon = 'psychology';
+    stepLabel = reason;
+    stepClass = 'analyzing';
+  } else if (reason.includes('Upload')) {
+    stepIcon = 'cloud_upload';
+    stepLabel = 'Audio uploaden...';
+    stepClass = 'uploading';
+  } else if (reason.includes('Fout')) {
+    stepIcon = 'error';
+    stepClass = 'error';
+  }
+
+  widget.className = `sidebar-transcript-widget ${stepClass}`;
+  widget.innerHTML = `
+    <div class="stw-header">
+      <span class="material-symbols-outlined stw-icon spinning">${stepIcon}</span>
+      <span class="stw-label">${stepLabel}</span>
+    </div>
+    ${pct > 0 ? `<div class="stw-progress"><div class="stw-progress-fill" style="width:${pct}%"></div></div>` : ''}
+  `;
 }
 
 // ---- SECTION LIST (SIDEBAR) ----

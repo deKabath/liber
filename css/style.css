@@ -789,6 +789,68 @@ body {
   color: var(--gray-500);
   border-color: var(--gray-300);
 }
+.sidebar-footer .btn-primary:disabled:has(.spinning) {
+  background: var(--orange-light, #fff0e0);
+  color: var(--orange);
+  border-color: var(--orange);
+  opacity: 0.9;
+}
+
+/* Sidebar progress bar in disabled knop */
+.sidebar-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--gray-400);
+  border-radius: 2px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: var(--orange);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* Sidebar transcript status widget */
+.sidebar-transcript-widget {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: var(--gray-700);
+}
+.sidebar-transcript-widget.transcribing { border-color: var(--orange); background: #fff8f0; }
+.sidebar-transcript-widget.analyzing { border-color: #7c3aed; background: #f5f0ff; }
+.sidebar-transcript-widget.error { border-color: var(--red, #e53e3e); background: #fef2f2; }
+
+.stw-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+.stw-icon { font-size: 18px; color: var(--orange); }
+.sidebar-transcript-widget.analyzing .stw-icon { color: #7c3aed; }
+.sidebar-transcript-widget.error .stw-icon { color: var(--red, #e53e3e); }
+.stw-label { flex: 1; line-height: 1.3; }
+
+.stw-progress {
+  width: 100%;
+  height: 4px;
+  background: var(--gray-200);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.stw-progress-fill {
+  height: 100%;
+  background: var(--orange);
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+.sidebar-transcript-widget.analyzing .stw-progress-fill { background: #7c3aed; }
 
 /* Header fields table in editor */
 .header-fields-table {
