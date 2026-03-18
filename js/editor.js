@@ -185,8 +185,8 @@ function openEditor(reportId) {
     // Check transcriptie completeness
     checkAndUpdateTranscriptStatus(serverId);
 
-    // Start polling als status 'transcribing' of 'uploading' is
-    if (EDITOR.report.status === 'transcribing' || EDITOR.report.status === 'uploading') {
+    // Start polling als status 'transcribing', 'uploading' of 'chunking' is
+    if (EDITOR.report.status === 'transcribing' || EDITOR.report.status === 'uploading' || EDITOR.report.status === 'chunking') {
       startTranscriptStatusPolling();
     }
 
@@ -229,6 +229,13 @@ async function checkAndUpdateTranscriptStatus(serverId) {
         EDITOR.transcriptReady = false;
         updateGenerateButtonsState(false, 'Transcriptie voltooid maar bestand ontbreekt');
       }
+    } else if (status.status === 'chunking') {
+      EDITOR.transcriptReady = false;
+      const pct = status.analysisProgress || 0;
+      const btnMsg = `Analyse bezig: ${pct}%`;
+      updateGenerateButtonsState(false, btnMsg);
+      updateTranscriptStatusUI(status);
+      if (!_statusPollInterval) startTranscriptStatusPolling();
     } else if (status.status === 'transcribing') {
       EDITOR.transcriptReady = false;
       const pl = status.pipeline || {};
@@ -724,16 +731,25 @@ function startTranscriptStatusPolling() {
       updateTranscriptStatusUI(status);
 
       if (status.status === 'transcribed' || status.status === 'done' || status.status === 'generating') {
-        // Transcriptie klaar - stop polling, activeer generatie knoppen
+        // Transcriptie + analyse klaar - stop polling, activeer generatie knoppen
         stopTranscriptStatusPolling();
         EDITOR.transcriptReady = true;
         updateGenerateButtonsState(true);
 
         if (status.status === 'transcribed' && status.hasTranscript) {
-          showToast('Transcriptie voltooid! Je kunt nu secties genereren.', 'success');
+          showToast('Analyse voltooid! Je kunt nu secties genereren.', 'success');
         }
+      } else if (status.status === 'chunking') {
+        // Analyse loopt - toon voortgang
+        EDITOR.transcriptReady = false;
+        const pct = status.analysisProgress || 0;
+        const state = status.analysisStatus || 'chunking';
+        let btnMsg = state === 'finalizing'
+          ? 'Analyse afronden...'
+          : `Analyse bezig: ${pct}%`;
+        updateGenerateButtonsState(false, btnMsg);
       } else if (status.status === 'transcribing') {
-        // Update voortgang in knoppen met pipeline info
+        // Transcriptie loopt - toon voortgang
         EDITOR.transcriptReady = false;
         const pl = status.pipeline || {};
         const eta = pl.eta || {};
@@ -811,7 +827,43 @@ function updateTranscriptStatusUI(status) {
     return;
   }
 
-  // Actieve status
+  // === CHUNKING / ANALYSE STATUS ===
+  if (status.status === 'chunking') {
+    const pct = status.analysisProgress || 0;
+    const analysisState = status.analysisStatus || 'chunking';
+
+    labelEl.textContent = analysisState === 'finalizing'
+      ? 'Analyse afronden — secties samenvoegen...'
+      : `Transcriptie analyseren — ${pct}%`;
+
+    etaEl.textContent = '';
+    etaEl.className = 'pipeline-eta';
+
+    const progressFill = document.getElementById('pipeline-progress-fill');
+    progressFill.style.width = pct + '%';
+
+    // Toon analyse-stappen
+    const analysisSteps = [
+      { id: 'transcribe', label: 'Transcriptie', icon: 'mic', status: 'completed' },
+      { id: 'chunking', label: `Analyseren (${pct}%)`, icon: 'psychology',
+        status: analysisState === 'finalizing' ? 'completed' : 'active',
+        detail: status.analysisTotal > 0 ? `${Math.round(status.analysisOffset / 1000)}k / ${Math.round(status.analysisTotal / 1000)}k tekens` : '' },
+      { id: 'finalizing', label: 'Samenvoegen', icon: 'merge_type',
+        status: analysisState === 'finalizing' ? 'active' : 'pending' },
+      { id: 'ready', label: 'Klaar voor generatie', icon: 'check_circle', status: 'pending' }
+    ];
+    renderPipelineSteps_(analysisSteps);
+
+    const functionEl = document.getElementById('pipeline-function');
+    const elapsedEl = document.getElementById('pipeline-elapsed');
+    functionEl.textContent = 'AI analyseert transcriptie in stukken';
+    elapsedEl.textContent = status.analysisTotal > 0
+      ? `${Math.round(status.analysisOffset / 1000)}k / ${Math.round(status.analysisTotal / 1000)}k tekens verwerkt`
+      : '';
+    return;
+  }
+
+  // Actieve status (transcriptie)
   labelEl.textContent = pipeline.currentStepLabel || 'Pipeline actief...';
 
   // ETA

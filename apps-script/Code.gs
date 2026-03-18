@@ -2077,10 +2077,25 @@ function getFullReportStatus_(reportId) {
     if (jobState === "done") transcriptProgress = 100;
   }
 
+  // ── ANALYSE / CHUNKING voortgang ──
+  const analysisKey = "analysis_" + meetingFolderId;
+  const analysisState = PROPS.getProperty(analysisKey + "_state") || "";
+  const analysisOffset = parseInt(PROPS.getProperty(analysisKey + "_offset") || "0", 10);
+  let analysisTotal = 0;
+  if (analysisState && (analysisState === "pending" || analysisState === "chunking" || analysisState === "finalizing")) {
+    try {
+      const txtFileId = PROPS.getProperty(analysisKey + "_transcriptTxtFileId") || "";
+      if (txtFileId) analysisTotal = DriveApp.getFileById(txtFileId).getBlob().getDataAsString("UTF-8").length;
+    } catch (e) { /* ignore */ }
+  }
+  const analysisProgress = analysisTotal > 0 ? Math.round((analysisOffset / analysisTotal) * 100) : (analysisState === "done" ? 100 : 0);
+
   // Bepaal de overkoepelende status
   let overallStatus = reportStatus;
   if (jobState === "queued" || jobState === "preparing" || jobState === "ready" || jobState === "transcribing") {
     overallStatus = "transcribing";
+  } else if (analysisState === "pending" || analysisState === "chunking" || analysisState === "finalizing") {
+    overallStatus = "chunking";
   } else if (jobState === "done" && secgenState !== "done") {
     overallStatus = "transcribed"; // klaar voor generatie
   } else if (secgenState === "generating") {
@@ -2088,7 +2103,9 @@ function getFullReportStatus_(reportId) {
   } else if (secgenState === "done") {
     overallStatus = "done";
   }
+  if (analysisState === "done" && overallStatus === "chunking") overallStatus = "transcribed";
   if (jobState === "error") overallStatus = "error";
+  if (analysisState === "error") { overallStatus = "error"; }
 
   // Check hoeveel secties al gegenereerd zijn
   let generatedSections = 0;
@@ -2136,7 +2153,12 @@ function getFullReportStatus_(reportId) {
     generatedSections: generatedSections,
     totalSections: MRA_SECTIONS.filter(s => s.generatable).length,
     hasTranscript: !!transcriptTxtFileId,
-    error: PROPS.getProperty(reportPrefix + "_error") || PROPS.getProperty(jobKey + "_error") || "",
+    // Analyse / chunking voortgang
+    analysisStatus: analysisState || "none",
+    analysisProgress: analysisProgress,
+    analysisOffset: analysisOffset,
+    analysisTotal: analysisTotal,
+    error: PROPS.getProperty(reportPrefix + "_error") || PROPS.getProperty(jobKey + "_error") || PROPS.getProperty(analysisKey + "_error") || "",
     // v12.4: Gedetailleerde pipeline info
     pipeline: {
       currentStep: currentStep,

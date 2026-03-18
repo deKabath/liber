@@ -82,7 +82,7 @@ function renderDashboard() {
   const reports = APP.reports;
   document.getElementById('stat-total').textContent = reports.length;
   document.getElementById('stat-done').textContent = reports.filter(r => r.status === 'done').length;
-  document.getElementById('stat-progress').textContent = reports.filter(r => ['created','generating','chunking'].includes(r.status)).length;
+  document.getElementById('stat-progress').textContent = reports.filter(r => ['created','generating','chunking','transcribed'].includes(r.status)).length;
   document.getElementById('stat-transcribing').textContent = reports.filter(r => ['transcribing','preparing','ready'].includes(r.status)).length;
 
   // Table
@@ -97,7 +97,9 @@ function renderDashboard() {
       'done':         '<span class="status-badge status-done">✓ Voltooid</span>',
       'created':      '<span class="status-badge status-progress">📝 Aangemaakt</span>',
       'generating':   '<span class="status-badge status-progress">⏳ Genereren...</span>',
+      'chunking':     '<span class="status-badge status-progress">🔄 Analyseren...</span>',
       'transcribing': '<span class="status-badge status-progress">🎙️ Transcriptie...</span>',
+      'transcribed':  '<span class="status-badge status-done">📝 Getranscribeerd</span>',
       'preparing':    '<span class="status-badge status-progress">⏳ Voorbereiden...</span>',
       'error':        '<span class="status-badge status-error">⚠️ Fout</span>',
     };
