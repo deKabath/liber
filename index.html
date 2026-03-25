@@ -134,24 +134,6 @@
         <a href="#diensten" class="btn btn-outline-white btn-lg">Onze diensten</a>
       </div>
     </div>
-    <div class="hero-stat-bar">
-      <div class="hero-stat">
-        <span class="hero-stat-number" data-count="28">0</span>
-        <span class="hero-stat-label">Jaar ervaring</span>
-      </div>
-      <div class="hero-stat">
-        <span class="hero-stat-number" data-count="500" data-suffix="+">0</span>
-        <span class="hero-stat-label">Projecten</span>
-      </div>
-      <div class="hero-stat">
-        <span class="hero-stat-number" data-count="200" data-suffix="+">0</span>
-        <span class="hero-stat-label">Verenigingen</span>
-      </div>
-      <div class="hero-stat">
-        <span class="hero-stat-number" data-count="50" data-suffix="+">0</span>
-        <span class="hero-stat-label">Gemeenten</span>
-      </div>
-    </div>
     <!-- Scroll indicator -->
     <div class="hero-scroll-hint" id="hero-scroll-hint">
       <span class="material-symbols-outlined hero-scroll-icon">expand_more</span>
@@ -180,7 +162,7 @@
   <section id="diensten" class="section section-decorated">
     <div class="deco-dots" style="top:40px;right:5%;"></div>
     <div class="section-inner">
-      <h2 class="section-title">Onze <span class="accent">Diensten</span></h2>
+      <h2 class="section-title">Van advies tot <span class="accent">uitvoering</span></h2>
       <p class="section-sub">Van advies tot uitvoering — wij ondersteunen sportorganisaties op elk niveau.</p>
 
       <div class="services-grid">
@@ -804,46 +786,6 @@
       const scrolled = windowH - rect.top;
       const pct = Math.min(100, Math.max(0, (scrolled / (totalH + windowH * 0.3)) * 100));
       progress.style.height = pct + '%';
-    }
-
-    // ---- Animated counter for hero stats ----
-    function animateCounters() {
-      const counters = document.querySelectorAll('.hero-stat-number[data-count]');
-      counters.forEach(counter => {
-        if (counter.dataset.animated) return;
-        counter.dataset.animated = 'true';
-
-        const target = parseInt(counter.dataset.count);
-        const suffix = counter.dataset.suffix || '';
-        const duration = 2000;
-        const start = performance.now();
-
-        function update(now) {
-          const elapsed = now - start;
-          const progress = Math.min(elapsed / duration, 1);
-          // Ease out cubic
-          const ease = 1 - Math.pow(1 - progress, 3);
-          const current = Math.round(target * ease);
-          counter.textContent = current + suffix;
-
-          if (progress < 1) {
-            requestAnimationFrame(update);
-          }
-        }
-        requestAnimationFrame(update);
-      });
-    }
-
-    // Trigger counters when hero stat bar is visible
-    const statBar = document.querySelector('.hero-stat-bar');
-    if (statBar) {
-      const counterObserver = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          animateCounters();
-          counterObserver.disconnect();
-        }
-      }, { threshold: 0.5 });
-      counterObserver.observe(statBar);
     }
 
     // ---- Scroll progress bar ----
