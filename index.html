@@ -119,14 +119,12 @@
       <div class="hero-shape hero-shape-5"></div>
     </div>
     <div class="hero-content fade-in">
-      <div style="display:inline-flex;flex-direction:column;align-items:center;">
-        <img src="img/LiBeR.png" alt="LiBeR" style="width:100%;margin-bottom:1rem;">
-        <p class="hero-tagline" style="margin:0;">
+      <img src="img/LiBeR.png" alt="LiBeR" id="hero-logo" style="margin-bottom:1rem;">
+      <p class="hero-tagline" id="hero-tagline">
           <span class="hero-tagline-line"></span>
           Advies · Begeleiding · Concepten
           <span class="hero-tagline-line"></span>
         </p>
-      </div>
       <h1 class="hero-title-animated">
         <span class="hero-title-line"><span class="hero-title-word">Maakt</span> <span class="hero-title-word">sport</span></span>
         <span class="hero-title-line"><span class="hero-title-word accent-word">sterker</span></span>
@@ -967,6 +965,22 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeGreeting();
     });
+  </script>
+
+  <!-- Match hero logo width to tagline -->
+  <script>
+    (function() {
+      var logo = document.getElementById('hero-logo');
+      var tagline = document.getElementById('hero-tagline');
+      function matchWidth() {
+        if (logo && tagline) {
+          logo.style.width = tagline.offsetWidth + 'px';
+        }
+      }
+      matchWidth();
+      window.addEventListener('resize', matchWidth);
+      window.addEventListener('load', matchWidth);
+    })();
   </script>
 
   <!-- Wachtwoordbeveiliging script -->
