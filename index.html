@@ -11,8 +11,79 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+  <style>
+    /* Wachtwoordbeveiliging */
+    .pw-overlay {
+      position: fixed; inset: 0; z-index: 99999;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      transition: opacity .5s ease, visibility .5s ease;
+    }
+    .pw-overlay.pw-hidden {
+      opacity: 0; visibility: hidden; pointer-events: none;
+    }
+    .pw-box {
+      background: #fff; border-radius: 16px; padding: 2.5rem 2rem;
+      width: 90%; max-width: 380px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.3);
+      text-align: center;
+      animation: pw-slide-up .5s ease;
+    }
+    @keyframes pw-slide-up {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .pw-logo { max-width: 160px; margin-bottom: 1.5rem; }
+    .pw-title {
+      font-family: 'Inter', sans-serif; font-size: 1.1rem;
+      font-weight: 600; color: #212121; margin-bottom: .5rem;
+    }
+    .pw-sub {
+      font-family: 'Inter', sans-serif; font-size: .85rem;
+      color: #757575; margin-bottom: 1.5rem;
+    }
+    .pw-input {
+      width: 100%; padding: .75rem 1rem;
+      border: 2px solid #E0E0E0; border-radius: 10px;
+      font-family: 'Inter', sans-serif; font-size: 1rem;
+      outline: none; transition: border-color .2s;
+    }
+    .pw-input:focus { border-color: #E87722; }
+    .pw-input.pw-error { border-color: #C62828; animation: pw-shake .4s ease; }
+    @keyframes pw-shake {
+      0%,100% { transform: translateX(0); }
+      20%,60% { transform: translateX(-8px); }
+      40%,80% { transform: translateX(8px); }
+    }
+    .pw-btn {
+      width: 100%; margin-top: 1rem; padding: .75rem;
+      background: #E87722; color: #fff; border: none; border-radius: 10px;
+      font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: background .2s;
+    }
+    .pw-btn:hover { background: #C4611A; }
+    .pw-msg {
+      font-family: 'Inter', sans-serif; font-size: .8rem;
+      color: #C62828; margin-top: .75rem; min-height: 1.2em;
+    }
+    body.pw-locked > *:not(.pw-overlay) { filter: blur(8px); pointer-events: none; user-select: none; }
+  </style>
 </head>
-<body>
+<body class="pw-locked">
+
+  <!-- WACHTWOORDBEVEILIGING -->
+  <div class="pw-overlay" id="pw-overlay">
+    <div class="pw-box">
+      <img src="img/LiBeR.logo2008.png" alt="LiBeR" class="pw-logo">
+      <div class="pw-title">Beveiligde omgeving</div>
+      <div class="pw-sub">Voer het wachtwoord in om toegang te krijgen</div>
+      <form id="pw-form" onsubmit="return checkPassword(event)">
+        <input type="password" class="pw-input" id="pw-input" placeholder="Wachtwoord" autocomplete="off" autofocus>
+        <button type="submit" class="pw-btn">Inloggen</button>
+        <div class="pw-msg" id="pw-msg"></div>
+      </form>
+    </div>
+  </div>
 
   <!-- SCROLL PROGRESS -->
   <div class="scroll-progress" id="scroll-progress"></div>
@@ -952,6 +1023,37 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') closeGreeting();
     });
+  </script>
+
+  <!-- Wachtwoordbeveiliging script -->
+  <script>
+    (function() {
+      var PASS = 'liber2026';
+      var overlay = document.getElementById('pw-overlay');
+      var input = document.getElementById('pw-input');
+      var msg = document.getElementById('pw-msg');
+
+      if (sessionStorage.getItem('liber_auth') === 'true') {
+        overlay.classList.add('pw-hidden');
+        document.body.classList.remove('pw-locked');
+      }
+
+      window.checkPassword = function(e) {
+        e.preventDefault();
+        if (input.value === PASS) {
+          sessionStorage.setItem('liber_auth', 'true');
+          overlay.classList.add('pw-hidden');
+          document.body.classList.remove('pw-locked');
+        } else {
+          input.classList.add('pw-error');
+          msg.textContent = 'Onjuist wachtwoord. Probeer het opnieuw.';
+          setTimeout(function() { input.classList.remove('pw-error'); }, 400);
+          input.value = '';
+          input.focus();
+        }
+        return false;
+      };
+    })();
   </script>
 
 </body>
