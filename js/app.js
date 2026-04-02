@@ -27,6 +27,26 @@ const MRA_SECTIONS = [
   { id: 'bijlage',            title: 'Bijlage',                     generatable: false, page: 4, allowImages: true }
 ];
 
+// ---- KNVB Template ----
+const KNVB_SECTIONS = [
+  { id: 'header',             title: 'Basisgegevens',                          generatable: false, page: 1 },
+  { id: 'inleiding',          title: 'Inleiding',                              generatable: true,  page: 1 },
+  { id: 'big_data',           title: 'Big data',                               generatable: true,  page: 1 },
+  { id: 'beschrijving',       title: 'Korte beschrijving van de vereniging',    generatable: true,  page: 1 },
+  { id: 'taxameter',          title: 'Taxameter',                              generatable: false, page: 2, allowImages: true },
+  { id: 'onderstroom',        title: 'Onderstroom',                            generatable: true,  page: 2 },
+  { id: 'swot',               title: 'SWOT',                                   generatable: true,  page: 2 },
+  { id: 'quick_scan',         title: 'Quick scan',                             generatable: true,  page: 2 },
+  { id: 'ontwikkelbehoefte',  title: 'Ontwikkelbehoefte',                      generatable: true,  page: 3 },
+  { id: 'advies',             title: 'Observatie en vrijblijvend advies',       generatable: true,  page: 3 },
+  { id: 'afsluiting',         title: 'Afsluiting',                             generatable: true,  page: 3 },
+  { id: 'bijlage',            title: 'Bijlage',                                generatable: false, page: 4, allowImages: true }
+];
+
+function getTemplateSections(templateId) {
+  return templateId === 'knvb_intake' ? KNVB_SECTIONS : MRA_SECTIONS;
+}
+
 // ---- NAVIGATION ----
 function navigateTo(page, reportId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -105,12 +125,15 @@ function renderDashboard() {
     const date = r.createdAt ? new Date(r.createdAt).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
 
     // Bereken sectie-voortgang
-    const generatableSections = MRA_SECTIONS.filter(s => s.generatable);
+    const rTemplate = r.template || r.templateId || 'rabobank_mra';
+    const rSections = getTemplateSections(rTemplate);
+    const generatableSections = rSections.filter(s => s.generatable);
     const totalSections = generatableSections.length;
     const sections = r.sections || {};
     const completedSections = generatableSections.filter(s => sections[s.id] && sections[s.id].content).length;
     const progressPct = totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0;
     const progressClass = progressPct === 100 ? 'progress-complete' : progressPct > 0 ? 'progress-partial' : '';
+    const templateLabel = rTemplate === 'knvb_intake' ? 'KNVB Intake' : 'Rabobank MRA';
 
     return `<tr>
       <td><strong>${escapeHtml(r.meetingName)}</strong></td>
@@ -123,7 +146,7 @@ function renderDashboard() {
           <span class="dashboard-progress-label">${completedSections}/${totalSections}</span>
         </div>
       </td>
-      <td>Rabobank MRA</td>
+      <td>${templateLabel}</td>
       <td>${date}</td>
       <td>
         <button class="btn btn-ghost btn-sm" onclick="navigateTo('editor','${r.reportId}')">
@@ -158,13 +181,17 @@ async function createReport() {
     return;
   }
 
+  const templateSelect = document.getElementById('template-select');
+  const selectedTemplate = templateSelect ? templateSelect.value : 'rabobank_mra';
+  const opdrachtgever = selectedTemplate === 'knvb_intake' ? 'KNVB' : 'Rabobank Kring Metropool Regio Amsterdam';
+
   const headerFields = {
     '<<naam vereniging>>': vereniging,
     '<<datum>>': datum,
     '<<contactpersoon>>': contact,
     '<<onderwerp>>': onderwerp || 'verslag intake',
     '<<opgesteld_door>>': opgesteld || 'Lutger Brenninkmeijer',
-    '<<opdrachtgever>>': 'Rabobank Kring Metropool Regio Amsterdam'
+    '<<opdrachtgever>>': opdrachtgever
   };
 
   try {
@@ -173,7 +200,7 @@ async function createReport() {
     // Maak report aan op server
     const res = await API.createReport({
       meetingName: vereniging,
-      template: 'rabobank_mra',
+      template: selectedTemplate,
       headerFields: headerFields
     });
 
@@ -185,7 +212,7 @@ async function createReport() {
       serverReportId: serverReportId,
       meetingName: vereniging,
       status: 'created',
-      template: 'rabobank_mra',
+      template: selectedTemplate,
       createdAt: new Date().toISOString(),
       headerFields: headerFields,
       sections: {}
