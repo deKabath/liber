@@ -13,6 +13,12 @@ const EDITOR = {
   transcriptReady: false  // Buffer: true = transcriptie volledig, mag genereren
 };
 
+// Haal de juiste template secties op voor het huidige rapport
+function getEditorSections() {
+  const templateId = (EDITOR.report && EDITOR.report.template) || (EDITOR.report && EDITOR.report.templateId) || 'rabobank_mra';
+  return getTemplateSections(templateId);
+}
+
 // ---- GENERATION PROGRESS TRACKER ----
 const GenProgress = (() => {
   let _timer = null;
@@ -296,7 +302,7 @@ function renderSectionList() {
   const list = document.getElementById('section-list');
   let generatedCount = 0;
 
-  list.innerHTML = MRA_SECTIONS.map(sec => {
+  list.innerHTML = getEditorSections().map(sec => {
     const data = EDITOR.sections[sec.id];
     let dotClass = 'empty';
     if (data && data.content) {
@@ -311,7 +317,7 @@ function renderSectionList() {
     </li>`;
   }).join('');
 
-  document.getElementById('section-progress').textContent = `${generatedCount}/${MRA_SECTIONS.length}`;
+  document.getElementById('section-progress').textContent = `${generatedCount}/${getEditorSections().length}`;
 }
 
 // ---- SELECT SECTION ----
@@ -344,7 +350,7 @@ function renderEditorDocument() {
   </div>`;
 
   // Sections
-  for (const sec of MRA_SECTIONS) {
+  for (const sec of getEditorSections()) {
     if (sec.id === 'header') continue;
 
     const data = EDITOR.sections[sec.id] || {};
@@ -455,7 +461,7 @@ async function generateSingleSection(sectionId, opts = {}) {
 
   // Toon voortgangsmodal (tenzij onderdeel van bulk-generatie)
   const showProgress = !opts._bulkMode;
-  const sectionDef = MRA_SECTIONS.find(s => s.id === sectionId);
+  const sectionDef = getEditorSections().find(s => s.id === sectionId);
   const sectionTitle = sectionDef ? sectionDef.title : sectionId;
 
   if (showProgress) {
@@ -543,7 +549,7 @@ async function generateAllSections() {
     return;
   }
 
-  const generatable = MRA_SECTIONS.filter(s => s.generatable);
+  const generatable = getEditorSections().filter(s => s.generatable);
   // Filter secties die al gegenereerd zijn
   const toGenerate = generatable.filter(s => !EDITOR.sections[s.id] || !EDITOR.sections[s.id].content);
 
@@ -618,7 +624,7 @@ async function generateAllSections() {
 // ---- SAVE ALL ----
 function saveAllSections() {
   // Lees alle contenteditable velden
-  MRA_SECTIONS.forEach(sec => {
+  getEditorSections().forEach(sec => {
     const el = document.getElementById('content-' + sec.id);
     if (el && el.innerText.trim()) {
       if (!EDITOR.sections[sec.id]) EDITOR.sections[sec.id] = {};

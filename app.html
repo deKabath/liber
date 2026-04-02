@@ -294,7 +294,18 @@
   <!-- ════════════════════════════════════════════ -->
   <div class="container page active" id="page-upload">
     <h1>Audio uploaden</h1>
-    <p class="subtitle">Upload een audio-opname van het intake gesprek. De app transcribeert de audio en genereert automatisch een MRA verslag.</p>
+    <p class="subtitle">Upload een audio-opname van het intake gesprek. De app transcribeert de audio en genereert automatisch een verslag.</p>
+
+    <div class="card">
+      <h2>Template</h2>
+      <div class="form-group">
+        <label for="template-select">Verslagtype</label>
+        <select id="template-select" class="form-input" onchange="onTemplateChange()">
+          <option value="rabobank_mra">Rabobank MRA – Maatschappelijke Relevantie Analyse</option>
+          <option value="knvb_intake">KNVB – Intake Verslag</option>
+        </select>
+      </div>
+    </div>
 
     <div class="card">
       <h2>Basisgegevens</h2>
@@ -528,6 +539,28 @@ const MRA_SECTIONS = [
   { id: 'experts',            title: 'Voorgestelde expert(s)',       generatable: true,  page: 3 }
 ];
 
+const KNVB_SECTIONS = [
+  { id: 'inleiding',          title: 'Inleiding',                          generatable: true,  page: 1 },
+  { id: 'big_data',           title: 'Big data',                           generatable: true,  page: 1 },
+  { id: 'beschrijving',       title: 'Korte beschrijving van de vereniging',generatable: true,  page: 1 },
+  { id: 'onderstroom',        title: 'Onderstroom',                        generatable: true,  page: 2 },
+  { id: 'swot',               title: 'SWOT',                               generatable: true,  page: 2 },
+  { id: 'quick_scan',         title: 'Quick scan',                         generatable: true,  page: 2 },
+  { id: 'ontwikkelbehoefte',  title: 'Ontwikkelbehoefte',                  generatable: true,  page: 3 },
+  { id: 'advies',             title: 'Observatie en vrijblijvend advies',   generatable: true,  page: 3 },
+  { id: 'afsluiting',         title: 'Afsluiting',                         generatable: true,  page: 3 }
+];
+
+function getActiveSections() {
+  const templateId = STATE.template || 'rabobank_mra';
+  return templateId === 'knvb_intake' ? KNVB_SECTIONS : MRA_SECTIONS;
+}
+
+function onTemplateChange() {
+  const sel = document.getElementById('template-select');
+  STATE.template = sel.value;
+}
+
 // ═══════════════════════════════════════════
 // API LAYER
 // ═══════════════════════════════════════════
@@ -637,13 +670,17 @@ async function startProcess() {
     return;
   }
 
+  const selectedTemplate = document.getElementById('template-select').value;
+  STATE.template = selectedTemplate;
+
+  const opdrachtgever = selectedTemplate === 'knvb_intake' ? 'KNVB' : 'Rabobank Kring Metropool Regio Amsterdam';
   STATE.headerFields = {
     '<<naam vereniging>>': naam,
     '<<datum>>': document.getElementById('inp-datum').value,
     '<<contactpersoon>>': document.getElementById('inp-contact').value.trim(),
     '<<onderwerp>>': 'verslag intake',
     '<<opgesteld_door>>': document.getElementById('inp-opgesteld').value.trim() || 'Lutger Brenninkmeijer',
-    '<<opdrachtgever>>': 'Rabobank Kring Metropool Regio Amsterdam'
+    '<<opdrachtgever>>': opdrachtgever
   };
 
   const btn = document.getElementById('btn-start');
@@ -656,6 +693,7 @@ async function startProcess() {
       const res = await apiPost('submitTranscription', {
         meetingName: naam,
         transcriptionText: pastedText,
+        template: selectedTemplate,
         headerFields: STATE.headerFields
       });
       if (res.error) throw new Error(res.error);
@@ -679,7 +717,7 @@ async function startProcess() {
     // Route B: audio upload
     toast('Verslag aanmaken...');
     const createRes = await apiPost('createReport', {
-      data: { meetingName: naam, template: 'rabobank_mra', headerFields: STATE.headerFields }
+      data: { meetingName: naam, template: selectedTemplate, headerFields: STATE.headerFields }
     });
     if (!createRes.reportId) throw new Error('Geen reportId ontvangen');
     STATE.reportId = createRes.reportId;
@@ -893,7 +931,7 @@ function showTranscript(text) {
 // ═══════════════════════════════════════════
 function renderSectionList() {
   const list = document.getElementById('section-list');
-  const generatable = MRA_SECTIONS.filter(s => s.generatable);
+  const generatable = getActiveSections().filter(s => s.generatable);
 
   let generated = 0;
   list.innerHTML = generatable.map(sec => {
@@ -925,7 +963,7 @@ function renderSectionList() {
 
 function selectSection(sectionId) {
   STATE.activeSection = sectionId;
-  const sec = MRA_SECTIONS.find(s => s.id === sectionId);
+  const sec = getActiveSections().find(s => s.id === sectionId);
   const data = STATE.sections[sectionId];
 
   document.getElementById('editor-section-title').textContent = sec ? sec.title : '';
@@ -946,7 +984,7 @@ async function generateAll() {
   const progressCard = document.getElementById('gen-progress-card');
   progressCard.hidden = false;
 
-  const generatable = MRA_SECTIONS.filter(s => s.generatable);
+  const generatable = getActiveSections().filter(s => s.generatable);
   const startTime = Date.now();
   let completed = 0;
 
@@ -1006,7 +1044,7 @@ async function generateAll() {
 async function regenerateCurrentSection() {
   if (!STATE.activeSection || !STATE.reportId) return;
 
-  const sec = MRA_SECTIONS.find(s => s.id === STATE.activeSection);
+  const sec = getActiveSections().find(s => s.id === STATE.activeSection);
   const statusEl = document.getElementById('section-gen-status');
   statusEl.hidden = false;
   document.getElementById('section-gen-label').textContent = `${sec.title} hergenereren...`;
@@ -1065,7 +1103,7 @@ function renderReport() {
   const pageBreakAfter = { 1: true, 2: true };
   let currentPage = 0;
 
-  for (const sec of MRA_SECTIONS.filter(s => s.generatable)) {
+  for (const sec of getActiveSections().filter(s => s.generatable)) {
     const data = STATE.sections[sec.id];
     if (!data || !data.content) continue;
 
