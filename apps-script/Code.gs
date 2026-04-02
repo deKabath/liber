@@ -332,6 +332,306 @@ Schrijfstijl: professioneel, beknopt. Nederlands.`
 ];
 
 /****************************************************
+ * KNVB INTAKE TEMPLATE DEFINITIE
+ * Gebaseerd op analyse van 6+ voorbeeldverslagen
+ ****************************************************/
+
+const KNVB_PLACEHOLDER_KEYS = [
+  '<<naam vereniging>>',
+  '<<datum>>',
+  '<<contactpersoon>>',
+  '<<opgesteld_door>>',
+  '<<onderwerp>>',
+  '<<Inleiding>>',
+  '<<Big data>>',
+  '<<beschrijving vereniging>>',
+  '<<taxameter>>',
+  '<<onderstroom>>',
+  '<<Zwakte>>',
+  '<<Sterkte>>',
+  '<<Bedreigingen>>',
+  '<<Kansen>>',
+  '<<quick_scan>>',
+  '<<ontwikkelbehoefte>>',
+  '<<observatie & advies>>',
+  '<<Afsluiting>>',
+  '<<bijlagen>>'
+];
+
+const KNVB_SECTIONS = [
+  {
+    id: 'header',
+    title: 'Basisgegevens',
+    page: 1,
+    fields: ['<<naam vereniging>>', '<<datum>>', '<<contactpersoon>>', '<<opgesteld_door>>', '<<onderwerp>>'],
+    generatable: false
+  },
+  {
+    id: 'inleiding',
+    title: 'Inleiding',
+    page: 1,
+    fields: ['<<Inleiding>>'],
+    generatable: true,
+    systemPrompt: `Je schrijft de inleiding van een KNVB intake verslag.
+MINIMUM LENGTE: 40 woorden. Schrijf minstens 3-4 zinnen.
+Formaat: 2-4 korte alinea's.
+
+Begin ALTIJD met: "Op [datum] hebben we een bezoek gebracht aan [type club] [naam] te [plaats]."
+Tweede zin: "Aan tafel zaten [aantal] personen: [opsomming namen en rollen]." of "Aan \"tafel\" zaten [aantal] personen: [opsomming]."
+Derde zin: Beschrijf kort het karakter van het gesprek, bijvoorbeeld: "Tijdens de intake is gedurende een uitgebreid gesprek stilgestaan bij de huidige positie van de vereniging, de ontwikkeling van het ledenbestand en de wijze waarop de club organisatorisch en sportief functioneert."
+Eventueel vierde zin: "Het gesprek kenmerkte zich door [openheid/betrokkenheid/kritische reflectie]."
+
+Schrijfstijl: zakelijk, warm, persoonlijk. Geen opsommingstekens. Nederlands.
+Gebruik ALLEEN informatie uit de transcriptie. Verzin NIETS.`
+  },
+  {
+    id: 'big_data',
+    title: 'Big data',
+    page: 1,
+    fields: ['<<Big data>>'],
+    generatable: true,
+    systemPrompt: `Je schrijft de "Big data" sectie van een KNVB intake verslag.
+MINIMUM LENGTE: 200 woorden. Dit is een uitgebreide sectie.
+
+Begin ALTIJD met: "De vrijgegeven data van de KNVB zijn doorgenomen."
+
+Behandel daarna de volgende onderwerpen, elk als aparte alinea met de naam van het onderwerp vetgedrukt of als openingszin:
+
+1. **Ledenontwikkeling**: Beschrijf trends in ledenaantal (groei/daling), oorzaken, verhouding jeugd/senioren, bijzonderheden. Vergelijk met eigen cijfers van de club indien besproken.
+
+2. **Gediplomeerde trainers**: Beschrijf het percentage gediplomeerde trainers, vergelijking met landelijk gemiddelde, oorzaken (snelle groei, niet-gecertificeerde maar ervaren trainers), lopende initiatieven (technische commissie, trainerscoördinator).
+
+3. **Gediplomeerde scheidsrechters**: Beschrijf de situatie rond scheidsrechters, of het aanbod voldoende is, eventuele uitdagingen (opleidingskosten, verjonging), bijzonderheden.
+
+4. **Gekwalificeerd bestuur**: Beschrijf of bestuursleden KNVB-cursussen gevolgd hebben (bijv. Besturen Met Impact), ervaring, bijzonderheden.
+
+Schrijfstijl: feitelijk, analytisch, beschrijvend. Elke alinea begint met het onderwerp.
+Per onderwerp 2-4 zinnen. Nederlands.
+Gebruik ALLEEN informatie uit de transcriptie. Verzin NIETS. Als informatie over een onderwerp ontbreekt in de transcriptie, vermeld dan dat dit niet besproken is.`
+  },
+  {
+    id: 'beschrijving',
+    title: 'Korte beschrijving van de vereniging',
+    page: 1,
+    fields: ['<<beschrijving vereniging>>'],
+    generatable: true,
+    systemPrompt: `Je schrijft de sectie "Korte beschrijving van de club" voor een KNVB intake verslag.
+MINIMUM LENGTE: 180 woorden. Dit is een uitgebreide sectie.
+
+FORMAT: Schrijf losse feitelijke zinnen of korte alinea's, als bullet points (•).
+Elke bullet is 1-3 zinnen die een feit, observatie of kenmerk van de club beschrijven.
+Schrijf minimaal 8-12 bullets.
+
+Onderwerpen om te behandelen (indien relevant):
+- Positie van de club in de lokale gemeenschap
+- Ledenprofiel en diversiteit
+- Accommodatie en faciliteiten (staat van onderhoud, zichtbaarheid)
+- Clubcultuur en identiteit (kernwaarden, sfeer, familiegevoel)
+- Bestuur en organisatiestructuur (ervaring, werkwijze)
+- Vrijwilligers en betrokkenheid
+- Historie en bijzonderheden
+- Activiteiten en evenementen
+- Samenwerking met externe partijen
+- Financiële situatie (vergoedingen, kosten)
+
+Voorbeeld:
+• De club heeft een centrale plek in de lokale gemeenschap.
+• De accommodatie ziet er uiterst verzorgd uit. Daar wordt ook veel aandacht aan gegeven.
+• Het bestuur werkt voornamelijk vanuit willen (plannen) en niet vanuit moeten (reageren op vraagstukken).
+• Over het algemeen is de onderlinge verstandhouding goed en is er een hoge mate van bereidheid om elkaar te helpen.
+
+Schrijfstijl: beschrijvend, feitelijk, observerend. Nederlands.
+Gebruik ALLEEN informatie uit de transcriptie. Verzin NIETS.`
+  },
+  {
+    id: 'taxameter',
+    title: 'Taxameter',
+    page: 2,
+    fields: ['<<taxameter>>'],
+    generatable: false,
+    allowImages: true
+  },
+  {
+    id: 'onderstroom',
+    title: 'Onderstroom',
+    page: 2,
+    fields: ['<<onderstroom>>'],
+    generatable: true,
+    systemPrompt: `Je schrijft de sectie "Onderstroom" voor een KNVB intake verslag.
+MINIMUM LENGTE: 60 woorden. Schrijf 2-3 observerende alinea's.
+
+De onderstroom beschrijft wat er ONDER DE OPPERVLAKTE zichtbaar is bij de vereniging. Dit gaat over:
+- Onuitgesproken spanningen, frustraties of zorgen
+- Verborgen motivaties en drijfveren
+- De kloof tussen wat men zegt en wat men voelt
+- Ontwikkelbereidheid die nog niet benut wordt
+- Loyaliteit en betrokkenheid die niet altijd zichtbaar is
+
+Voorbeeld zinnen:
+"Onder de oppervlakte is een sterke ontwikkelbereidheid zichtbaar."
+"De vereniging wil een doelgerichte én lerende organisatie zijn, maar ervaart spanning in de verhouding met de KNVB."
+"Wanneer druk toeneemt, ontstaat de neiging tot reactief handelen."
+"Er is behoefte aan meer duidelijkheid over richting, rolverdeling en ontwikkelperspectief."
+
+Schrijfstijl: observerend, psychologisch, inzichtelijk. Nederlands.
+Gebruik ALLEEN wat uit de transcriptie af te leiden is. Verzin NIETS.`
+  },
+  {
+    id: 'swot',
+    title: 'SWOT',
+    page: 2,
+    fields: ['<<Zwakte>>', '<<Sterkte>>', '<<Bedreigingen>>', '<<Kansen>>'],
+    generatable: true,
+    outputFormat: 'json_table',
+    systemPrompt: `Je genereert de SWOT-analyse voor een KNVB intake verslag.
+
+BELANGRIJK: Genereer je antwoord als JSON object met exact deze structuur:
+{
+  "sterktes": ["item1", "item2", ...],
+  "zwaktes": ["item1", "item2", ...],
+  "kansen": ["item1", "item2", ...],
+  "bedreigingen": ["item1", "item2", ...]
+}
+
+Per categorie 4-8 items. Elk item is een korte zin of opsomming (max 15 woorden per item).
+
+Voorbeelden van items:
+Sterktes: "Sterke sociale binding", "Betrokken kern vrijwilligers", "Samenwerking met externe partijen"
+Zwaktes: "Smalle juniorenlijn", "Laag aandeel gediplomeerde trainers", "Gedateerd clubhuis"
+Kansen: "Opleiden en begeleiden eigen trainers", "Vergroten eigenaarschap leden", "Doorbreken van vaste patronen"
+Bedreigingen: "Overbelasting vrijwilligers", "Structurele uitstroom junioren", "Stijgende kosten"
+
+Genereer ALLEEN valide JSON, geen andere tekst.
+Baseer de items ALLEEN op informatie uit de transcriptie. Verzin NIETS.`
+  },
+  {
+    id: 'quick_scan',
+    title: 'Quick scan',
+    page: 2,
+    fields: ['<<quick_scan>>'],
+    generatable: true,
+    systemPrompt: `Je schrijft de "quick scan" sectie van een KNVB intake verslag.
+MINIMUM LENGTE: 160 woorden. Dit is een uitgebreide sectie.
+
+Begin ALTIJD met: "De door de procesbegeleider gemaakte quick scan:"
+
+Dit zijn procesobservaties over het groepsproces tijdens het gesprek. Schrijf per observatie een aparte alinea als bullet point (•). Elke bullet is 2-3 zinnen.
+
+Schrijf 5-8 observatie-bullets. Focus op:
+- Overtuiging, passie en verantwoordelijkheidsgevoel ("De aanwezigen zitten met volle overtuiging en passie aan tafel. Er is een hoog verantwoordelijkheidsgevoel.")
+- Hoe men met elkaar omgaat: luisteren, doorvragen ("Er wordt waardig met elkaar omgegaan. Men luistert aandachtig naar elkaar. Wel zouden de aanwezigen elkaar meer mogen doorvragen.")
+- Communicatiestijl: "ik vind" vs "wij vinden", projectie, invullen voor de ander
+- Oordelend vs onderzoekend: oordeelt men over symptomen of zoekt men naar oorzaken
+- Perspectief: kijkt men naar wat fout gaat of naar vergezicht/kansen
+- Organisatiestructuur: klassiek (top-down) of bottom-up
+- Of er gesprekken gevoerd worden met de achterban
+- Mate van zelfreflectie en zelfkritiek
+
+Schrijfstijl: observerend, coachend, direct, eerlijk. Begin bullets met "De aanwezigen...", "Er wordt...", "Men...", "Het bestuur...".
+Nederlands. Gebruik ALLEEN wat uit de transcriptie af te leiden is.`
+  },
+  {
+    id: 'ontwikkelbehoefte',
+    title: 'Ontwikkelbehoefte',
+    page: 3,
+    fields: ['<<ontwikkelbehoefte>>'],
+    generatable: true,
+    systemPrompt: `Je schrijft de sectie "Ontwikkelbehoefte" (of "Hulpvraag") voor een KNVB intake verslag.
+MINIMUM LENGTE: 100 woorden.
+
+Begin ALTIJD met: "Alles overziend gaven de aanwezigen aan graag met de volgende thema's aan de slag te willen:" of een vergelijkbare openingszin.
+
+Beschrijf daarna de concrete ontwikkelthema's als aparte alinea's:
+- Elk thema als bullet point (•) met 1-2 zinnen
+- Typische thema's: toekomstvisie ontwikkelen, vrijwilligerscultuur versterken, leden activeren/verbinden, voetbalfilosofie implementeren, organisatiekracht versterken
+
+Voeg een verbindende zin toe zoals: "Deze thema's zouden heel goed hand in hand kunnen gaan. De club zou heel erg geholpen zijn met een procesbegeleider die het bestuur hierbij ondersteunt."
+
+Eventueel toevoegen (als relevant):
+- Verwijzing naar Rabo ClubSupport: "Rabo ClubSupport kan de club hierbij helpen. Via: https://www.rabo-clubsupportvo.nl/ Kies voor de aanvraag voor onderdeel kennis en kunde."
+- Verwijzing naar De Derde Helft (voor oudere leden): "https://ouderenfonds.nl/activiteit/dederdehelft/"
+
+Schrijfstijl: samenvattend, oplossingsgericht, constructief. Nederlands.
+Gebruik ALLEEN informatie uit de transcriptie. Verzin NIETS.`
+  },
+  {
+    id: 'advies',
+    title: 'Observatie en vrijblijvend advies',
+    page: 3,
+    fields: ['<<observatie & advies>>'],
+    generatable: true,
+    systemPrompt: `Je schrijft de sectie "Observatie en vrijblijvend advies" voor een KNVB intake verslag.
+MINIMUM LENGTE: 280 woorden. Dit is de langste sectie van het verslag. Schrijf uitgebreid.
+
+FORMAT: Schrijf losse alinea's als bullet points (•). Elke bullet is 2-4 zinnen. Schrijf minimaal 7-10 bullets.
+
+VASTE ELEMENTEN die ALTIJD terugkomen (pas de naam van de organisatie aan):
+
+1. Begin met een observatie over wat je hebt gezien: "Ik zag een groep gepassioneerde vrijwilligers die in een open dialoog geïnteresseerd in elkaar waren." of "Ik zie een bestuur die alles uit de kast haalt om er van te maken wat ze kunnen."
+
+2. Einstein-quote (ALTIJD opnemen): "Einstein zei al: als je doet wat je deed dan krijg je wat je kreeg. [Naam club] mag durven nieuwe paden te bewandelen en verder te kijken dan de successen en emoties uit het verleden. Ga met de tijd mee en kijk goed om je heen. Neem de tijd om met elkaar hierover in gesprek te gaan en neem de leden hierin stap voor stap mee (zie ontwikkelmodel van Lev Vygotsky). Het ontwikkelen van een \"roadmap\" is hiervoor een mooi instrument."
+
+3. Vygotsky-referentie (ALTIJD opnemen): "Zorg voor een helder stappenplan om mensen zorgvuldig mee te kunnen nemen naar de gewenste situatie. Als de stappen te groot zijn of te snel genomen worden dan is de kans dat de betrokkenen niet meer in de cirkel van naaste ontwikkeling komen maar in de overlevingsstand waardoor er weerstand kan ontstaan."
+
+4. Uitspreken-afspreken-aanspreken (ALTIJD opnemen): "Gebruik bijvoorbeeld hierbij de formule uitspreken – afspreken – aanspreken."
+
+5. Voeg 3-5 SPECIFIEKE advies-bullets toe op basis van de transcriptie. Typische onderwerpen:
+   - Profilering en zichtbaarheid van de club
+   - Vrijwilligers positioneren als eervol ("je WILT vrijwilliger zijn, je MOET niet")
+   - Ontwikkeling vs winnen bij trainers
+   - Vereniging vs team: "Mensen worden lid van een TEAM, niet van een club"
+   - Verwachtingsmanagement bij (ouders van) leden
+   - Ledenreis in kaart brengen
+
+Schrijfstijl: coachend, inspirerend, direct, persoonlijk. Nederlands.`
+  },
+  {
+    id: 'afsluiting',
+    title: 'Afsluiting',
+    page: 3,
+    fields: ['<<Afsluiting>>'],
+    generatable: true,
+    systemPrompt: `Je schrijft de sectie "Afsluiting" voor een KNVB intake verslag.
+MINIMUM LENGTE: 50 woorden. Schrijf 2-4 zinnen.
+
+Dit is een korte samenvattende afsluiting van het verslag. Beschrijf:
+- De kern van de club (sterke basis, identiteit, betrokkenheid)
+- De grootste uitdaging
+- De grootste kans of het pad voorwaarts
+
+Voorbeeld:
+"[Naam] is een club in transitie: van overleven naar floreren, van functioneel naar doelgericht. De grootste uitdaging is [uitdaging]. De grootste kans: [kans]."
+
+Of: "[Naam] beschikt over een stevige basis en een betrokken kern van vrijwilligers. Door deze kracht te verbinden aan duidelijke structuur en gerichte ondersteuning kan [Naam] haar kwetsbaarheid verkleinen en haar sociale functie versterken."
+
+Schrijfstijl: samenvattend, positief, toekomstgericht. Nederlands.
+Gebruik ALLEEN informatie uit de transcriptie.`
+  },
+  {
+    id: 'bijlage',
+    title: 'Bijlage',
+    page: 4,
+    fields: ['<<bijlagen>>'],
+    generatable: false,
+    allowImages: true
+  }
+];
+
+/****************************************************
+ * TEMPLATE LOOKUP HELPER
+ ****************************************************/
+function getTemplateById_(templateId) {
+  if (templateId === 'knvb_intake') {
+    return { sections: KNVB_SECTIONS, placeholders: KNVB_PLACEHOLDER_KEYS };
+  }
+  return { sections: MRA_SECTIONS, placeholders: PLACEHOLDER_KEYS };
+}
+
+function getTemplateSections_(templateId) {
+  return getTemplateById_(templateId).sections;
+}
+
+/****************************************************
  * SETUP (1x uitvoeren om keys op te slaan)
  ****************************************************/
 function setupAPIKeys() {
@@ -807,7 +1107,12 @@ function generateSection(reportId, sectionId, overrides) {
   overrides = overrides || {};
   console.log(`=== GENERATE SECTION: ${sectionId} ===`);
 
-  const section = MRA_SECTIONS.find(s => s.id === sectionId);
+  // Bepaal template op basis van reportData
+  const reportDataForTemplate = loadReportData_(reportId);
+  const templateId = (overrides && overrides.templateId) || (reportDataForTemplate && reportDataForTemplate.template) || 'rabobank_mra';
+  const templateSections = getTemplateSections_(templateId);
+
+  const section = templateSections.find(s => s.id === sectionId);
   if (!section) throw new Error("Onbekende sectie: " + sectionId);
   if (!section.generatable) throw new Error("Sectie " + sectionId + " is niet genereerbaar (handmatig invullen).");
 
@@ -901,7 +1206,10 @@ function generateSection(reportId, sectionId, overrides) {
  */
 function generateAllSections(reportId) {
   const started = Date.now();
-  const generatableSections = MRA_SECTIONS.filter(s => s.generatable);
+  const reportDataInit = loadReportData_(reportId);
+  const templateId = (reportDataInit && reportDataInit.template) || 'rabobank_mra';
+  const templateSections = getTemplateSections_(templateId);
+  const generatableSections = templateSections.filter(s => s.generatable);
 
   console.log(`=== GENERATE ALL SECTIONS (${generatableSections.length}) ===`);
 
@@ -1028,10 +1336,12 @@ function assembleReport(reportId, headerFields) {
 
   headerFields = headerFields || {};
   const reportData = loadReportData_(reportId);
+  const templateId = (reportData && reportData.template) || 'rabobank_mra';
+  const templateSections = getTemplateSections_(templateId);
 
   // Verzamel alle secties
   const sections = {};
-  for (const section of MRA_SECTIONS) {
+  for (const section of templateSections) {
     const key = `report_${reportId}_section_${section.id}`;
     const data = PROPS.getProperty(key);
     if (data) {
@@ -1039,7 +1349,12 @@ function assembleReport(reportId, headerFields) {
     }
   }
 
-  // Maak Google Doc
+  // Branch naar KNVB assembler indien nodig
+  if (templateId === 'knvb_intake') {
+    return assembleKnvbReport_(reportId, headerFields, sections, reportData);
+  }
+
+  // Maak Google Doc (Rabobank MRA)
   const reportTitle = `Rabobank MRA - verslag intake ${headerFields['<<naam vereniging>>'] || reportData.meetingName}`;
   const reportsFolder = DriveApp.getFolderById(REPORTS_FOLDER_ID);
   const doc = DocumentApp.create(reportTitle);
@@ -1170,6 +1485,172 @@ function assembleReport(reportId, headerFields) {
   console.log("Doc URL:", doc.getUrl());
 
   // Sla report doc ID op
+  PROPS.setProperty(`report_${reportId}_docId`, doc.getId());
+
+  return {
+    docId: doc.getId(),
+    docUrl: doc.getUrl(),
+    title: reportTitle
+  };
+}
+
+/****************************************************
+ * KNVB INTAKE VERSLAG ASSEMBLY
+ ****************************************************/
+function assembleKnvbReport_(reportId, headerFields, sections, reportData) {
+  const reportTitle = `KNVB - verslag intake ${headerFields['<<naam vereniging>>'] || reportData.meetingName}`;
+  const reportsFolder = DriveApp.getFolderById(REPORTS_FOLDER_ID);
+  const doc = DocumentApp.create(reportTitle);
+  const body = doc.getBody();
+
+  body.setMarginTop(50);
+  body.setMarginBottom(50);
+  body.setMarginLeft(60);
+  body.setMarginRight(60);
+
+  const ORANJE = '#E87722';
+  const DONKERGRIJS = '#333333';
+
+  // === HEADER ===
+  const headerTable = body.appendTable([
+    ['Opdrachtgever:', 'KNVB'],
+    ['Vereniging:', headerFields['<<naam vereniging>>'] || ''],
+    ['Onderwerp:', headerFields['<<onderwerp>>'] || ''],
+    ['Contact met:', headerFields['<<contactpersoon>>'] || ''],
+    ['Opgesteld door:', headerFields['<<opgesteld_door>>'] || 'Lutger Brenninkmeijer']
+  ]);
+  headerTable.setBorderWidth(0);
+  for (let r = 0; r < headerTable.getNumRows(); r++) {
+    headerTable.getRow(r).getCell(0).getChild(0).asText().setItalic(true).setForegroundColor(DONKERGRIJS);
+    headerTable.getRow(r).getCell(1).getChild(0).asText().setForegroundColor(DONKERGRIJS);
+  }
+
+  const divider = body.appendParagraph('____________________________________________________');
+  divider.getChild(0).asText().setForegroundColor(ORANJE);
+
+  // === INLEIDING ===
+  if (sections.inleiding) {
+    appendSectionHeader_(body, 'Inleiding', ORANJE);
+    appendPlainText_(body, sections.inleiding.content);
+  }
+
+  // === BIG DATA ===
+  if (sections.big_data) {
+    appendSectionHeader_(body, 'Big data', ORANJE);
+    appendPlainText_(body, sections.big_data.content);
+  }
+
+  // === KORTE BESCHRIJVING ===
+  if (sections.beschrijving) {
+    appendSectionHeader_(body, 'Korte beschrijving van de vereniging', ORANJE);
+    appendBulletContent_(body, sections.beschrijving.content);
+  }
+
+  // === TAXAMETER (afbeelding placeholder) ===
+  body.appendParagraph(''); // spacing
+  const taxameterHeader = body.appendParagraph('Taxameter');
+  taxameterHeader.getChild(0).asText().setBold(true).setItalic(true).setFontSize(11).setForegroundColor(ORANJE);
+  const taxameterPlaceholder = body.appendParagraph('[Taxameter afbeelding wordt hier geplaatst via de editor]');
+  taxameterPlaceholder.getChild(0).asText().setItalic(true).setForegroundColor('#999999').setFontSize(9);
+
+  // === ONDERSTROOM ===
+  if (sections.onderstroom) {
+    appendSectionHeader_(body, 'Onderstroom', ORANJE);
+    appendPlainText_(body, sections.onderstroom.content);
+  }
+
+  // === PAGINA 2 ===
+  body.appendPageBreak();
+
+  // === SWOT TABEL ===
+  appendSectionHeader_(body, 'SWOT', ORANJE);
+  if (sections.swot) {
+    let swotData;
+    try {
+      swotData = JSON.parse(sections.swot.content);
+    } catch (e) {
+      // Als het geen JSON is, probeer het als platte tekst
+      swotData = null;
+    }
+
+    if (swotData && swotData.sterktes) {
+      const swotTable = body.appendTable([
+        ['Zwakte', 'Sterkte'],
+        [(swotData.zwaktes || []).map(s => '• ' + s).join('\n'), (swotData.sterktes || []).map(s => '• ' + s).join('\n')],
+        ['Bedreigingen', 'Kansen'],
+        [(swotData.bedreigingen || []).map(s => '• ' + s).join('\n'), (swotData.kansen || []).map(s => '• ' + s).join('\n')]
+      ]);
+
+      // Style SWOT tabel
+      swotTable.setBorderWidth(1);
+      swotTable.setBorderColor('#CCCCCC');
+      // Headers bold
+      for (const rowIdx of [0, 2]) {
+        for (let c = 0; c < 2; c++) {
+          swotTable.getRow(rowIdx).getCell(c).getChild(0).asText().setBold(true).setFontSize(10);
+        }
+      }
+      // Content cells
+      for (const rowIdx of [1, 3]) {
+        for (let c = 0; c < 2; c++) {
+          swotTable.getRow(rowIdx).getCell(c).getChild(0).asText().setFontSize(9);
+        }
+      }
+    } else {
+      // Fallback: platte tekst
+      appendPlainText_(body, sections.swot.content);
+    }
+  }
+
+  // === QUICK SCAN ===
+  body.appendParagraph(''); // spacing
+  if (sections.quick_scan) {
+    appendSectionHeader_(body, 'Quick scan', ORANJE);
+    appendBulletContent_(body, sections.quick_scan.content);
+  }
+
+  // === PAGINA 3 ===
+  body.appendPageBreak();
+
+  // === ONTWIKKELBEHOEFTE ===
+  if (sections.ontwikkelbehoefte) {
+    appendSectionHeader_(body, 'Ontwikkelbehoefte', ORANJE);
+    appendBulletContent_(body, sections.ontwikkelbehoefte.content);
+  }
+
+  // === OBSERVATIE EN ADVIES ===
+  if (sections.advies) {
+    body.appendParagraph(''); // spacing
+    appendSectionHeader_(body, 'Observatie en vrijblijvend advies', ORANJE);
+    appendBulletContent_(body, sections.advies.content);
+  }
+
+  // === AFSLUITING ===
+  if (sections.afsluiting) {
+    body.appendParagraph(''); // spacing
+    appendSectionHeader_(body, 'Afsluiting', ORANJE);
+    appendPlainText_(body, sections.afsluiting.content);
+  }
+
+  // === BIJLAGE ===
+  body.appendPageBreak();
+  const bijlageHeader = body.appendParagraph('Bijlage');
+  bijlageHeader.setHeading(DocumentApp.ParagraphHeading.HEADING2);
+  bijlageHeader.getChild(0).asText().setBold(true).setItalic(true).setFontSize(13).setForegroundColor(ORANJE);
+
+  const bijlagePlaceholder = body.appendParagraph('[Bijlage-afbeeldingen en KNVB-statistieken worden hier geplaatst via de editor]');
+  bijlagePlaceholder.getChild(0).asText().setItalic(true).setForegroundColor('#999999').setFontSize(9);
+
+  doc.saveAndClose();
+
+  // Verplaats naar Reports folder
+  const docFile = DriveApp.getFileById(doc.getId());
+  reportsFolder.addFile(docFile);
+  try { DriveApp.getRootFolder().removeFile(docFile); } catch(e) {}
+
+  console.log("✓ KNVB verslag samengesteld:", reportTitle);
+  console.log("Doc URL:", doc.getUrl());
+
   PROPS.setProperty(`report_${reportId}_docId`, doc.getId());
 
   return {
@@ -1449,9 +1930,12 @@ function doGet(e) {
         result = getAllSections_(params.reportId);
         break;
 
-      case 'getTemplate':
-        result = { sections: MRA_SECTIONS, placeholderKeys: PLACEHOLDER_KEYS };
+      case 'getTemplate': {
+        const tid = params.templateId || 'rabobank_mra';
+        const tmpl = getTemplateById_(tid);
+        result = { sections: tmpl.sections, placeholderKeys: tmpl.placeholders, templateId: tid };
         break;
+      }
 
       case 'getTranscriptStatus':
         result = getTranscriptStatus_(params.reportId);
@@ -1734,8 +2218,9 @@ function deleteReport_(reportId) {
     }
   }
 
-  // Verwijder ook section data
-  for (const sec of MRA_SECTIONS) {
+  // Verwijder ook section data (voor beide templates)
+  const allSections = [...MRA_SECTIONS, ...KNVB_SECTIONS];
+  for (const sec of allSections) {
     const sectionKey = `report_${reportId}_section_${sec.id}`;
     if (PROPS.getProperty(sectionKey)) {
       PROPS.deleteProperty(sectionKey);
@@ -1788,18 +2273,25 @@ function getReportDetails_(reportId) {
   const summary = getReportSummary_(reportId);
   const sections = getAllSections_(reportId);
   const headerFields = PROPS.getProperty("report_" + reportId + "_headerFields");
+  const reportData = loadReportData_(reportId);
+  const templateId = (reportData && reportData.template) || 'rabobank_mra';
 
   return {
     ...summary,
     headerFields: headerFields ? JSON.parse(headerFields) : {},
     sections: sections.sections,
-    template: MRA_SECTIONS
+    template: getTemplateSections_(templateId),
+    templateId: templateId
   };
 }
 
 function getAllSections_(reportId) {
+  const reportData = loadReportData_(reportId);
+  const templateId = (reportData && reportData.template) || 'rabobank_mra';
+  const templateSections = getTemplateSections_(templateId);
+
   const sections = {};
-  for (const section of MRA_SECTIONS) {
+  for (const section of templateSections) {
     const key = `report_${reportId}_section_${section.id}`;
     const data = PROPS.getProperty(key);
     sections[section.id] = {
@@ -1808,7 +2300,7 @@ function getAllSections_(reportId) {
       content: data ? JSON.parse(data) : null
     };
   }
-  return { sections };
+  return { sections, templateId };
 }
 
 function getSectionContent_(reportId, sectionId) {
@@ -1883,7 +2375,8 @@ function loadReportData_(reportId) {
       (meetingFolderId !== reportId ? PROPS.getProperty("job_" + meetingFolderId + "_meetingName") : "") || "",
     meetingFolderId: meetingFolderId,
     transcriptTxtFileId: transcriptTxtFileId,
-    docId: PROPS.getProperty(reportPrefix + "_docId") || ""
+    docId: PROPS.getProperty(reportPrefix + "_docId") || "",
+    template: PROPS.getProperty(reportPrefix + "_template") || "rabobank_mra"
   };
 }
 
@@ -2091,8 +2584,11 @@ function getFullReportStatus_(reportId) {
   if (jobState === "error") overallStatus = "error";
 
   // Check hoeveel secties al gegenereerd zijn
+  const reportDataForStatus = loadReportData_(reportId);
+  const statusTemplateId = (reportDataForStatus && reportDataForStatus.template) || 'rabobank_mra';
+  const statusTemplateSections = getTemplateSections_(statusTemplateId);
   let generatedSections = 0;
-  for (const sec of MRA_SECTIONS) {
+  for (const sec of statusTemplateSections) {
     if (PROPS.getProperty(`report_${reportId}_section_${sec.id}`) ||
         PROPS.getProperty(`report_${meetingFolderId}_section_${sec.id}`)) {
       generatedSections++;
@@ -2134,7 +2630,7 @@ function getFullReportStatus_(reportId) {
     transcriptCurrent: transcriptCurrent,
     sectionGenerationStatus: secgenState || "none",
     generatedSections: generatedSections,
-    totalSections: MRA_SECTIONS.filter(s => s.generatable).length,
+    totalSections: statusTemplateSections.filter(s => s.generatable).length,
     hasTranscript: !!transcriptTxtFileId,
     error: PROPS.getProperty(reportPrefix + "_error") || PROPS.getProperty(jobKey + "_error") || "",
     // v12.4: Gedetailleerde pipeline info
@@ -3222,7 +3718,7 @@ function submitTranscriptionText_(body) {
   PROPS.setProperty(reportKey + "_meetingName", meetingName);
   PROPS.setProperty(reportKey + "_meetingFolderId", reportId);
   PROPS.setProperty(reportKey + "_createdAt", new Date().toISOString());
-  PROPS.setProperty(reportKey + "_template", "rabobank_mra");
+  PROPS.setProperty(reportKey + "_template", body.template || "rabobank_mra");
   PROPS.setProperty(reportKey + "_status", "transcribed");
   PROPS.setProperty(reportKey + "_transcriptTxtFileId", txtFile.getId());
   PROPS.setProperty(reportKey + "_source", "manual");
