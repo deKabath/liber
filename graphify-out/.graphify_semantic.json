@@ -1,0 +1,2027 @@
+{
+  "nodes": [
+    {
+      "id": "js_editor_js",
+      "label": "editor.js",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "editor_geteditorsections",
+      "label": "getEditorSections()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L17"
+    },
+    {
+      "id": "editor_openeditor",
+      "label": "openEditor()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L160"
+    },
+    {
+      "id": "editor_checkandupdatetranscriptstatus",
+      "label": "checkAndUpdateTranscriptStatus()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L224"
+    },
+    {
+      "id": "editor_updategeneratebuttonsstate",
+      "label": "updateGenerateButtonsState()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L275"
+    },
+    {
+      "id": "editor_rendersectionlist",
+      "label": "renderSectionList()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L301"
+    },
+    {
+      "id": "editor_selectsection",
+      "label": "selectSection()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L324"
+    },
+    {
+      "id": "editor_rendereditordocument",
+      "label": "renderEditorDocument()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L335"
+    },
+    {
+      "id": "editor_onsectionedit",
+      "label": "onSectionEdit()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L439"
+    },
+    {
+      "id": "editor_generatesinglesection",
+      "label": "generateSingleSection()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L452"
+    },
+    {
+      "id": "editor_regeneratesinglesection",
+      "label": "regenerateSingleSection()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L520"
+    },
+    {
+      "id": "editor_generateallsections",
+      "label": "generateAllSections()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L545"
+    },
+    {
+      "id": "editor_saveallsections",
+      "label": "saveAllSections()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L625"
+    },
+    {
+      "id": "editor_assemblereport",
+      "label": "assembleReport()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L654"
+    },
+    {
+      "id": "editor_assembleandpreview",
+      "label": "assembleAndPreview()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L674"
+    },
+    {
+      "id": "editor_deletecurrentreport",
+      "label": "deleteCurrentReport()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L680"
+    },
+    {
+      "id": "editor_uploadimageforsection",
+      "label": "uploadImageForSection()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L686"
+    },
+    {
+      "id": "editor_starttranscriptstatuspolling",
+      "label": "startTranscriptStatusPolling()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L721"
+    },
+    {
+      "id": "editor_stoptranscriptstatuspolling",
+      "label": "stopTranscriptStatusPolling()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L765"
+    },
+    {
+      "id": "editor_updatetranscriptstatusui",
+      "label": "updateTranscriptStatusUI()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L772"
+    },
+    {
+      "id": "editor_showpipelinedone",
+      "label": "showPipelineDone_()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L875"
+    },
+    {
+      "id": "editor_renderpipelinesteps",
+      "label": "renderPipelineSteps_()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L891"
+    },
+    {
+      "id": "editor_generateofflinecontent",
+      "label": "generateOfflineContent()",
+      "file_type": "code",
+      "source_file": "js/editor.js",
+      "source_location": "L918"
+    },
+    {
+      "id": "js_app_js",
+      "label": "app.js",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "app_gettemplatesections",
+      "label": "getTemplateSections()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L46"
+    },
+    {
+      "id": "app_navigateto",
+      "label": "navigateTo()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L51"
+    },
+    {
+      "id": "app_showtoast",
+      "label": "showToast()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L78"
+    },
+    {
+      "id": "app_loaddashboard",
+      "label": "loadDashboard()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L88"
+    },
+    {
+      "id": "app_renderdashboard",
+      "label": "renderDashboard()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L100"
+    },
+    {
+      "id": "app_createreport",
+      "label": "createReport()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L167"
+    },
+    {
+      "id": "app_uploadaudiotoserver",
+      "label": "uploadAudioToServer()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L253"
+    },
+    {
+      "id": "app_deletereport",
+      "label": "deleteReport()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L331"
+    },
+    {
+      "id": "app_handleaudiofile",
+      "label": "handleAudioFile()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L372"
+    },
+    {
+      "id": "app_removeaudio",
+      "label": "removeAudio()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L382"
+    },
+    {
+      "id": "app_handleimagefiles",
+      "label": "handleImageFiles()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L404"
+    },
+    {
+      "id": "app_renderimagesgrid",
+      "label": "renderImagesGrid()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L416"
+    },
+    {
+      "id": "app_removeimage",
+      "label": "removeImage()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L426"
+    },
+    {
+      "id": "app_savelocalreports",
+      "label": "saveLocalReports()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L432"
+    },
+    {
+      "id": "app_loadlocalreports",
+      "label": "loadLocalReports()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L442"
+    },
+    {
+      "id": "app_checkapiconfig",
+      "label": "checkApiConfig()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L452"
+    },
+    {
+      "id": "app_escapehtml",
+      "label": "escapeHtml()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L461"
+    },
+    {
+      "id": "app_formatdate",
+      "label": "formatDate()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L467"
+    },
+    {
+      "id": "app_loadjotformpage",
+      "label": "loadJotformPage()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L474"
+    },
+    {
+      "id": "app_loadjotformsubmissions",
+      "label": "loadJotformSubmissions()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L488"
+    },
+    {
+      "id": "app_submittranscription",
+      "label": "submitTranscription()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L536"
+    },
+    {
+      "id": "app_copywebhookurl",
+      "label": "copyWebhookUrl()",
+      "file_type": "code",
+      "source_file": "js/app.js",
+      "source_location": "L594"
+    },
+    {
+      "id": "js_preview_js",
+      "label": "preview.js",
+      "file_type": "code",
+      "source_file": "js/preview.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "preview_renderpreview",
+      "label": "renderPreview()",
+      "file_type": "code",
+      "source_file": "js/preview.js",
+      "source_location": "L6"
+    },
+    {
+      "id": "preview_buildpreviewpage",
+      "label": "buildPreviewPage()",
+      "file_type": "code",
+      "source_file": "js/preview.js",
+      "source_location": "L130"
+    },
+    {
+      "id": "preview_esc",
+      "label": "esc()",
+      "file_type": "code",
+      "source_file": "js/preview.js",
+      "source_location": "L137"
+    },
+    {
+      "id": "preview_texttohtml",
+      "label": "textToHtml()",
+      "file_type": "code",
+      "source_file": "js/preview.js",
+      "source_location": "L144"
+    },
+    {
+      "id": "js_api_js",
+      "label": "api.js",
+      "file_type": "code",
+      "source_file": "js/api.js",
+      "source_location": "L1"
+    },
+    {
+      "id": "scripts_download_logos_py",
+      "label": "download_logos.py",
+      "file_type": "code",
+      "source_file": "scripts/download_logos.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "readme_liber_verslaggenerator",
+      "label": "LiBeR Verslaggenerator",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_rabobank",
+      "label": "Rabobank",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_rabobank_mra",
+      "label": "Rabobank MRA (Maatschappelijke Relevantie Analyse)",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_rabobank_kring_mra",
+      "label": "Rabobank Kring Metropool Regio Amsterdam",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_liber_org",
+      "label": "LiBeR (Advies Begeleiding Concepten)",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_openai_whisper",
+      "label": "OpenAI Whisper",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_gpt4o",
+      "label": "GPT-4o",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_cloudconvert",
+      "label": "CloudConvert API",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_google_apps_script",
+      "label": "Google Apps Script",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_google_drive",
+      "label": "Google Drive",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_google_docs",
+      "label": "Google Docs",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_google_sheets",
+      "label": "Google Sheets",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_audio_transcription",
+      "label": "Audio Transcription Pipeline",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_section_generation",
+      "label": "Section Generation Pipeline",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_mra_template",
+      "label": "MRA Template Structure",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "readme_lutger_brenninkmeijer",
+      "label": "Lutger Brenninkmeijer",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "knvb_template_intake",
+      "label": "KNVB Intake Verslag Template",
+      "file_type": "document",
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf"
+    },
+    {
+      "id": "knvb_template_knvb",
+      "label": "KNVB",
+      "file_type": "document",
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf"
+    },
+    {
+      "id": "knvb_template_lutger",
+      "label": "Lutger Brenninkmeijer (Author)",
+      "file_type": "document",
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf"
+    },
+    {
+      "id": "knvb_template_swot",
+      "label": "SWOT Analysis",
+      "file_type": "document",
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf"
+    },
+    {
+      "id": "knvb_template_big_data",
+      "label": "Big Data Section",
+      "file_type": "document",
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf"
+    },
+    {
+      "id": "knvb_template_ontwikkelbehoefte",
+      "label": "Ontwikkelbehoefte (Development Needs)",
+      "file_type": "document",
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf"
+    },
+    {
+      "id": "knvb_template_observatie_advies",
+      "label": "Observatie en Vrijblijvend Advies",
+      "file_type": "document",
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf"
+    },
+    {
+      "id": "knvb_template_liber_org",
+      "label": "LiBeR (Advies Begeleiding Concepten)",
+      "file_type": "document",
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf"
+    },
+    {
+      "id": "knvb_template_vereniging_beschrijving",
+      "label": "Korte Beschrijving van de Vereniging",
+      "file_type": "document",
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf"
+    },
+    {
+      "id": "knvb_template_taxameter",
+      "label": "Taxameter",
+      "file_type": "document",
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf"
+    },
+    {
+      "id": "knvb_template_onderstroom",
+      "label": "Onderstroom",
+      "file_type": "document",
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf"
+    },
+    {
+      "id": "logo_white_liber",
+      "label": "LiBeR Logo (White SVG)",
+      "file_type": "image",
+      "source_file": "img/logo-white.svg"
+    },
+    {
+      "id": "logo_orange_liber",
+      "label": "LiBeR Logo (Orange SVG)",
+      "file_type": "image",
+      "source_file": "img/logo-orange.svg"
+    },
+    {
+      "id": "liber_png",
+      "label": "LiBeR Logo (White on Transparent PNG)",
+      "file_type": "image",
+      "source_file": "img/LiBeR.png"
+    },
+    {
+      "id": "liber_logo2008",
+      "label": "LiBeR Logo 2008 (Orange on White)",
+      "file_type": "image",
+      "source_file": "img/LiBeR.logo2008.png"
+    },
+    {
+      "id": "liber_logo2008_diap",
+      "label": "LiBeR Logo 2008 Diapositief (White on Orange)",
+      "file_type": "image",
+      "source_file": "img/LiBeR.logo2008.diap - kopie.jpg"
+    },
+    {
+      "id": "liber_logo2008_kopie",
+      "label": "LiBeR Logo 2008 (Orange on White, JPG Copy)",
+      "file_type": "image",
+      "source_file": "img/LiBeR.logo2008 - kopie.jpg"
+    },
+    {
+      "id": "liber_logowitpng",
+      "label": "LiBeR Logo (White on Transparent PNG with Subtitle)",
+      "file_type": "image",
+      "source_file": "img/LiBeR.logowitpng.png"
+    },
+    {
+      "id": "entity_liber",
+      "label": "LiBeR",
+      "file_type": "entity",
+      "source_file": "img/LiBeR.logo2008.png"
+    },
+    {
+      "id": "entity_advies",
+      "label": "Advies",
+      "file_type": "entity",
+      "source_file": "img/LiBeR.logo2008.png"
+    },
+    {
+      "id": "entity_begeleiding",
+      "label": "Begeleiding",
+      "file_type": "entity",
+      "source_file": "img/LiBeR.logo2008.png"
+    },
+    {
+      "id": "entity_concepten",
+      "label": "Concepten",
+      "file_type": "entity",
+      "source_file": "img/LiBeR.logo2008.png"
+    },
+    {
+      "id": "entity_brand_orange",
+      "label": "Brand Color Orange (#E87722)",
+      "file_type": "entity",
+      "source_file": "img/logo-orange.svg"
+    },
+    {
+      "id": "entity_brand_white",
+      "label": "Brand Color White (#FFFFFF)",
+      "file_type": "entity",
+      "source_file": "img/logo-white.svg"
+    },
+    {
+      "id": "entity_nunito_font",
+      "label": "Nunito (Font)",
+      "file_type": "entity",
+      "source_file": "img/logo-white.svg"
+    },
+    {
+      "id": "entity_logo2008_era",
+      "label": "Logo Design Era 2008",
+      "file_type": "entity",
+      "source_file": "img/LiBeR.logo2008.png"
+    }
+  ],
+  "edges": [
+    {
+      "source": "js_editor_js",
+      "target": "editor_geteditorsections",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_openeditor",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L160",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_checkandupdatetranscriptstatus",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L224",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_updategeneratebuttonsstate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L275",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_rendersectionlist",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L301",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_selectsection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L324",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_rendereditordocument",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L335",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_onsectionedit",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L439",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_generatesinglesection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L452",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_regeneratesinglesection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L520",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_generateallsections",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L545",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_saveallsections",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L625",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_assemblereport",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L654",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_assembleandpreview",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L674",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_deletecurrentreport",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L680",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_uploadimageforsection",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L686",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_starttranscriptstatuspolling",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L721",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_stoptranscriptstatuspolling",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L765",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_updatetranscriptstatusui",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L772",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_showpipelinedone",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L875",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_renderpipelinesteps",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L891",
+      "weight": 1.0
+    },
+    {
+      "source": "js_editor_js",
+      "target": "editor_generateofflinecontent",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L918",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_openeditor",
+      "target": "editor_rendersectionlist",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L180",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_openeditor",
+      "target": "editor_rendereditordocument",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L183",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_openeditor",
+      "target": "editor_checkandupdatetranscriptstatus",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L192",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_openeditor",
+      "target": "editor_starttranscriptstatuspolling",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L196",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_checkandupdatetranscriptstatus",
+      "target": "editor_updategeneratebuttonsstate",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L232",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_checkandupdatetranscriptstatus",
+      "target": "editor_updatetranscriptstatusui",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L233",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_checkandupdatetranscriptstatus",
+      "target": "editor_starttranscriptstatuspolling",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L248",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_rendersectionlist",
+      "target": "editor_geteditorsections",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L305",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_selectsection",
+      "target": "editor_rendersectionlist",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L326",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_selectsection",
+      "target": "editor_rendereditordocument",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L327",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_rendereditordocument",
+      "target": "editor_geteditorsections",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L353",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_generatesinglesection",
+      "target": "editor_geteditorsections",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L464",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_generatesinglesection",
+      "target": "editor_generateofflinecontent",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L482",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_generatesinglesection",
+      "target": "editor_rendersectionlist",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L496",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_generatesinglesection",
+      "target": "editor_rendereditordocument",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L497",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_regeneratesinglesection",
+      "target": "editor_generatesinglesection",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L531",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_regeneratesinglesection",
+      "target": "editor_rendereditordocument",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L538",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_generateallsections",
+      "target": "editor_geteditorsections",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L552",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_generateallsections",
+      "target": "editor_generateofflinecontent",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L584",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_generateallsections",
+      "target": "editor_rendersectionlist",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L598",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_generateallsections",
+      "target": "editor_rendereditordocument",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L599",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_saveallsections",
+      "target": "editor_geteditorsections",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L627",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_assemblereport",
+      "target": "editor_saveallsections",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L655",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_assembleandpreview",
+      "target": "editor_saveallsections",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L675",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_starttranscriptstatuspolling",
+      "target": "editor_stoptranscriptstatuspolling",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L722",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_updatetranscriptstatusui",
+      "target": "editor_showpipelinedone",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L783",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_updatetranscriptstatusui",
+      "target": "editor_renderpipelinesteps",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L814",
+      "weight": 1.0
+    },
+    {
+      "source": "editor_showpipelinedone",
+      "target": "editor_renderpipelinesteps",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/editor.js",
+      "source_location": "L888",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_gettemplatesections",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_navigateto",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_showtoast",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L78",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_loaddashboard",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L88",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_renderdashboard",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L100",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_createreport",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L167",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_uploadaudiotoserver",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L253",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_deletereport",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L331",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_handleaudiofile",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L372",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_removeaudio",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L382",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_handleimagefiles",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L404",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_renderimagesgrid",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L416",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_removeimage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L426",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_savelocalreports",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L432",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_loadlocalreports",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L442",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_checkapiconfig",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L452",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_escapehtml",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L461",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_formatdate",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L467",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_loadjotformpage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L474",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_loadjotformsubmissions",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L488",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_submittranscription",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L536",
+      "weight": 1.0
+    },
+    {
+      "source": "js_app_js",
+      "target": "app_copywebhookurl",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L594",
+      "weight": 1.0
+    },
+    {
+      "source": "app_navigateto",
+      "target": "app_loaddashboard",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L63",
+      "weight": 1.0
+    },
+    {
+      "source": "app_navigateto",
+      "target": "app_loadjotformpage",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
+      "source": "app_loaddashboard",
+      "target": "app_renderdashboard",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L97",
+      "weight": 1.0
+    },
+    {
+      "source": "app_createreport",
+      "target": "app_showtoast",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L175",
+      "weight": 1.0
+    },
+    {
+      "source": "app_createreport",
+      "target": "app_savelocalreports",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L222",
+      "weight": 1.0
+    },
+    {
+      "source": "app_createreport",
+      "target": "app_uploadaudiotoserver",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L230",
+      "weight": 1.0
+    },
+    {
+      "source": "app_createreport",
+      "target": "app_navigateto",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L239",
+      "weight": 1.0
+    },
+    {
+      "source": "app_deletereport",
+      "target": "app_savelocalreports",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L339",
+      "weight": 1.0
+    },
+    {
+      "source": "app_deletereport",
+      "target": "app_showtoast",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L350",
+      "weight": 1.0
+    },
+    {
+      "source": "app_deletereport",
+      "target": "app_renderdashboard",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L351",
+      "weight": 1.0
+    },
+    {
+      "source": "app_handleaudiofile",
+      "target": "app_showtoast",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L374",
+      "weight": 1.0
+    },
+    {
+      "source": "app_removeimage",
+      "target": "app_renderimagesgrid",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L428",
+      "weight": 1.0
+    },
+    {
+      "source": "app_loadjotformpage",
+      "target": "app_loadjotformsubmissions",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L485",
+      "weight": 1.0
+    },
+    {
+      "source": "app_loadjotformsubmissions",
+      "target": "app_escapehtml",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L532",
+      "weight": 1.0
+    },
+    {
+      "source": "app_submittranscription",
+      "target": "app_showtoast",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L542",
+      "weight": 1.0
+    },
+    {
+      "source": "app_submittranscription",
+      "target": "app_loadjotformsubmissions",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/app.js",
+      "source_location": "L580",
+      "weight": 1.0
+    },
+    {
+      "source": "js_preview_js",
+      "target": "preview_renderpreview",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/preview.js",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
+      "source": "js_preview_js",
+      "target": "preview_buildpreviewpage",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/preview.js",
+      "source_location": "L130",
+      "weight": 1.0
+    },
+    {
+      "source": "js_preview_js",
+      "target": "preview_esc",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/preview.js",
+      "source_location": "L137",
+      "weight": 1.0
+    },
+    {
+      "source": "js_preview_js",
+      "target": "preview_texttohtml",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "js/preview.js",
+      "source_location": "L144",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_renderpreview",
+      "target": "preview_buildpreviewpage",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/preview.js",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_renderpreview",
+      "target": "preview_esc",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/preview.js",
+      "source_location": "L20",
+      "weight": 1.0
+    },
+    {
+      "source": "preview_renderpreview",
+      "target": "preview_texttohtml",
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "js/preview.js",
+      "source_location": "L29",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_download_logos_py",
+      "target": "os",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/download_logos.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_download_logos_py",
+      "target": "re",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/download_logos.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_download_logos_py",
+      "target": "sys",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/download_logos.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_download_logos_py",
+      "target": "urllib_request",
+      "relation": "imports",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/download_logos.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "scripts_download_logos_py",
+      "target": "pyairtable",
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/download_logos.py",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_liber_verslaggenerator",
+      "target": "readme_rabobank_mra",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_rabobank_mra",
+      "target": "readme_rabobank",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_rabobank_mra",
+      "target": "readme_rabobank_kring_mra",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_liber_verslaggenerator",
+      "target": "readme_liber_org",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_audio_transcription",
+      "target": "readme_openai_whisper",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_section_generation",
+      "target": "readme_gpt4o",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_liber_verslaggenerator",
+      "target": "readme_audio_transcription",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_liber_verslaggenerator",
+      "target": "readme_section_generation",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_liber_verslaggenerator",
+      "target": "readme_google_apps_script",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_liber_verslaggenerator",
+      "target": "readme_google_drive",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_liber_verslaggenerator",
+      "target": "readme_google_docs",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_liber_verslaggenerator",
+      "target": "readme_google_sheets",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_liber_verslaggenerator",
+      "target": "readme_cloudconvert",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_liber_verslaggenerator",
+      "target": "readme_mra_template",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "weight": 1.0
+    },
+    {
+      "source": "knvb_template_intake",
+      "target": "knvb_template_knvb",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 1.0
+    },
+    {
+      "source": "knvb_template_intake",
+      "target": "knvb_template_lutger",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 1.0
+    },
+    {
+      "source": "knvb_template_intake",
+      "target": "knvb_template_liber_org",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 1.0
+    },
+    {
+      "source": "knvb_template_intake",
+      "target": "knvb_template_swot",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 1.0
+    },
+    {
+      "source": "knvb_template_intake",
+      "target": "knvb_template_big_data",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 1.0
+    },
+    {
+      "source": "knvb_template_intake",
+      "target": "knvb_template_ontwikkelbehoefte",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 1.0
+    },
+    {
+      "source": "knvb_template_intake",
+      "target": "knvb_template_observatie_advies",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 1.0
+    },
+    {
+      "source": "knvb_template_intake",
+      "target": "knvb_template_vereniging_beschrijving",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 1.0
+    },
+    {
+      "source": "knvb_template_intake",
+      "target": "knvb_template_taxameter",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 1.0
+    },
+    {
+      "source": "knvb_template_intake",
+      "target": "knvb_template_onderstroom",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 1.0
+    },
+    {
+      "source": "knvb_template_liber_org",
+      "target": "readme_liber_org",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 0.9
+    },
+    {
+      "source": "knvb_template_lutger",
+      "target": "readme_lutger_brenninkmeijer",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 0.9
+    },
+    {
+      "source": "knvb_template_intake",
+      "target": "readme_mra_template",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 0.7
+    },
+    {
+      "source": "readme_liber_verslaggenerator",
+      "target": "knvb_template_intake",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "README.md",
+      "weight": 0.7
+    },
+    {
+      "source": "knvb_template_knvb",
+      "target": "readme_rabobank",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.6,
+      "source_file": "KNVB - TEMPLATE verslag intake.pdf",
+      "weight": 0.6
+    },
+    {
+      "source": "logo_white_liber",
+      "target": "entity_liber",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/logo-white.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "logo_orange_liber",
+      "target": "entity_liber",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/logo-orange.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "liber_png",
+      "target": "entity_liber",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/LiBeR.png",
+      "weight": 1.0
+    },
+    {
+      "source": "liber_logo2008",
+      "target": "entity_liber",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/LiBeR.logo2008.png",
+      "weight": 1.0
+    },
+    {
+      "source": "liber_logo2008_diap",
+      "target": "entity_liber",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/LiBeR.logo2008.diap - kopie.jpg",
+      "weight": 1.0
+    },
+    {
+      "source": "liber_logo2008_kopie",
+      "target": "entity_liber",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/LiBeR.logo2008 - kopie.jpg",
+      "weight": 1.0
+    },
+    {
+      "source": "liber_logowitpng",
+      "target": "entity_liber",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/LiBeR.logowitpng.png",
+      "weight": 1.0
+    },
+    {
+      "source": "entity_liber",
+      "target": "entity_advies",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/LiBeR.logo2008.png",
+      "weight": 1.0
+    },
+    {
+      "source": "entity_liber",
+      "target": "entity_begeleiding",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/LiBeR.logo2008.png",
+      "weight": 1.0
+    },
+    {
+      "source": "entity_liber",
+      "target": "entity_concepten",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/LiBeR.logo2008.png",
+      "weight": 1.0
+    },
+    {
+      "source": "logo_white_liber",
+      "target": "logo_orange_liber",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "img/logo-white.svg",
+      "weight": 0.9
+    },
+    {
+      "source": "logo_orange_liber",
+      "target": "entity_brand_orange",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/logo-orange.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "logo_white_liber",
+      "target": "entity_brand_white",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/logo-white.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "logo_white_liber",
+      "target": "entity_nunito_font",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/logo-white.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "logo_orange_liber",
+      "target": "entity_nunito_font",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/logo-orange.svg",
+      "weight": 1.0
+    },
+    {
+      "source": "liber_logo2008",
+      "target": "entity_logo2008_era",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "img/LiBeR.logo2008.png",
+      "weight": 0.85
+    },
+    {
+      "source": "liber_logo2008_diap",
+      "target": "entity_logo2008_era",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "img/LiBeR.logo2008.diap - kopie.jpg",
+      "weight": 0.85
+    },
+    {
+      "source": "liber_logo2008_kopie",
+      "target": "entity_logo2008_era",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "img/LiBeR.logo2008 - kopie.jpg",
+      "weight": 0.85
+    },
+    {
+      "source": "liber_logo2008",
+      "target": "liber_logo2008_kopie",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "img/LiBeR.logo2008.png",
+      "weight": 0.95
+    },
+    {
+      "source": "liber_logo2008_diap",
+      "target": "liber_logo2008_kopie",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "img/LiBeR.logo2008.diap - kopie.jpg",
+      "weight": 0.85
+    },
+    {
+      "source": "liber_logo2008",
+      "target": "liber_logo2008_diap",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "img/LiBeR.logo2008.png",
+      "weight": 0.85
+    },
+    {
+      "source": "liber_png",
+      "target": "liber_logowitpng",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "img/LiBeR.png",
+      "weight": 0.9
+    },
+    {
+      "source": "liber_logo2008",
+      "target": "entity_brand_orange",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/LiBeR.logo2008.png",
+      "weight": 1.0
+    },
+    {
+      "source": "liber_logo2008_diap",
+      "target": "entity_brand_white",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/LiBeR.logo2008.diap - kopie.jpg",
+      "weight": 1.0
+    },
+    {
+      "source": "liber_logo2008_diap",
+      "target": "entity_brand_orange",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/LiBeR.logo2008.diap - kopie.jpg",
+      "weight": 1.0
+    },
+    {
+      "source": "liber_logo2008_kopie",
+      "target": "entity_brand_orange",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "img/LiBeR.logo2008 - kopie.jpg",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

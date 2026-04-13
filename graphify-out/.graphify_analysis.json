@@ -1,0 +1,268 @@
+{
+  "communities": {
+    "0": [
+      "editor_assembleandpreview",
+      "editor_assemblereport",
+      "editor_checkandupdatetranscriptstatus",
+      "editor_deletecurrentreport",
+      "editor_generateallsections",
+      "editor_generateofflinecontent",
+      "editor_generatesinglesection",
+      "editor_geteditorsections",
+      "editor_onsectionedit",
+      "editor_openeditor",
+      "editor_regeneratesinglesection",
+      "editor_rendereditordocument",
+      "editor_renderpipelinesteps",
+      "editor_rendersectionlist",
+      "editor_saveallsections",
+      "editor_selectsection",
+      "editor_showpipelinedone",
+      "editor_starttranscriptstatuspolling",
+      "editor_stoptranscriptstatuspolling",
+      "editor_updategeneratebuttonsstate",
+      "editor_updatetranscriptstatusui",
+      "editor_uploadimageforsection",
+      "js_editor_js"
+    ],
+    "1": [
+      "app_checkapiconfig",
+      "app_copywebhookurl",
+      "app_createreport",
+      "app_deletereport",
+      "app_escapehtml",
+      "app_formatdate",
+      "app_gettemplatesections",
+      "app_handleaudiofile",
+      "app_handleimagefiles",
+      "app_loaddashboard",
+      "app_loadjotformpage",
+      "app_loadjotformsubmissions",
+      "app_loadlocalreports",
+      "app_navigateto",
+      "app_removeaudio",
+      "app_removeimage",
+      "app_renderdashboard",
+      "app_renderimagesgrid",
+      "app_savelocalreports",
+      "app_showtoast",
+      "app_submittranscription",
+      "app_uploadaudiotoserver",
+      "js_app_js"
+    ],
+    "2": [
+      "entity_advies",
+      "entity_begeleiding",
+      "entity_brand_orange",
+      "entity_brand_white",
+      "entity_concepten",
+      "entity_liber",
+      "entity_logo2008_era",
+      "entity_nunito_font",
+      "liber_logo2008",
+      "liber_logo2008_diap",
+      "liber_logo2008_kopie",
+      "liber_logowitpng",
+      "liber_png",
+      "logo_orange_liber",
+      "logo_white_liber"
+    ],
+    "3": [
+      "knvb_template_big_data",
+      "knvb_template_intake",
+      "knvb_template_knvb",
+      "knvb_template_observatie_advies",
+      "knvb_template_onderstroom",
+      "knvb_template_ontwikkelbehoefte",
+      "knvb_template_swot",
+      "knvb_template_taxameter",
+      "knvb_template_vereniging_beschrijving"
+    ],
+    "4": [
+      "readme_cloudconvert",
+      "readme_google_apps_script",
+      "readme_google_docs",
+      "readme_google_drive",
+      "readme_google_sheets",
+      "readme_gpt4o",
+      "readme_liber_verslaggenerator",
+      "readme_mra_template",
+      "readme_section_generation"
+    ],
+    "5": [
+      "js_preview_js",
+      "preview_buildpreviewpage",
+      "preview_esc",
+      "preview_renderpreview",
+      "preview_texttohtml"
+    ],
+    "6": [
+      "readme_rabobank",
+      "readme_rabobank_kring_mra",
+      "readme_rabobank_mra"
+    ],
+    "7": [
+      "readme_audio_transcription",
+      "readme_openai_whisper"
+    ],
+    "8": [
+      "knvb_template_liber_org",
+      "readme_liber_org"
+    ],
+    "9": [
+      "knvb_template_lutger",
+      "readme_lutger_brenninkmeijer"
+    ],
+    "10": [
+      "js_api_js"
+    ],
+    "11": [
+      "scripts_download_logos_py"
+    ]
+  },
+  "cohesion": {
+    "0": 0.2,
+    "1": 0.15,
+    "2": 0.25,
+    "3": 0.22,
+    "4": 0.22,
+    "5": 0.7,
+    "6": 0.67,
+    "7": 1.0,
+    "8": 1.0,
+    "9": 1.0,
+    "10": 1.0,
+    "11": 1.0
+  },
+  "gods": [
+    {
+      "id": "knvb_template_intake",
+      "label": "KNVB Intake Verslag Template",
+      "edges": 12
+    },
+    {
+      "id": "readme_liber_verslaggenerator",
+      "label": "LiBeR Verslaggenerator",
+      "edges": 11
+    },
+    {
+      "id": "entity_liber",
+      "label": "LiBeR",
+      "edges": 10
+    },
+    {
+      "id": "editor_rendereditordocument",
+      "label": "renderEditorDocument()",
+      "edges": 7
+    },
+    {
+      "id": "editor_geteditorsections",
+      "label": "getEditorSections()",
+      "edges": 6
+    },
+    {
+      "id": "editor_rendersectionlist",
+      "label": "renderSectionList()",
+      "edges": 6
+    },
+    {
+      "id": "editor_generatesinglesection",
+      "label": "generateSingleSection()",
+      "edges": 6
+    },
+    {
+      "id": "liber_logo2008_diap",
+      "label": "LiBeR Logo 2008 Diapositief (White on Orange)",
+      "edges": 6
+    },
+    {
+      "id": "editor_openeditor",
+      "label": "openEditor()",
+      "edges": 5
+    },
+    {
+      "id": "editor_checkandupdatetranscriptstatus",
+      "label": "checkAndUpdateTranscriptStatus()",
+      "edges": 5
+    }
+  ],
+  "surprises": [
+    {
+      "source": "KNVB Intake Verslag Template",
+      "target": "MRA Template Structure",
+      "source_files": [
+        "KNVB - TEMPLATE verslag intake.pdf",
+        "README.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "conceptually_related_to",
+      "why": "inferred connection - not explicitly stated in source; crosses file types (doc \u2194 paper); connects across different repos/directories; bridges separate communities; peripheral node `MRA Template Structure` unexpectedly reaches hub `KNVB Intake Verslag Template`"
+    },
+    {
+      "source": "LiBeR Verslaggenerator",
+      "target": "KNVB Intake Verslag Template",
+      "source_files": [
+        "README.md",
+        "KNVB - TEMPLATE verslag intake.pdf"
+      ],
+      "confidence": "INFERRED",
+      "relation": "conceptually_related_to",
+      "why": "inferred connection - not explicitly stated in source; crosses file types (doc \u2194 paper); connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "KNVB",
+      "target": "Rabobank",
+      "source_files": [
+        "KNVB - TEMPLATE verslag intake.pdf",
+        "README.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "conceptually_related_to",
+      "why": "inferred connection - not explicitly stated in source; crosses file types (doc \u2194 paper); connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "LiBeR (Advies Begeleiding Concepten)",
+      "target": "LiBeR (Advies Begeleiding Concepten)",
+      "source_files": [
+        "KNVB - TEMPLATE verslag intake.pdf",
+        "README.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "conceptually_related_to",
+      "why": "inferred connection - not explicitly stated in source; crosses file types (doc \u2194 paper); connects across different repos/directories"
+    },
+    {
+      "source": "Lutger Brenninkmeijer (Author)",
+      "target": "Lutger Brenninkmeijer",
+      "source_files": [
+        "KNVB - TEMPLATE verslag intake.pdf",
+        "README.md"
+      ],
+      "confidence": "INFERRED",
+      "relation": "conceptually_related_to",
+      "why": "inferred connection - not explicitly stated in source; crosses file types (doc \u2194 paper); connects across different repos/directories"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `LiBeR Verslaggenerator` connect `Community 4` to `Community 8`, `Community 3`, `Community 6`, `Community 7`?",
+      "why": "High betweenness centrality (0.051) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `KNVB Intake Verslag Template` connect `Community 3` to `Community 8`, `Community 9`, `Community 4`?",
+      "why": "High betweenness centrality (0.048) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 2 inferred relationships involving `KNVB Intake Verslag Template` (e.g. with `MRA Template Structure` and `LiBeR Verslaggenerator`) actually correct?",
+      "why": "`KNVB Intake Verslag Template` has 2 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `Rabobank Kring Metropool Regio Amsterdam`, `OpenAI Whisper`, `GPT-4o` to the rest of the system?",
+      "why": "19 weakly-connected nodes found - possible documentation gaps or missing edges."
+    }
+  ]
+}
