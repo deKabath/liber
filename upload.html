@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LiBeR – Upload formulier voor transcriptie en verslaggeneratie">
+  <meta name="theme-color" content="#E87722">
+  <title>LiBeR – Upload Formulier</title>
+  <link rel="stylesheet" href="css/landing.css?v=20260316a">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+  <style>
+    .upload-hero{min-height:340px;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);display:flex;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;padding-top:80px}
+    .upload-hero .hero-shapes{position:absolute;inset:0;overflow:hidden}
+    .upload-hero .hero-shape{position:absolute;border-radius:50%;opacity:.08;background:var(--orange)}
+    .upload-hero .hs1{width:400px;height:400px;top:-150px;right:-100px;animation:f1 20s ease-in-out infinite}
+    .upload-hero .hs2{width:250px;height:250px;bottom:-80px;left:-60px;animation:f2 15s ease-in-out infinite}
+    .upload-hero .hs3{width:150px;height:150px;top:40%;left:60%;animation:f3 18s ease-in-out infinite}
+    @keyframes f1{0%,100%{transform:translate(0)}50%{transform:translate(-30px,20px)}}
+    @keyframes f2{0%,100%{transform:translate(0)}50%{transform:translate(20px,-15px)}}
+    @keyframes f3{0%,100%{transform:translate(0)}50%{transform:translate(-15px,25px)}}
+    .upload-hero-content{position:relative;z-index:1}
+    .upload-hero-content h1{font-size:clamp(28px,5vw,42px);font-weight:700;color:#fff;margin-bottom:8px}
+    .upload-hero-content h1 .accent{color:var(--orange)}
+    .upload-hero-content p{font-size:1rem;color:rgba(255,255,255,.7);max-width:500px;margin:0 auto}
+    .upload-section{padding:0 24px 80px;max-width:720px;margin:-60px auto 0;position:relative;z-index:2}
+    .upload-card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow-xl);border:1px solid var(--gray-200);overflow:hidden}
+    .upload-card-body{padding:36px}
+    @media(max-width:640px){.upload-card-body{padding:20px}}
+    .form-divider{height:3px;background:linear-gradient(90deg,var(--orange),var(--orange-light),transparent);margin:28px 0;border-radius:2px}
+    .form-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--gray-500);margin-bottom:16px}
+    .upload-card select,.upload-card input[type="text"]{width:100%;padding:12px 16px;border:1px solid var(--gray-300);border-radius:var(--radius-sm);font-size:14px;font-family:var(--font-sans);color:var(--gray-900);transition:all .25s;background:var(--gray-50)}
+    .upload-card select:focus,.upload-card input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,119,34,.1);background:var(--white)}
+    .field-group{margin-bottom:20px}.field-group.hidden{display:none}
+    .field-label{display:block;font-size:13px;font-weight:500;color:var(--gray-700);margin-bottom:6px}
+    .field-label .req{color:#C62828;margin-left:2px}
+    .upload-zone{border:2px dashed var(--gray-300);border-radius:var(--radius-md);padding:28px;text-align:center;cursor:pointer;transition:all .25s;position:relative}
+    .upload-zone:hover,.upload-zone.dragover{border-color:var(--orange);background:var(--orange-light)}
+    .upload-zone .material-symbols-outlined{font-size:2.2rem;color:var(--gray-400);margin-bottom:8px;transition:color .2s}
+    .upload-zone:hover .material-symbols-outlined{color:var(--orange)}
+    .upload-zone p{font-size:.85rem;color:var(--gray-500)}.upload-zone .upload-hint{font-size:.75rem;color:var(--gray-400);margin-top:4px}
+    .upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer}
+    .file-list{margin-top:8px}
+    .file-item{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);margin-top:6px;font-size:13px}
+    .file-item .material-symbols-outlined{font-size:18px;color:#2D5A27}.file-item .file-name{flex:1;font-weight:500}
+    .file-item .file-size{color:var(--gray-500);font-size:12px}.file-item .remove-file{cursor:pointer;color:var(--gray-400);font-size:18px}
+    .file-item .remove-file:hover{color:#C62828}
+    .image-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media(max-width:500px){.image-grid{grid-template-columns:1fr}}
+    .image-grid .upload-zone{padding:16px}.image-grid .upload-zone .material-symbols-outlined{font-size:1.5rem;margin-bottom:4px}
+    .image-grid .upload-zone p{font-size:.75rem;font-weight:500}
+    .image-grid .upload-zone.has-file{border-color:#2D5A27;border-style:solid;background:rgba(45,90,39,.04)}
+    .image-grid .upload-zone.has-file .material-symbols-outlined{color:#2D5A27}
+    .submit-btn{width:100%;padding:14px 28px;background:var(--orange);color:var(--white);border:none;border-radius:var(--radius-md);font-size:16px;font-weight:600;font-family:var(--font-sans);cursor:pointer;transition:all .25s cubic-bezier(.16,1,.3,1);display:flex;align-items:center;justify-content:center;gap:8px;position:relative;overflow:hidden}
+    .submit-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2),transparent);opacity:0;transition:opacity .3s}
+    .submit-btn:hover::before{opacity:1}
+    .submit-btn:hover{background:var(--orange-dark);transform:translateY(-2px);box-shadow:0 6px 20px rgba(232,119,34,.25)}
+    .submit-btn:disabled{background:var(--gray-300);cursor:not-allowed;transform:none;box-shadow:none}
+    .progress-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,.6);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center}
+    .progress-overlay.active{display:flex}
+    .progress-card{background:var(--white);border-radius:var(--radius-lg);padding:48px;text-align:center;max-width:380px;width:90%;box-shadow:var(--shadow-xl)}
+    .spinner{width:48px;height:48px;border:4px solid var(--gray-200);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .success-card{display:none;text-align:center;padding:60px 36px}
+    .success-card .material-symbols-outlined{font-size:4rem;color:#2D5A27;margin-bottom:16px}
+    .success-card h2{font-size:1.5rem;margin-bottom:8px}.success-card p{color:var(--gray-600);margin-bottom:28px;line-height:1.6}
+    .btn-outline-orange{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border:2px solid var(--orange);color:var(--orange);background:transparent;border-radius:var(--radius-sm);font-family:var(--font-sans);font-weight:600;font-size:14px;cursor:pointer;transition:all .25s}
+    .btn-outline-orange:hover{background:var(--orange);color:var(--white);transform:translateY(-2px)}
+    .back-link{display:inline-flex;align-items:center;gap:4px;margin-bottom:20px;font-size:13px;font-weight:500;color:var(--gray-500);text-decoration:none;transition:color .2s}
+    .back-link:hover{color:var(--orange)}.back-link .material-symbols-outlined{font-size:18px}
+  </style>
+</head>
+<body>
+  <nav class="nav nav-scrolled" id="main-nav"><div class="nav-inner">
+    <a href="/" class="nav-logo"><img src="img/LiBeR.logo2008 - kopie.jpg" alt="LiBeR" class="nav-logo-img" style="opacity:1"></a>
+    <div class="nav-links" id="nav-links"><a href="/">Home</a><a href="/verslaggenerator.html">Verslaggenerator</a><a href="/upload.html" style="color:var(--orange)">Upload</a><a href="/#contact">Contact</a></div>
+  </div></nav>
+
+  <section class="upload-hero"><div class="hero-shapes"><div class="hero-shape hs1"></div><div class="hero-shape hs2"></div><div class="hero-shape hs3"></div></div>
+    <div class="upload-hero-content"><h1>Upload <span class="accent">&amp;</span> Verslag</h1><p>Upload een audio-opname voor automatische transcriptie en verslaggeneratie</p></div>
+  </section>
+
+  <section class="upload-section"><div class="upload-card"><div class="upload-card-body" id="formBody">
+    <a href="/" class="back-link"><span class="material-symbols-outlined">arrow_back</span>Terug naar home</a>
+
+    <div class="field-group"><label class="field-label">Waar wil je een transcriptie van maken? <span class="req">*</span></label>
+      <select id="transcriptieType" required><option value="">Selecteer...</option><option value="Intake">Intake</option><option value="Overleg">Overleg</option><option value="Gespreksverslag">Gespreksverslag</option></select></div>
+
+    <div class="field-group hidden" id="templateGroup"><label class="field-label">In welke template moet het verslag? <span class="req">*</span></label>
+      <select id="template"><option value="">Selecteer...</option><option value="Rabobank">Rabobank</option><option value="KNVB">KNVB</option><option value="Sport Akkoord">Sport Akkoord</option><option value="Overig">Overig</option></select></div>
+
+    <div class="form-divider"></div><div class="form-section-label">Gegevens</div>
+    <div class="field-group"><label class="field-label">Vereniging</label><input type="text" id="vereniging" placeholder="Naam van de vereniging"></div>
+    <div class="field-group"><label class="field-label">Onderwerp <span class="req">*</span></label><input type="text" id="onderwerp" placeholder="Bijv. verslag intake 17 april 2025"></div>
+    <div class="field-group"><label class="field-label">Contact met</label><input type="text" id="contactMet" placeholder="Namen van contactpersonen"></div>
+
+    <div class="form-divider"></div><div class="form-section-label">Audio-opname</div>
+    <div class="field-group"><div class="upload-zone" id="audioZone"><span class="material-symbols-outlined">audio_file</span><p>Sleep je audiobestand hierheen of klik om te bladeren</p><p class="upload-hint">MP3, WAV, M4A, AAC, OGG, FLAC</p><input type="file" id="audioFile" accept=".mp3,.wav,.m4a,.aac,.ogg,.flac,.opus,.wma"></div><div class="file-list" id="audioFileList"></div></div>
+
+    <div class="field-group hidden" id="raboImagesGroup"><div class="form-divider"></div><div class="form-section-label">Rabobank Afbeeldingen</div><div class="image-grid">
+      <div class="upload-zone" data-key="raboKompasNulmeting"><span class="material-symbols-outlined">image</span><p>Kompas 0-Meting</p><input type="file" accept="image/*"></div>
+      <div class="upload-zone" data-key="raboKompasStip"><span class="material-symbols-outlined">image</span><p>Kompas Stip</p><input type="file" accept="image/*"></div>
+      <div class="upload-zone" data-key="raboDriehoekNulmeting"><span class="material-symbols-outlined">image</span><p>Driehoek 0-Meting</p><input type="file" accept="image/*"></div>
+      <div class="upload-zone" data-key="raboDriehoekStip"><span class="material-symbols-outlined">image</span><p>Driehoek Stip</p><input type="file" accept="image/*"></div>
+      <div class="upload-zone" data-key="raboRoos"><span class="material-symbols-outlined">image</span><p>Roos / Hart</p><input type="file" accept="image/*"></div>
+      <div class="upload-zone" data-key="raboBijlagenPositief"><span class="material-symbols-outlined">image</span><p>Bijlagen Positief</p><input type="file" accept="image/*"></div>
+      <div class="upload-zone" data-key="raboBijlagenNegatief"><span class="material-symbols-outlined">image</span><p>Bijlagen Negatief</p><input type="file" accept="image/*"></div>
+      <div class="upload-zone" data-key="raboBijlagenNulmeting"><span class="material-symbols-outlined">image</span><p>Bijlagen 0-Meting</p><input type="file" accept="image/*"></div>
+      <div class="upload-zone" data-key="raboBijlagenStip" style="grid-column:span 2"><span class="material-symbols-outlined">image</span><p>Bijlagen Stip</p><input type="file" accept="image/*"></div>
+    </div></div>
+
+    <div class="field-group hidden" id="knvbImagesGroup"><div class="form-divider"></div><div class="form-section-label">KNVB Afbeeldingen</div><div class="image-grid">
+      <div class="upload-zone" data-key="knvbBovenstroom"><span class="material-symbols-outlined">image</span><p>Bovenstroom</p><input type="file" accept="image/*"></div>
+      <div class="upload-zone" data-key="knvbOnderstroom"><span class="material-symbols-outlined">image</span><p>Onderstroom</p><input type="file" accept="image/*"></div>
+    </div></div>
+
+    <div class="form-divider"></div>
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()"><span class="material-symbols-outlined">send</span>Versturen</button>
+  </div>
+
+  <div class="success-card" id="successCard"><span class="material-symbols-outlined">check_circle</span><h2>Verstuurd!</h2><p id="successMessage">Je upload wordt verwerkt. Het verslag wordt per e-mail verstuurd naar lutger@liberabc.nl</p><button class="btn-outline-orange" onclick="resetForm()"><span class="material-symbols-outlined">add</span>Nieuw formulier</button></div>
+  </div></section>
+
+  <div class="progress-overlay" id="progressOverlay"><div class="progress-card"><div class="spinner"></div><h3 id="progressTitle">Bezig met uploaden...</h3><p id="progressMessage">Even geduld</p></div></div>
+
+  <script>
+    const WEBHOOK_URL='https://script.google.com/macros/s/AKfycbz0AFVa1KwXEqTM4OQ70mYFdMBLOWLYNyZewFSWwnYpugJCTWwctJKhiQUtKwfP5gJsHg/exec';
+    const WEBHOOK_TOKEN='2a045b9c370240009780a54df446bf9e';
+    let audioFileData=null,imageFiles={};
+
+    document.getElementById('transcriptieType').addEventListener('change',function(){const v=this.value,i=v==='Intake';document.getElementById('templateGroup').classList.toggle('hidden',!i);if(!i){document.getElementById('template').value='Overig';document.getElementById('raboImagesGroup').classList.add('hidden');document.getElementById('knvbImagesGroup').classList.add('hidden')}});
+    document.getElementById('template').addEventListener('change',function(){const v=this.value;document.getElementById('raboImagesGroup').classList.toggle('hidden',v!=='Rabobank');document.getElementById('knvbImagesGroup').classList.toggle('hidden',v!=='KNVB')});
+
+    document.getElementById('audioFile').addEventListener('change',function(e){const f=e.target.files[0];if(!f)return;audioFileData=f;const s=(f.size/(1024*1024)).toFixed(1)+' MB';document.getElementById('audioFileList').innerHTML='<div class="file-item"><span class="material-symbols-outlined">check_circle</span><span class="file-name">'+f.name+'</span><span class="file-size">'+s+'</span><span class="material-symbols-outlined remove-file" onclick="removeAudio()">close</span></div>';document.getElementById('audioZone').style.display='none'});
+    function removeAudio(){audioFileData=null;document.getElementById('audioFile').value='';document.getElementById('audioFileList').innerHTML='';document.getElementById('audioZone').style.display=''}
+
+    document.querySelectorAll('.upload-zone').forEach(z=>{z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('dragover')});z.addEventListener('dragleave',()=>z.classList.remove('dragover'));z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('dragover');const i=z.querySelector('input[type="file"]');if(e.dataTransfer.files.length){i.files=e.dataTransfer.files;i.dispatchEvent(new Event('change'))}})});
+    document.querySelectorAll('.image-grid .upload-zone input[type="file"]').forEach(i=>{i.addEventListener('change',function(){const k=this.parentElement.dataset.key,f=this.files[0];if(!f||!k)return;imageFiles[k]=f;const z=this.parentElement;z.classList.add('has-file');z.querySelector('.material-symbols-outlined').textContent='check_circle';z.querySelector('p').textContent=f.name.length>20?f.name.substring(0,20)+'...':f.name})});
+
+    async function submitForm(){const t=document.getElementById('transcriptieType').value,tp=document.getElementById('template').value,o=document.getElementById('onderwerp').value;if(!t)return alert('Selecteer een transcriptie type');if(t==='Intake'&&!tp)return alert('Selecteer een template');if(!o)return alert('Vul het onderwerp in');if(!audioFileData)return alert('Upload een audiobestand');showProgress('Bezig met uploaden...','Formulier wordt verstuurd');document.getElementById('submitBtn').disabled=true;try{const n=new Date(),p=new URLSearchParams({token:WEBHOOK_TOKEN,q37_transcriptie_type:t,q5_template:t==='Intake'?tp:'Overig',q7_vereniging:document.getElementById('vereniging').value,q38_onderwerp:o,q41_contactMet:document.getElementById('contactMet').value,'q6_datum[day]':String(n.getDate()).padStart(2,'0'),'q6_datum[month]':String(n.getMonth()+1).padStart(2,'0'),'q6_datum[year]':String(n.getFullYear())});await fetch(WEBHOOK_URL+'?'+p.toString(),{method:'GET',mode:'no-cors'});hideProgress();showSuccess(t)}catch(e){hideProgress();alert('Fout: '+e.message)}document.getElementById('submitBtn').disabled=false}
+
+    function showProgress(t,m){document.getElementById('progressTitle').textContent=t;document.getElementById('progressMessage').textContent=m;document.getElementById('progressOverlay').classList.add('active')}
+    function hideProgress(){document.getElementById('progressOverlay').classList.remove('active')}
+    function showSuccess(t){document.getElementById('formBody').style.display='none';document.getElementById('successCard').style.display='block';document.getElementById('successMessage').textContent=t==='Intake'?'Je intake-opname wordt getranscribeerd en het verslag wordt automatisch gegenereerd. Je ontvangt het per e-mail op lutger@liberabc.nl.':'Je opname wordt getranscribeerd en het gespreksverslag wordt automatisch gegenereerd. Je ontvangt het per e-mail op lutger@liberabc.nl.'}
+    function resetForm(){document.getElementById('formBody').style.display='';document.getElementById('successCard').style.display='none';document.getElementById('transcriptieType').value='';document.getElementById('template').value='';document.getElementById('vereniging').value='';document.getElementById('onderwerp').value='';document.getElementById('contactMet').value='';removeAudio();imageFiles={};document.querySelectorAll('.image-grid .upload-zone').forEach(z=>{z.classList.remove('has-file');z.querySelector('.material-symbols-outlined').textContent='image'});document.getElementById('templateGroup').classList.add('hidden');document.getElementById('raboImagesGroup').classList.add('hidden');document.getElementById('knvbImagesGroup').classList.add('hidden')}
+  </script>
+</body>
+</html>
