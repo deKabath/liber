@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="LiBeR – Upload audio- en beeldbestanden voor uw project.">
+  <meta name="theme-color" content="#E87722">
+  <title>LiBeR – Media Upload</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+  <style>
+    /* ============================================
+       LiBeR Media Upload – Stylesheet
+       Consistent met liberabc.nl huisstijl
+       ============================================ */
+
+    :root {
+      --orange: #E87722;
+      --orange-light: #FFF3EB;
+      --orange-dark: #C4611A;
+      --orange-glow: rgba(232, 119, 34, 0.25);
+      --green: #2E7D32;
+      --green-light: #E8F5E9;
+      --red: #C62828;
+      --red-light: #FFEBEE;
+      --gray-50: #FAFAFA;
+      --gray-100: #F5F5F5;
+      --gray-200: #EEEEEE;
+      --gray-300: #E0E0E0;
+      --gray-400: #BDBDBD;
+      --gray-500: #9E9E9E;
+      --gray-600: #757575;
+      --gray-700: #616161;
+      --gray-800: #424242;
+      --gray-900: #212121;
+      --white: #FFFFFF;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+      --shadow-xl: 0 16px 48px rgba(0,0,0,0.15);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-serif: 'Libre Caslon Text', Georgia, serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--gray-100);
+      color: var(--gray-900);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a { color: var(--orange); text-decoration: none; }
+    a:hover { color: var(--orange-dark); }
+    .accent { color: var(--orange); }
+
+    /* ---- NAVIGATION ---- */
+    .nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--gray-900);
+      letter-spacing: -0.5px;
+    }
+    .nav-logo .accent { color: var(--orange); }
+    .nav-subtitle {
+      font-size: 13px;
+      color: var(--gray-500);
+      font-weight: 400;
+    }
+    .nav-links {
+      display: flex;
+      gap: 4px;
+    }
+    .nav-links a {
+      color: var(--gray-600);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+    }
+    .nav-links a:hover {
+      background: var(--gray-100);
+      color: var(--gray-900);
+    }
+    .nav-links a.active {
+      background: var(--orange-light);
+      color: var(--orange);
+    }
+
+    /* ---- PAGE HEADER ---- */
+    .page-header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      padding: 60px 24px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, var(--orange-glow), transparent 70%);
+      border-radius: 50%;
+    }
+    .page-header::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      left: -40px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(232, 119, 34, 0.1), transparent 70%);
+      border-radius: 50%;
+    }
+    .page-header h1 {
+      font-family: var(--font-serif);
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 8px;
+      position: relative;
+    }
+    .page-header p {
+      color: rgba(255,255,255,0.7);
+      font-size: 16px;
+      max-width: 540px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* ---- MAIN CONTENT ---- */
+    .main-content {
+      flex: 1;
+      max-width: 800px;
+      width: 100%;
+      margin: -32px auto 0;
+      padding: 0 24px 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ---- CARDS ---- */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-200);
+      padding: 28px;
+      margin-bottom: 20px;
+      transition: box-shadow 0.3s;
+    }
+    .card:focus-within {
+      box-shadow: var(--shadow-md), 0 0 0 2px rgba(232, 119, 34, 0.08);
+    }
+
+    /* ---- STEP CARDS ---- */
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .step-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--orange);
+      color: var(--white);
+      font-size: 15px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-header h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+    .step-body {
+      padding-left: 44px;
+    }
+    .optional-badge {
+      font-size: 11px;
+      background: var(--gray-200);
+      color: var(--gray-600);
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 400;
+    }
+
+    /* ---- FORMS ---- */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    .form-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: var(--font-sans);
+      color: var(--gray-900);
+      background: var(--gray-50);
+      transition: all 0.25s;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(232, 119, 34, 0.1);
+      background: var(--white);
+    }
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .help-text {
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    /* ---- UPLOAD ZONES ---- */
+    .upload-zone {
+      border: 2px dashed var(--gray-300);
+      border-radius: var(--radius-md);
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      position: relative;
+    }
+    .upload-zone:hover,
+    .upload-zone.drag-over {
+      border-color: var(--orange);
+      background: var(--orange-light);
+    }
+    .upload-zone-sm { padding: 24px; }
+    .upload-icon {
+      font-size: 44px;
+      color: var(--gray-400);
+      margin-bottom: 8px;
+      transition: color 0.25s;
+    }
+    .upload-zone:hover .upload-icon { color: var(--orange); }
+    .upload-zone p {
+      color: var(--gray-600);
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .upload-zone .help-text {
+      margin-top: 8px;
+    }
+
+    /* ---- FILE PREVIEWS ---- */
+    .file-list {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--gray-50);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--gray-200);
+      font-size: 14px;
+      animation: slideIn 0.2s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .file-item .material-symbols-outlined {
+      color: var(--orange);
+      font-size: 20px;
+    }
+    .file-item-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--gray-800);
+    }
+    .file-item-size {
+      font-size: 12px;
+      color: var(--gray-500);
+      white-space: nowrap;
+    }
+    .file-item-remove {
+      background: none;
+      border: none;
+      color: var(--gray-400);
+      cursor: pointer;
+      padding: 2px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      transition: all 0.15s;
+    }
+    .file-item-remove:hover {
+      color: var(--red);
+      background: var(--red-light);
+    }
+    .file-item-remove .material-symbols-outlined { font-size: 18px; }
+
+    /* Image preview grid */
+    .images-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .image-thumb {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+      animation: slideIn 0.2s ease;
+    }
+    .image-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .image-thumb .remove-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .image-thumb:hover .remove-btn { opacity: 1; }
+
+    /* ---- BUTTONS ---- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--font-sans);
+    }
+    .btn .material-symbols-outlined { font-size: 18px; }
+    .btn-primary {
+      background: var(--orange);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(232, 119, 34, 0.3);
+    }
+    .btn-primary:hover {
+      background: var(--orange-dark);
+      box-shadow: 0 4px 16px rgba(232, 119, 34, 0.4);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled {
+      background: var(--gray-300);
+      color: var(--gray-500);
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    .btn-secondary {
+      background: var(--gray-200);
+      color: var(--gray-800);
+    }
+    .btn-secondary:hover { background: var(--gray-300); }
+    .btn-ghost {
+      background: none;
+      color: var(--gray-600);
+    }
+    .btn-ghost:hover { background: var(--gray-100); }
+    .btn-lg {
+      padding: 14px 32px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+    /* ---- SUBMIT SECTION ---- */
+    .submit-section {
+      text-align: center;
+      padding: 24px 0 0;
+    }
+
+    /* ---- SUCCESS / ERROR TOAST ---- */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--white);
+      box-shadow: var(--shadow-lg);
+      z-index: 1000;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast.visible { transform: translateY(0); opacity: 1; }
+    .toast-success { background: var(--green); }
+    .toast-error { background: var(--red); }
+
+    /* ---- UPLOAD PROGRESS ---- */
+    .upload-progress {
+      margin-top: 16px;
+      padding: 16px;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+    }
+    .upload-progress-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: var(--gray-800);
+    }
+    .upload-progress-header .material-symbols-outlined {
+      color: var(--orange);
+      font-size: 20px;
+    }
+    .upload-progress-bar {
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .upload-progress-fill {
+      height: 100%;
+      background: var(--orange);
+      border-radius: 4px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .upload-progress-detail {
+      font-size: 13px;
+      color: var(--gray-500);
+    }
+    .upload-progress.done .upload-progress-fill { background: var(--green); }
+    .upload-progress.done .upload-progress-header .material-symbols-outlined { color: var(--green); }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .spinning { animation: spin 1.2s linear infinite; }
+
+    /* ---- FOOTER ---- */
+    .footer {
+      background: var(--gray-900);
+      padding: 36px 24px;
+      margin-top: auto;
+      position: relative;
+      overflow: hidden;
+    }
+    .footer::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(232, 119, 34, 0.08), transparent 70%);
+      border-radius: 50%;
+    }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .footer-logo {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+    }
+    .footer-logo .accent { color: var(--orange); }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-links a {
+      color: var(--gray-500);
+      font-size: 13px;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--orange); }
+    .footer-meta span {
+      font-size: 13px;
+      color: var(--gray-500);
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .page-header { padding: 48px 20px 36px; }
+      .page-header h1 { font-size: 28px; }
+      .main-content { padding: 0 16px 40px; }
+      .card { padding: 20px; }
+      .step-body { padding-left: 0; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full-width { grid-column: auto; }
+      .upload-zone { padding: 28px 16px; }
+      .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
+
+    @media (max-width: 480px) {
+      .images-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <span class="nav-logo">Li<span class="accent">Be</span>R</span>
+        <span class="nav-subtitle">Media Upload</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#diensten">Diensten</a>
+        <a href="index.html#contact">Contact</a>
+        <a href="#" class="active">Media Upload</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1>Media <span class="accent">Upload</span></h1>
+    <p>Upload audio- en beeldbestanden voor uw project. Alle bestanden worden veilig verwerkt.</p>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- STAP 1: Gegevens -->
+    <div class="card">
+      <div class="step-header">
+        <span class="step-number">1</span>
+        <h3>Uw gegevens</h3>
+      </div>
+      <div class="step-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="field-naam">Naam *</label>
+            <input type="text" id="field-naam" class="form-input" placeholder="Uw volledige naam" required>
+          </div>
+          <div class="form-group">
+            <label for="field-email">E-mailadres *</label>
+            <input type="email" id="field-email" class="form-input" placeholder="uw@email.nl" required>
+          </div>
+          <div class="form-group">
+            <label for="field-organisatie">Organisatie / Vereniging</label>
+            <input type="text" id="field-organisatie" class="form-input" placeholder="Naam van uw organisatie">
+          </div>
+          <div class="form-group">
+            <label for="field-project">Project / Referentie</label>
+            <input type="text" id="field-project" class="form-input" placeholder="bijv. MRA Intake, Lustrumboek">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAP 2: Audio Upload -->
+    <div class="card">
+      <div class="step-header">
+        <span class="step-number">2</span>
+        <h3>Audiobestanden uploaden</h3>
+      </div>
+      <div class="step-body">
+        <div class="upload-zone" id="audio-drop-zone">
+          <span class="material-symbols-outlined upload-icon">mic</span>
+          <p>Sleep audiobestanden hierheen of klik om te selecteren</p>
+          <p class="help-text">MP3, WAV, M4A, AAC, OGG, FLAC — Max 500 MB per bestand</p>
+          <input type="file" id="audio-input" accept=".mp3,.wav,.m4a,.aac,.ogg,.flac,audio/*" multiple hidden>
+        </div>
+        <div class="file-list" id="audio-file-list"></div>
+      </div>
+    </div>
+
+    <!-- STAP 3: Beeldbestanden -->
+    <div class="card">
+      <div class="step-header">
+        <span class="step-number">3</span>
+        <h3>Beeldbestanden uploaden <span class="optional-badge">optioneel</span></h3>
+      </div>
+      <div class="step-body">
+        <div class="upload-zone upload-zone-sm" id="images-drop-zone">
+          <span class="material-symbols-outlined upload-icon">photo_library</span>
+          <p>Sleep foto's en afbeeldingen hierheen of klik om te selecteren</p>
+          <p class="help-text">JPG, PNG, WEBP, HEIC, GIF — Max 50 MB per bestand</p>
+          <input type="file" id="images-input" accept=".jpg,.jpeg,.png,.webp,.heic,.gif,image/*" multiple hidden>
+        </div>
+        <div class="images-grid" id="images-grid"></div>
+      </div>
+    </div>
+
+    <!-- STAP 4: Video -->
+    <div class="card">
+      <div class="step-header">
+        <span class="step-number">4</span>
+        <h3>Videobestanden uploaden <span class="optional-badge">optioneel</span></h3>
+      </div>
+      <div class="step-body">
+        <div class="upload-zone upload-zone-sm" id="video-drop-zone">
+          <span class="material-symbols-outlined upload-icon">videocam</span>
+          <p>Sleep videobestanden hierheen of klik om te selecteren</p>
+          <p class="help-text">MP4, MOV, AVI, MKV, WEBM — Max 2 GB per bestand</p>
+          <input type="file" id="video-input" accept=".mp4,.mov,.avi,.mkv,.webm,video/*" multiple hidden>
+        </div>
+        <div class="file-list" id="video-file-list"></div>
+      </div>
+    </div>
+
+    <!-- STAP 5: Toelichting -->
+    <div class="card">
+      <div class="step-header">
+        <span class="step-number">5</span>
+        <h3>Toelichting <span class="optional-badge">optioneel</span></h3>
+      </div>
+      <div class="step-body">
+        <div class="form-group">
+          <label for="field-toelichting">Opmerkingen of instructies</label>
+          <textarea id="field-toelichting" class="form-input form-textarea" rows="4" placeholder="Geef eventueel extra context, instructies of een beschrijving van de bestanden..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPLOAD PROGRESS -->
+    <div id="upload-progress" class="upload-progress" hidden>
+      <div class="upload-progress-header">
+        <span class="material-symbols-outlined spinning">cloud_upload</span>
+        <span id="upload-progress-label">Bestanden uploaden...</span>
+      </div>
+      <div class="upload-progress-bar">
+        <div class="upload-progress-fill" id="upload-progress-fill"></div>
+      </div>
+      <div class="upload-progress-detail" id="upload-progress-detail"></div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-section">
+      <button class="btn btn-primary btn-lg" id="btn-submit" onclick="handleSubmit()">
+        <span class="material-symbols-outlined">cloud_upload</span> Bestanden Uploaden
+      </button>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="footer-logo">Li<span class="accent">Be</span>R</span>
+      </div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#diensten">Diensten</a>
+        <a href="index.html#over">Over LiBeR</a>
+        <a href="index.html#contact">Contact</a>
+      </div>
+      <div class="footer-meta">
+        <span>&copy; 1997 – 2026 LiBeR. Alle rechten voorbehouden.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast" id="toast">
+    <span class="material-symbols-outlined" id="toast-icon">check_circle</span>
+    <span id="toast-message"></span>
+  </div>
+
+  <script>
+    // ============================================
+    // Media Upload Form – Client-side Logic
+    // ============================================
+
+    const audioFiles = [];
+    const imageFiles = [];
+    const videoFiles = [];
+
+    // --- Utility: format file size ---
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+      if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+      return (bytes / 1073741824).toFixed(2) + ' GB';
+    }
+
+    // --- Toast notifications ---
+    function showToast(message, type) {
+      const toast = document.getElementById('toast');
+      const icon = document.getElementById('toast-icon');
+      const msg = document.getElementById('toast-message');
+      toast.className = 'toast toast-' + type + ' visible';
+      icon.textContent = type === 'success' ? 'check_circle' : 'error';
+      msg.textContent = message;
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => { toast.classList.remove('visible'); }, 4000);
+    }
+
+    // --- Setup upload zones ---
+    function setupDropZone(zoneId, inputId, fileArray, renderFn, accepts, maxSize) {
+      const zone = document.getElementById(zoneId);
+      const input = document.getElementById(inputId);
+
+      zone.addEventListener('click', () => input.click());
+
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('drag-over');
+      });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        addFiles(Array.from(e.dataTransfer.files), fileArray, renderFn, accepts, maxSize);
+      });
+
+      input.addEventListener('change', () => {
+        addFiles(Array.from(input.files), fileArray, renderFn, accepts, maxSize);
+        input.value = '';
+      });
+    }
+
+    function addFiles(newFiles, fileArray, renderFn, accepts, maxSize) {
+      for (const file of newFiles) {
+        const ext = '.' + file.name.split('.').pop().toLowerCase();
+        if (accepts && !accepts.some(a => file.type.startsWith(a.replace('/*', '/')) || ext === a)) {
+          showToast('Ongeldig bestandsformaat: ' + file.name, 'error');
+          continue;
+        }
+        if (maxSize && file.size > maxSize) {
+          showToast('Bestand te groot: ' + file.name + ' (' + formatSize(file.size) + ')', 'error');
+          continue;
+        }
+        // Prevent duplicates by name+size
+        if (!fileArray.some(f => f.name === file.name && f.size === file.size)) {
+          fileArray.push(file);
+        }
+      }
+      renderFn();
+    }
+
+    // --- Render audio file list ---
+    function renderAudioFiles() {
+      const container = document.getElementById('audio-file-list');
+      container.innerHTML = audioFiles.map((f, i) => `
+        <div class="file-item">
+          <span class="material-symbols-outlined">audio_file</span>
+          <span class="file-item-name">${escapeHtml(f.name)}</span>
+          <span class="file-item-size">${formatSize(f.size)}</span>
+          <button class="file-item-remove" onclick="removeFile(${i}, 'audio')" title="Verwijderen">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // --- Render video file list ---
+    function renderVideoFiles() {
+      const container = document.getElementById('video-file-list');
+      container.innerHTML = videoFiles.map((f, i) => `
+        <div class="file-item">
+          <span class="material-symbols-outlined">movie</span>
+          <span class="file-item-name">${escapeHtml(f.name)}</span>
+          <span class="file-item-size">${formatSize(f.size)}</span>
+          <button class="file-item-remove" onclick="removeFile(${i}, 'video')" title="Verwijderen">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // --- Render image previews ---
+    function renderImageFiles() {
+      const container = document.getElementById('images-grid');
+      container.innerHTML = '';
+      imageFiles.forEach((f, i) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'image-thumb';
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(f);
+        img.alt = f.name;
+        const btn = document.createElement('button');
+        btn.className = 'remove-btn';
+        btn.innerHTML = '&times;';
+        btn.title = 'Verwijderen';
+        btn.onclick = () => { imageFiles.splice(i, 1); renderImageFiles(); };
+        thumb.appendChild(img);
+        thumb.appendChild(btn);
+        container.appendChild(thumb);
+      });
+    }
+
+    // --- Remove file ---
+    function removeFile(index, type) {
+      if (type === 'audio') { audioFiles.splice(index, 1); renderAudioFiles(); }
+      else if (type === 'video') { videoFiles.splice(index, 1); renderVideoFiles(); }
+    }
+
+    // --- Escape HTML ---
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // --- Form validation ---
+    function validateForm() {
+      const naam = document.getElementById('field-naam').value.trim();
+      const email = document.getElementById('field-email').value.trim();
+
+      if (!naam) {
+        showToast('Vul uw naam in.', 'error');
+        document.getElementById('field-naam').focus();
+        return false;
+      }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showToast('Vul een geldig e-mailadres in.', 'error');
+        document.getElementById('field-email').focus();
+        return false;
+      }
+      if (audioFiles.length === 0 && imageFiles.length === 0 && videoFiles.length === 0) {
+        showToast('Upload minimaal één bestand.', 'error');
+        return false;
+      }
+      return true;
+    }
+
+    // --- Handle form submit ---
+    function handleSubmit() {
+      if (!validateForm()) return;
+
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined spinning">cloud_upload</span> Bezig met uploaden...';
+
+      const progressEl = document.getElementById('upload-progress');
+      const progressFill = document.getElementById('upload-progress-fill');
+      const progressLabel = document.getElementById('upload-progress-label');
+      const progressDetail = document.getElementById('upload-progress-detail');
+      progressEl.hidden = false;
+      progressEl.classList.remove('done');
+
+      const allFiles = [...audioFiles, ...imageFiles, ...videoFiles];
+      const totalSize = allFiles.reduce((sum, f) => sum + f.size, 0);
+      let uploadedSize = 0;
+
+      // Simulate upload progress (replace with actual upload logic)
+      let fileIndex = 0;
+
+      function uploadNextFile() {
+        if (fileIndex >= allFiles.length) {
+          // All done
+          progressFill.style.width = '100%';
+          progressEl.classList.add('done');
+          progressLabel.textContent = 'Upload voltooid!';
+          progressDetail.textContent = allFiles.length + ' bestand(en) succesvol geüpload';
+          btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Verzonden!';
+          showToast('Alle bestanden zijn succesvol geüpload!', 'success');
+
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined">cloud_upload</span> Bestanden Uploaden';
+          }, 3000);
+          return;
+        }
+
+        const file = allFiles[fileIndex];
+        progressLabel.textContent = 'Uploaden: ' + file.name;
+        progressDetail.textContent = (fileIndex + 1) + ' van ' + allFiles.length + ' — ' + formatSize(file.size);
+
+        // Simulate chunked upload with progress
+        const chunks = Math.max(1, Math.ceil(file.size / (5 * 1024 * 1024)));
+        let chunk = 0;
+
+        function simulateChunk() {
+          chunk++;
+          uploadedSize += file.size / chunks;
+          const pct = Math.min(100, Math.round((uploadedSize / totalSize) * 100));
+          progressFill.style.width = pct + '%';
+
+          if (chunk < chunks) {
+            setTimeout(simulateChunk, 80);
+          } else {
+            fileIndex++;
+            setTimeout(uploadNextFile, 100);
+          }
+        }
+        setTimeout(simulateChunk, 80);
+      }
+
+      uploadNextFile();
+    }
+
+    // --- Initialize drop zones ---
+    setupDropZone(
+      'audio-drop-zone', 'audio-input', audioFiles, renderAudioFiles,
+      ['audio/', '.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'],
+      500 * 1024 * 1024
+    );
+    setupDropZone(
+      'images-drop-zone', 'images-input', imageFiles, renderImageFiles,
+      ['image/', '.jpg', '.jpeg', '.png', '.webp', '.heic', '.gif'],
+      50 * 1024 * 1024
+    );
+    setupDropZone(
+      'video-drop-zone', 'video-input', videoFiles, renderVideoFiles,
+      ['video/', '.mp4', '.mov', '.avi', '.mkv', '.webm'],
+      2 * 1024 * 1024 * 1024
+    );
+  </script>
+
+</body>
+</html>
