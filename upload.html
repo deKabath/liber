@@ -58,18 +58,59 @@
     .submit-btn:hover::before{opacity:1}
     .submit-btn:hover{background:var(--orange-dark);transform:translateY(-2px);box-shadow:0 6px 20px rgba(232,119,34,.25)}
     .submit-btn:disabled{background:var(--gray-300);cursor:not-allowed;transform:none;box-shadow:none}
-    .progress-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,.6);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center}
-    .progress-overlay.active{display:flex}
-    .progress-card{background:var(--white);border-radius:var(--radius-lg);padding:48px;text-align:center;max-width:380px;width:90%;box-shadow:var(--shadow-xl)}
-    .spinner{width:48px;height:48px;border:4px solid var(--gray-200);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 20px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .success-card{display:none;text-align:center;padding:60px 36px}
-    .success-card .material-symbols-outlined{font-size:4rem;color:#2D5A27;margin-bottom:16px}
-    .success-card h2{font-size:1.5rem;margin-bottom:8px}.success-card p{color:var(--gray-600);margin-bottom:28px;line-height:1.6}
-    .btn-outline-orange{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border:2px solid var(--orange);color:var(--orange);background:transparent;border-radius:var(--radius-sm);font-family:var(--font-sans);font-weight:600;font-size:14px;cursor:pointer;transition:all .25s}
-    .btn-outline-orange:hover{background:var(--orange);color:var(--white);transform:translateY(-2px)}
     .back-link{display:inline-flex;align-items:center;gap:4px;margin-bottom:20px;font-size:13px;font-weight:500;color:var(--gray-500);text-decoration:none;transition:color .2s}
     .back-link:hover{color:var(--orange)}.back-link .material-symbols-outlined{font-size:18px}
+
+    /* ── Progress Overlay ── */
+    .progress-overlay{display:none;position:fixed;inset:0;background:rgba(26,26,46,.7);backdrop-filter:blur(10px);z-index:10000;align-items:center;justify-content:center}
+    .progress-overlay.active{display:flex}
+    .progress-card{background:var(--white);border-radius:var(--radius-lg);padding:40px;text-align:center;max-width:440px;width:92%;box-shadow:var(--shadow-xl)}
+
+    /* Hourglass */
+    .hourglass{width:60px;height:60px;margin:0 auto 20px;position:relative;animation:hourglassRotate 3s ease-in-out infinite}
+    .hourglass::before,.hourglass::after{content:'';position:absolute;left:50%;width:0;height:0;border-style:solid}
+    .hourglass::before{top:0;transform:translateX(-50%);border-width:28px 18px 0 18px;border-color:var(--orange) transparent transparent transparent}
+    .hourglass::after{bottom:0;transform:translateX(-50%);border-width:0 18px 28px 18px;border-color:transparent transparent var(--orange-light) transparent}
+    @keyframes hourglassRotate{0%{transform:rotate(0)}40%{transform:rotate(0)}50%{transform:rotate(180deg)}90%{transform:rotate(180deg)}100%{transform:rotate(360deg)}}
+
+    /* Progress bar */
+    .progress-bar-wrap{width:100%;height:6px;background:var(--gray-200);border-radius:3px;margin:20px 0 16px;overflow:hidden}
+    .progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--orange-dark));border-radius:3px;width:0%;transition:width .5s ease}
+    .progress-bar-fill.animate{animation:progressFill 4s ease forwards}
+    @keyframes progressFill{0%{width:0}20%{width:25%}50%{width:60%}80%{width:85%}100%{width:95%}}
+
+    .progress-card h3{font-size:1.1rem;color:var(--gray-900);margin-bottom:4px}
+    .progress-card .progress-step{color:var(--gray-500);font-size:.85rem;margin-bottom:16px}
+
+    /* Summary in progress */
+    .progress-summary{text-align:left;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-sm);padding:16px;margin-top:8px}
+    .progress-summary-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;border-bottom:1px solid var(--gray-100)}
+    .progress-summary-row:last-child{border-bottom:none}
+    .progress-summary-row .psr-label{color:var(--gray-500);font-weight:500}
+    .progress-summary-row .psr-value{color:var(--gray-900);font-weight:600;text-align:right;max-width:60%}
+
+    /* ── Success Card ── */
+    .success-card{display:none;padding:48px 36px}
+    .success-header{text-align:center;margin-bottom:28px}
+    .success-header .material-symbols-outlined{font-size:4rem;color:#2D5A27;margin-bottom:12px}
+    .success-header h2{font-size:1.5rem;margin-bottom:4px}
+    .success-header p{color:var(--gray-600);font-size:.9rem}
+
+    .success-summary{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-md);padding:20px;margin-bottom:24px}
+    .success-summary h4{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gray-500);margin-bottom:12px}
+    .ss-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid var(--gray-100)}
+    .ss-row:last-child{border-bottom:none}
+    .ss-row .ss-label{color:var(--gray-500)}.ss-row .ss-value{color:var(--gray-900);font-weight:600}
+
+    .eta-card{background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:var(--radius-md);padding:20px;text-align:center;margin-bottom:24px;color:#fff}
+    .eta-card .eta-icon{font-size:1.5rem;color:var(--orange);margin-bottom:4px}
+    .eta-card .eta-label{font-size:.75rem;text-transform:uppercase;letter-spacing:1px;opacity:.7;margin-bottom:4px}
+    .eta-card .eta-time{font-size:1.8rem;font-weight:700;color:var(--orange)}
+    .eta-card .eta-sub{font-size:.8rem;opacity:.6;margin-top:4px}
+
+    .success-footer{text-align:center}
+    .btn-outline-orange{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border:2px solid var(--orange);color:var(--orange);background:transparent;border-radius:var(--radius-sm);font-family:var(--font-sans);font-weight:600;font-size:14px;cursor:pointer;transition:all .25s}
+    .btn-outline-orange:hover{background:var(--orange);color:var(--white);transform:translateY(-2px)}
   </style>
 </head>
 <body>
@@ -82,69 +123,254 @@
     <div class="upload-hero-content"><h1>Upload <span class="accent">&amp;</span> Verslag</h1><p>Upload een audio-opname voor automatische transcriptie en verslaggeneratie</p></div>
   </section>
 
-  <section class="upload-section"><div class="upload-card"><div class="upload-card-body" id="formBody">
-    <a href="/" class="back-link"><span class="material-symbols-outlined">arrow_back</span>Terug naar home</a>
+  <section class="upload-section"><div class="upload-card">
 
-    <div class="field-group"><label class="field-label">Waar wil je een transcriptie van maken? <span class="req">*</span></label>
-      <select id="transcriptieType" required><option value="">Selecteer...</option><option value="Intake">Intake</option><option value="Overleg">Overleg</option><option value="Gespreksverslag">Gespreksverslag</option></select></div>
+    <!-- ══ FORM ══ -->
+    <div class="upload-card-body" id="formBody">
+      <a href="/" class="back-link"><span class="material-symbols-outlined">arrow_back</span>Terug naar home</a>
 
-    <div class="field-group hidden" id="templateGroup"><label class="field-label">In welke template moet het verslag? <span class="req">*</span></label>
-      <select id="template"><option value="">Selecteer...</option><option value="Rabobank">Rabobank</option><option value="KNVB">KNVB</option><option value="Sport Akkoord">Sport Akkoord</option><option value="Overig">Overig</option></select></div>
+      <div class="field-group"><label class="field-label">Waar wil je een transcriptie van maken? <span class="req">*</span></label>
+        <select id="transcriptieType" required><option value="">Selecteer...</option><option value="Intake">Intake</option><option value="Overleg">Overleg</option><option value="Gespreksverslag">Gespreksverslag</option></select></div>
 
-    <div class="form-divider"></div><div class="form-section-label">Gegevens</div>
-    <div class="field-group"><label class="field-label">Vereniging</label><input type="text" id="vereniging" placeholder="Naam van de vereniging"></div>
-    <div class="field-group"><label class="field-label">Onderwerp <span class="req">*</span></label><input type="text" id="onderwerp" placeholder="Bijv. verslag intake 17 april 2025"></div>
-    <div class="field-group"><label class="field-label">Contact met</label><input type="text" id="contactMet" placeholder="Namen van contactpersonen"></div>
+      <div class="field-group hidden" id="templateGroup"><label class="field-label">In welke template moet het verslag? <span class="req">*</span></label>
+        <select id="template"><option value="">Selecteer...</option><option value="Rabobank">Rabobank</option><option value="KNVB">KNVB</option><option value="Sport Akkoord">Sport Akkoord</option><option value="Overig">Overig</option></select></div>
 
-    <div class="form-divider"></div><div class="form-section-label">Audio-opname</div>
-    <div class="field-group"><div class="upload-zone" id="audioZone"><span class="material-symbols-outlined">audio_file</span><p>Sleep je audiobestand hierheen of klik om te bladeren</p><p class="upload-hint">MP3, WAV, M4A, AAC, OGG, FLAC</p><input type="file" id="audioFile" accept=".mp3,.wav,.m4a,.aac,.ogg,.flac,.opus,.wma"></div><div class="file-list" id="audioFileList"></div></div>
+      <div class="form-divider"></div><div class="form-section-label">Gegevens</div>
+      <div class="field-group"><label class="field-label">Vereniging</label><input type="text" id="vereniging" placeholder="Naam van de vereniging"></div>
+      <div class="field-group"><label class="field-label">Onderwerp <span class="req">*</span></label><input type="text" id="onderwerp" placeholder="Bijv. verslag intake 17 april 2025"></div>
+      <div class="field-group"><label class="field-label">Contact met</label><input type="text" id="contactMet" placeholder="Namen van contactpersonen"></div>
 
-    <div class="field-group hidden" id="raboImagesGroup"><div class="form-divider"></div><div class="form-section-label">Rabobank Afbeeldingen</div><div class="image-grid">
-      <div class="upload-zone" data-key="raboKompasNulmeting"><span class="material-symbols-outlined">image</span><p>Kompas 0-Meting</p><input type="file" accept="image/*"></div>
-      <div class="upload-zone" data-key="raboKompasStip"><span class="material-symbols-outlined">image</span><p>Kompas Stip</p><input type="file" accept="image/*"></div>
-      <div class="upload-zone" data-key="raboDriehoekNulmeting"><span class="material-symbols-outlined">image</span><p>Driehoek 0-Meting</p><input type="file" accept="image/*"></div>
-      <div class="upload-zone" data-key="raboDriehoekStip"><span class="material-symbols-outlined">image</span><p>Driehoek Stip</p><input type="file" accept="image/*"></div>
-      <div class="upload-zone" data-key="raboRoos"><span class="material-symbols-outlined">image</span><p>Roos / Hart</p><input type="file" accept="image/*"></div>
-      <div class="upload-zone" data-key="raboBijlagenPositief"><span class="material-symbols-outlined">image</span><p>Bijlagen Positief</p><input type="file" accept="image/*"></div>
-      <div class="upload-zone" data-key="raboBijlagenNegatief"><span class="material-symbols-outlined">image</span><p>Bijlagen Negatief</p><input type="file" accept="image/*"></div>
-      <div class="upload-zone" data-key="raboBijlagenNulmeting"><span class="material-symbols-outlined">image</span><p>Bijlagen 0-Meting</p><input type="file" accept="image/*"></div>
-      <div class="upload-zone" data-key="raboBijlagenStip" style="grid-column:span 2"><span class="material-symbols-outlined">image</span><p>Bijlagen Stip</p><input type="file" accept="image/*"></div>
-    </div></div>
+      <div class="form-divider"></div><div class="form-section-label">Audio-opname</div>
+      <div class="field-group"><div class="upload-zone" id="audioZone"><span class="material-symbols-outlined">audio_file</span><p>Sleep je audiobestand hierheen of klik om te bladeren</p><p class="upload-hint">MP3, WAV, M4A, AAC, OGG, FLAC</p><input type="file" id="audioFile" accept=".mp3,.wav,.m4a,.aac,.ogg,.flac,.opus,.wma"></div><div class="file-list" id="audioFileList"></div></div>
 
-    <div class="field-group hidden" id="knvbImagesGroup"><div class="form-divider"></div><div class="form-section-label">KNVB Afbeeldingen</div><div class="image-grid">
-      <div class="upload-zone" data-key="knvbBovenstroom"><span class="material-symbols-outlined">image</span><p>Bovenstroom</p><input type="file" accept="image/*"></div>
-      <div class="upload-zone" data-key="knvbOnderstroom"><span class="material-symbols-outlined">image</span><p>Onderstroom</p><input type="file" accept="image/*"></div>
-    </div></div>
+      <div class="field-group hidden" id="raboImagesGroup"><div class="form-divider"></div><div class="form-section-label">Rabobank Afbeeldingen</div><div class="image-grid">
+        <div class="upload-zone" data-key="raboKompasNulmeting"><span class="material-symbols-outlined">image</span><p>Kompas 0-Meting</p><input type="file" accept="image/*"></div>
+        <div class="upload-zone" data-key="raboKompasStip"><span class="material-symbols-outlined">image</span><p>Kompas Stip</p><input type="file" accept="image/*"></div>
+        <div class="upload-zone" data-key="raboDriehoekNulmeting"><span class="material-symbols-outlined">image</span><p>Driehoek 0-Meting</p><input type="file" accept="image/*"></div>
+        <div class="upload-zone" data-key="raboDriehoekStip"><span class="material-symbols-outlined">image</span><p>Driehoek Stip</p><input type="file" accept="image/*"></div>
+        <div class="upload-zone" data-key="raboRoos"><span class="material-symbols-outlined">image</span><p>Roos / Hart</p><input type="file" accept="image/*"></div>
+        <div class="upload-zone" data-key="raboBijlagenPositief"><span class="material-symbols-outlined">image</span><p>Bijlagen Positief</p><input type="file" accept="image/*"></div>
+        <div class="upload-zone" data-key="raboBijlagenNegatief"><span class="material-symbols-outlined">image</span><p>Bijlagen Negatief</p><input type="file" accept="image/*"></div>
+        <div class="upload-zone" data-key="raboBijlagenNulmeting"><span class="material-symbols-outlined">image</span><p>Bijlagen 0-Meting</p><input type="file" accept="image/*"></div>
+        <div class="upload-zone" data-key="raboBijlagenStip" style="grid-column:span 2"><span class="material-symbols-outlined">image</span><p>Bijlagen Stip</p><input type="file" accept="image/*"></div>
+      </div></div>
 
-    <div class="form-divider"></div>
-    <button class="submit-btn" id="submitBtn" onclick="submitForm()"><span class="material-symbols-outlined">send</span>Versturen</button>
-  </div>
+      <div class="field-group hidden" id="knvbImagesGroup"><div class="form-divider"></div><div class="form-section-label">KNVB Afbeeldingen</div><div class="image-grid">
+        <div class="upload-zone" data-key="knvbBovenstroom"><span class="material-symbols-outlined">image</span><p>Bovenstroom</p><input type="file" accept="image/*"></div>
+        <div class="upload-zone" data-key="knvbOnderstroom"><span class="material-symbols-outlined">image</span><p>Onderstroom</p><input type="file" accept="image/*"></div>
+      </div></div>
 
-  <div class="success-card" id="successCard"><span class="material-symbols-outlined">check_circle</span><h2>Verstuurd!</h2><p id="successMessage">Je upload wordt verwerkt. Het verslag wordt per e-mail verstuurd naar lutger@liberabc.nl</p><button class="btn-outline-orange" onclick="resetForm()"><span class="material-symbols-outlined">add</span>Nieuw formulier</button></div>
+      <div class="form-divider"></div>
+      <button class="submit-btn" id="submitBtn" onclick="submitForm()"><span class="material-symbols-outlined">send</span>Versturen</button>
+    </div>
+
+    <!-- ══ SUCCESS ══ -->
+    <div class="success-card" id="successCard">
+      <div class="success-header">
+        <span class="material-symbols-outlined">check_circle</span>
+        <h2>Verstuurd!</h2>
+        <p>Je upload wordt verwerkt</p>
+      </div>
+
+      <div class="success-summary">
+        <h4>Samenvatting</h4>
+        <div id="successSummaryRows"></div>
+      </div>
+
+      <div class="eta-card">
+        <div class="eta-icon"><span class="material-symbols-outlined">schedule</span></div>
+        <div class="eta-label">Verwachte levertijd per e-mail</div>
+        <div class="eta-time" id="etaTime">~15 minuten</div>
+        <div class="eta-sub" id="etaSub">Het verslag wordt verstuurd naar lutger@liberabc.nl</div>
+      </div>
+
+      <div class="success-footer">
+        <button class="btn-outline-orange" onclick="resetForm()"><span class="material-symbols-outlined">add</span>Nieuw formulier</button>
+      </div>
+    </div>
+
   </div></section>
 
-  <div class="progress-overlay" id="progressOverlay"><div class="progress-card"><div class="spinner"></div><h3 id="progressTitle">Bezig met uploaden...</h3><p id="progressMessage">Even geduld</p></div></div>
+  <!-- ══ PROGRESS OVERLAY ══ -->
+  <div class="progress-overlay" id="progressOverlay">
+    <div class="progress-card">
+      <div class="hourglass"></div>
+      <h3 id="progressTitle">Bezig met versturen...</h3>
+      <div class="progress-step" id="progressStep">Gegevens worden verwerkt</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+      <div class="progress-summary" id="progressSummary"></div>
+    </div>
+  </div>
 
   <script>
     const WEBHOOK_URL='https://script.google.com/macros/s/AKfycbz0AFVa1KwXEqTM4OQ70mYFdMBLOWLYNyZewFSWwnYpugJCTWwctJKhiQUtKwfP5gJsHg/exec';
     const WEBHOOK_TOKEN='2a045b9c370240009780a54df446bf9e';
     let audioFileData=null,imageFiles={};
 
-    document.getElementById('transcriptieType').addEventListener('change',function(){const v=this.value,i=v==='Intake';document.getElementById('templateGroup').classList.toggle('hidden',!i);if(!i){document.getElementById('template').value='Overig';document.getElementById('raboImagesGroup').classList.add('hidden');document.getElementById('knvbImagesGroup').classList.add('hidden')}});
-    document.getElementById('template').addEventListener('change',function(){const v=this.value;document.getElementById('raboImagesGroup').classList.toggle('hidden',v!=='Rabobank');document.getElementById('knvbImagesGroup').classList.toggle('hidden',v!=='KNVB')});
+    // ── Conditional Logic ──
+    document.getElementById('transcriptieType').addEventListener('change',function(){
+      const v=this.value,i=v==='Intake';
+      document.getElementById('templateGroup').classList.toggle('hidden',!i);
+      if(!i){document.getElementById('template').value='Overig';document.getElementById('raboImagesGroup').classList.add('hidden');document.getElementById('knvbImagesGroup').classList.add('hidden')}
+    });
+    document.getElementById('template').addEventListener('change',function(){
+      const v=this.value;
+      document.getElementById('raboImagesGroup').classList.toggle('hidden',v!=='Rabobank');
+      document.getElementById('knvbImagesGroup').classList.toggle('hidden',v!=='KNVB');
+    });
 
-    document.getElementById('audioFile').addEventListener('change',function(e){const f=e.target.files[0];if(!f)return;audioFileData=f;const s=(f.size/(1024*1024)).toFixed(1)+' MB';document.getElementById('audioFileList').innerHTML='<div class="file-item"><span class="material-symbols-outlined">check_circle</span><span class="file-name">'+f.name+'</span><span class="file-size">'+s+'</span><span class="material-symbols-outlined remove-file" onclick="removeAudio()">close</span></div>';document.getElementById('audioZone').style.display='none'});
+    // ── Audio Upload ──
+    document.getElementById('audioFile').addEventListener('change',function(e){
+      const f=e.target.files[0];if(!f)return;audioFileData=f;
+      const s=(f.size/(1024*1024)).toFixed(1)+' MB';
+      document.getElementById('audioFileList').innerHTML='<div class="file-item"><span class="material-symbols-outlined">check_circle</span><span class="file-name">'+f.name+'</span><span class="file-size">'+s+'</span><span class="material-symbols-outlined remove-file" onclick="removeAudio()">close</span></div>';
+      document.getElementById('audioZone').style.display='none';
+    });
     function removeAudio(){audioFileData=null;document.getElementById('audioFile').value='';document.getElementById('audioFileList').innerHTML='';document.getElementById('audioZone').style.display=''}
 
-    document.querySelectorAll('.upload-zone').forEach(z=>{z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('dragover')});z.addEventListener('dragleave',()=>z.classList.remove('dragover'));z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('dragover');const i=z.querySelector('input[type="file"]');if(e.dataTransfer.files.length){i.files=e.dataTransfer.files;i.dispatchEvent(new Event('change'))}})});
-    document.querySelectorAll('.image-grid .upload-zone input[type="file"]').forEach(i=>{i.addEventListener('change',function(){const k=this.parentElement.dataset.key,f=this.files[0];if(!f||!k)return;imageFiles[k]=f;const z=this.parentElement;z.classList.add('has-file');z.querySelector('.material-symbols-outlined').textContent='check_circle';z.querySelector('p').textContent=f.name.length>20?f.name.substring(0,20)+'...':f.name})});
+    // ── Drag & Drop ──
+    document.querySelectorAll('.upload-zone').forEach(z=>{
+      z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('dragover')});
+      z.addEventListener('dragleave',()=>z.classList.remove('dragover'));
+      z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('dragover');const i=z.querySelector('input[type="file"]');if(e.dataTransfer.files.length){i.files=e.dataTransfer.files;i.dispatchEvent(new Event('change'))}});
+    });
 
-    async function submitForm(){const t=document.getElementById('transcriptieType').value,tp=document.getElementById('template').value,o=document.getElementById('onderwerp').value;if(!t)return alert('Selecteer een transcriptie type');if(t==='Intake'&&!tp)return alert('Selecteer een template');if(!o)return alert('Vul het onderwerp in');if(!audioFileData)return alert('Upload een audiobestand');showProgress('Bezig met uploaden...','Formulier wordt verstuurd');document.getElementById('submitBtn').disabled=true;try{const n=new Date(),p=new URLSearchParams({token:WEBHOOK_TOKEN,q37_transcriptie_type:t,q5_template:t==='Intake'?tp:'Overig',q7_vereniging:document.getElementById('vereniging').value,q38_onderwerp:o,q41_contactMet:document.getElementById('contactMet').value,'q6_datum[day]':String(n.getDate()).padStart(2,'0'),'q6_datum[month]':String(n.getMonth()+1).padStart(2,'0'),'q6_datum[year]':String(n.getFullYear())});await fetch(WEBHOOK_URL+'?'+p.toString(),{method:'GET',mode:'no-cors'});hideProgress();showSuccess(t)}catch(e){hideProgress();alert('Fout: '+e.message)}document.getElementById('submitBtn').disabled=false}
+    // ── Image Uploads ──
+    document.querySelectorAll('.image-grid .upload-zone input[type="file"]').forEach(i=>{
+      i.addEventListener('change',function(){
+        const k=this.parentElement.dataset.key,f=this.files[0];if(!f||!k)return;imageFiles[k]=f;
+        const z=this.parentElement;z.classList.add('has-file');z.querySelector('.material-symbols-outlined').textContent='check_circle';
+        z.querySelector('p').textContent=f.name.length>20?f.name.substring(0,20)+'...':f.name;
+      });
+    });
 
-    function showProgress(t,m){document.getElementById('progressTitle').textContent=t;document.getElementById('progressMessage').textContent=m;document.getElementById('progressOverlay').classList.add('active')}
-    function hideProgress(){document.getElementById('progressOverlay').classList.remove('active')}
-    function showSuccess(t){document.getElementById('formBody').style.display='none';document.getElementById('successCard').style.display='block';document.getElementById('successMessage').textContent=t==='Intake'?'Je intake-opname wordt getranscribeerd en het verslag wordt automatisch gegenereerd. Je ontvangt het per e-mail op lutger@liberabc.nl.':'Je opname wordt getranscribeerd en het gespreksverslag wordt automatisch gegenereerd. Je ontvangt het per e-mail op lutger@liberabc.nl.'}
-    function resetForm(){document.getElementById('formBody').style.display='';document.getElementById('successCard').style.display='none';document.getElementById('transcriptieType').value='';document.getElementById('template').value='';document.getElementById('vereniging').value='';document.getElementById('onderwerp').value='';document.getElementById('contactMet').value='';removeAudio();imageFiles={};document.querySelectorAll('.image-grid .upload-zone').forEach(z=>{z.classList.remove('has-file');z.querySelector('.material-symbols-outlined').textContent='image'});document.getElementById('templateGroup').classList.add('hidden');document.getElementById('raboImagesGroup').classList.add('hidden');document.getElementById('knvbImagesGroup').classList.add('hidden')}
+    // ── Helpers ──
+    function getFormData(){
+      const type=document.getElementById('transcriptieType').value;
+      const template=document.getElementById('template').value;
+      return {
+        type, template: type==='Intake'?template:'—',
+        vereniging: document.getElementById('vereniging').value||'—',
+        onderwerp: document.getElementById('onderwerp').value||'—',
+        contactMet: document.getElementById('contactMet').value||'—',
+        audioName: audioFileData?audioFileData.name:'—',
+        audioSize: audioFileData?((audioFileData.size/(1024*1024)).toFixed(1)+' MB'):'—',
+        imageCount: Object.keys(imageFiles).length,
+        verslagType: type==='Intake'?(template||'Onbekend')+' Intakeverslag':'Gespreksverslag'
+      };
+    }
+
+    function buildSummaryHTML(d){
+      let rows='';
+      rows+='<div class="progress-summary-row"><span class="psr-label">Type</span><span class="psr-value">'+d.type+'</span></div>';
+      if(d.type==='Intake')rows+='<div class="progress-summary-row"><span class="psr-label">Template</span><span class="psr-value">'+d.template+'</span></div>';
+      rows+='<div class="progress-summary-row"><span class="psr-label">Verslag</span><span class="psr-value">'+d.verslagType+'</span></div>';
+      if(d.vereniging!=='—')rows+='<div class="progress-summary-row"><span class="psr-label">Vereniging</span><span class="psr-value">'+d.vereniging+'</span></div>';
+      rows+='<div class="progress-summary-row"><span class="psr-label">Onderwerp</span><span class="psr-value">'+d.onderwerp+'</span></div>';
+      rows+='<div class="progress-summary-row"><span class="psr-label">Audiobestand</span><span class="psr-value">'+d.audioName+'</span></div>';
+      rows+='<div class="progress-summary-row"><span class="psr-label">Bestandsgrootte</span><span class="psr-value">'+d.audioSize+'</span></div>';
+      if(d.imageCount>0)rows+='<div class="progress-summary-row"><span class="psr-label">Afbeeldingen</span><span class="psr-value">'+d.imageCount+' bestanden</span></div>';
+      return rows;
+    }
+
+    function estimateTime(fileSizeMB, type){
+      // Whisper: ~1 min per 10MB, Claude: ~1-2 min, docx: ~30s, email: ~30s
+      const whisperMin = Math.max(2, Math.ceil(fileSizeMB / 10) * 2);
+      const claudeMin = type==='Intake' ? 2 : 1;
+      const overhead = 2;
+      const total = whisperMin + claudeMin + overhead;
+      if(total <= 5) return {text:'~5 minuten', sub:'Kort audiobestand — snel verwerkt'};
+      if(total <= 15) return {text:'~'+Math.ceil(total/5)*5+' minuten', sub:'Audio wordt getranscribeerd en verslag gegenereerd'};
+      if(total <= 30) return {text:'~'+Math.ceil(total/5)*5+' minuten', sub:'Groter audiobestand — even geduld'};
+      return {text:'~'+Math.ceil(total/5)*5+' minuten', sub:'Lang audiobestand — dit kan even duren'};
+    }
+
+    // ── Submit ──
+    async function submitForm(){
+      const type=document.getElementById('transcriptieType').value;
+      const template=document.getElementById('template').value;
+      const onderwerp=document.getElementById('onderwerp').value;
+      if(!type)return alert('Selecteer een transcriptie type');
+      if(type==='Intake'&&!template)return alert('Selecteer een template');
+      if(!onderwerp)return alert('Vul het onderwerp in');
+      if(!audioFileData)return alert('Upload een audiobestand');
+
+      // Show progress with summary
+      const fd=getFormData();
+      document.getElementById('progressSummary').innerHTML=buildSummaryHTML(fd);
+      document.getElementById('progressBar').className='progress-bar-fill';
+      document.getElementById('progressTitle').textContent='Bezig met versturen...';
+      document.getElementById('progressStep').textContent='Formulier wordt verzonden';
+      document.getElementById('progressOverlay').classList.add('active');
+
+      // Start progress bar animation
+      requestAnimationFrame(()=>{document.getElementById('progressBar').classList.add('animate')});
+      document.getElementById('submitBtn').disabled=true;
+
+      // Animate steps
+      setTimeout(()=>{document.getElementById('progressStep').textContent='Gegevens worden verwerkt...'},1500);
+      setTimeout(()=>{document.getElementById('progressStep').textContent='Upload wordt geregistreerd...'},3000);
+
+      try{
+        const n=new Date();
+        const p=new URLSearchParams({
+          token:WEBHOOK_TOKEN, q37_transcriptie_type:type,
+          q5_template:type==='Intake'?template:'Overig',
+          q7_vereniging:document.getElementById('vereniging').value,
+          q38_onderwerp:onderwerp,
+          q41_contactMet:document.getElementById('contactMet').value,
+          'q6_datum[day]':String(n.getDate()).padStart(2,'0'),
+          'q6_datum[month]':String(n.getMonth()+1).padStart(2,'0'),
+          'q6_datum[year]':String(n.getFullYear())
+        });
+
+        await fetch(WEBHOOK_URL+'?'+p.toString(),{method:'GET',mode:'no-cors'});
+
+        // Complete progress
+        document.getElementById('progressStep').textContent='Verzonden!';
+        document.getElementById('progressBar').style.width='100%';
+        await new Promise(r=>setTimeout(r,800));
+
+        document.getElementById('progressOverlay').classList.remove('active');
+        showSuccess(fd);
+      }catch(e){
+        document.getElementById('progressOverlay').classList.remove('active');
+        alert('Fout: '+e.message);
+      }
+      document.getElementById('submitBtn').disabled=false;
+    }
+
+    function showSuccess(fd){
+      document.getElementById('formBody').style.display='none';
+      document.getElementById('successCard').style.display='block';
+
+      // Build success summary (reuse same data, different format)
+      let rows='';
+      rows+='<div class="ss-row"><span class="ss-label">Verslagtype</span><span class="ss-value">'+fd.verslagType+'</span></div>';
+      if(fd.vereniging!=='—')rows+='<div class="ss-row"><span class="ss-label">Vereniging</span><span class="ss-value">'+fd.vereniging+'</span></div>';
+      rows+='<div class="ss-row"><span class="ss-label">Onderwerp</span><span class="ss-value">'+fd.onderwerp+'</span></div>';
+      if(fd.contactMet!=='—')rows+='<div class="ss-row"><span class="ss-label">Contact met</span><span class="ss-value">'+fd.contactMet+'</span></div>';
+      rows+='<div class="ss-row"><span class="ss-label">Audio</span><span class="ss-value">'+fd.audioName+' ('+fd.audioSize+')</span></div>';
+      if(fd.imageCount>0)rows+='<div class="ss-row"><span class="ss-label">Afbeeldingen</span><span class="ss-value">'+fd.imageCount+' bestanden</span></div>';
+      document.getElementById('successSummaryRows').innerHTML=rows;
+
+      // ETA
+      const fileMB=audioFileData?audioFileData.size/(1024*1024):10;
+      const eta=estimateTime(fileMB,fd.type);
+      document.getElementById('etaTime').textContent=eta.text;
+      document.getElementById('etaSub').textContent=eta.sub+' — verstuurd naar lutger@liberabc.nl';
+    }
+
+    function resetForm(){
+      document.getElementById('formBody').style.display='';document.getElementById('successCard').style.display='none';
+      document.getElementById('transcriptieType').value='';document.getElementById('template').value='';
+      document.getElementById('vereniging').value='';document.getElementById('onderwerp').value='';document.getElementById('contactMet').value='';
+      removeAudio();imageFiles={};
+      document.querySelectorAll('.image-grid .upload-zone').forEach(z=>{z.classList.remove('has-file');z.querySelector('.material-symbols-outlined').textContent='image'});
+      document.getElementById('templateGroup').classList.add('hidden');
+      document.getElementById('raboImagesGroup').classList.add('hidden');
+      document.getElementById('knvbImagesGroup').classList.add('hidden');
+    }
   </script>
 </body>
 </html>
